@@ -1,6 +1,22 @@
 # Republik Netizenia v2 — Rencana Tahap 1
 
-Status: **menunggu persetujuan**. Belum ada SQL atau HTML final yang ditulis.
+Status: Tahap 1 disetujui. Tahap 2 (SQL) selesai, menunggu tes dan persetujuan.
+
+## Keputusan yang sudah diambil
+
+- Voting lolos bila setuju > tolak **dan minimal 5 setuju**.
+- Batas harian koin dari aksi: **300 NC per hari WIB**.
+- **Tanpa Turnstile.**
+- Waktu bangun mengikuti tabel 2d.
+- Suara akun baru tetap dihitung. Bila nanti ada banjir akun palsu, presiden bisa mengubah `nz.settings.vote_min_account_age_hours` lewat SQL Editor.
+
+## Perubahan setelah membaca index.html lama
+
+- Nama tabel lama (`settings`, `proposals`, `proposal_votes`, `buildings`, `residents`) bertabrakan dengan rencana. Karena itu semua tabel game v2 ditaruh di **schema privat `nz`**. Schema ini tidak dibuka lewat Data API, jadi browser sama sekali tidak bisa menyentuh tabelnya selain lewat RPC.
+- Warga NPC disalin dari `public.residents` dan dari rekap komentar (`CONFIG.seed`) ke `nz.npcs`.
+- 22 fasilitas lama (`CONFIG.fas`) dipetakan ke grid baru sebagai bangunan negara yang dilindungi.
+- Antrean klaim memakai `public.claim_requests` yang sudah ada, ditambah kolom `user_id` dan `npc_id`.
+- Donatur tetap dibaca dari `public.donations`, dan `admin_add_donation` lama tetap dipakai.
 
 ## 0. Temuan penting sebelum mulai
 
