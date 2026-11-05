@@ -147,6 +147,9 @@ create table if not exists nz.settings (
   updated_at timestamptz not null default now()
 );
 
+-- Tahap 5: tautan Saweria disimpan di setelan negara.
+alter table nz.settings add column if not exists saweria_url text;
+
 create table if not exists nz.catalog (
   type text primary key,
   name text not null,
@@ -403,6 +406,18 @@ create table if not exists nz.chat_messages (
   created_at timestamptz not null default now()
 );
 create index if not exists chat_created_idx on nz.chat_messages (created_at desc);
+
+-- Tahap 5: papan donatur Saweria. Dicatat manual oleh presiden, TIDAK menghasilkan koin.
+create table if not exists nz.donations (
+  id bigint generated always as identity primary key,
+  donor_name text not null,
+  amount bigint not null check (amount >= 0),
+  message text,
+  donated_at timestamptz not null default now(),
+  created_by uuid,
+  created_at timestamptz not null default now()
+);
+create index if not exists donations_at_idx on nz.donations (donated_at desc);
 
 create table if not exists nz.optout_requests (
   id bigint generated always as identity primary key,
@@ -1295,7 +1310,8 @@ begin
       'pres_approve','pres_veto','pres_open_district','pres_set_tax','pres_announce',
       'pres_set_minister','pres_release',
       'admin_list_queue','admin_review_claim','admin_review_optout','admin_delete_donation',
-      'admin_set_donation_goal','admin_delete_chat','admin_sync_npcs','admin_run_tick')
+      'admin_set_donation_goal','admin_delete_chat','admin_sync_npcs','admin_run_tick',
+      'pres_add_donation','pres_set_saweria')
   loop
     execute format('drop function if exists %s', r.sig);
   end loop;
@@ -1310,12 +1326,10 @@ language plpgsql stable security definer set search_path = pg_catalog, nz, pg_te
 declare s nz.settings; v_don jsonb := '[]'; v_total bigint := 0; v_saweria text; v_legacy jsonb := '{}';
 begin
   select * into s from nz.settings where id = 1;
-  if to_regclass('public.donations') is not null then
-    execute $q$ select coalesce(jsonb_agg(x order by x.created_at desc), '[]'::jsonb) from (
-                  select id::text as id, donator_name, amount, message, created_at
-                  from public.donations order by created_at desc limit 30) x $q$ into v_don;
-    execute $q$ select coalesce(sum(amount), 0)::bigint from public.donations $q$ into v_total;
-  end if;
+  select coalesce(jsonb_agg(jsonb_build_object('id', x.id, 'name', x.donor_name, 'amount', x.amount,
+                                               'message', x.message, 'at', x.donated_at) order by x.donated_at desc), '[]'::jsonb)
+    into v_don from (select * from nz.donations order by donated_at desc limit 30) x;
+  select coalesce(sum(amount), 0)::bigint into v_total from nz.donations;
   if to_regclass('public.settings') is not null then
     execute $q$ select (select value #>> '{}' from public.settings where key = 'saweria_url'),
                        coalesce((select jsonb_object_agg(key, value) from public.settings
@@ -1351,7 +1365,7 @@ begin
                   from nz.district_proposals dp join nz.districts d on d.key = dp.district
                   left join nz.profiles p on p.id = dp.proposer_id
                   where dp.status in ('voting', 'menunggu_kas')),
-    'donations', v_don, 'donation_total', v_total, 'donation_goal', s.donation_goal, 'saweria_url', v_saweria,
+    'donations', v_don, 'donation_total', v_total, 'donation_goal', s.donation_goal, 'saweria_url', coalesce(s.saweria_url, v_saweria),
     'legacy', v_legacy,
     'chat', (select coalesce(jsonb_agg(jsonb_build_object('id', id, 'name', name, 'prof', profession, 'text', text, 'at', created_at)
                     order by id), '[]') from (select * from nz.chat_messages order by id desc limit 30) x)
@@ -2263,15 +2277,41 @@ begin
   return jsonb_build_object('msg', 'Nama ' || n.name || ' dihapus dari kota.');
 end $$;
 
-create function public.admin_delete_donation(p_id text) returns jsonb
+create function public.admin_delete_donation(p_id bigint) returns jsonb
 language plpgsql security definer set search_path = pg_catalog, nz, pg_temp as $$
-declare v int;
 begin
   perform nz.require_admin();
-  execute 'delete from public.donations where id::text = $1' using p_id;
-  get diagnostics v = row_count;
-  if v = 0 then raise exception 'Donasi tidak ditemukan.'; end if;
+  delete from nz.donations where id = p_id;
+  if not found then raise exception 'Donasi tidak ditemukan.'; end if;
   return jsonb_build_object('msg', 'Donasi dihapus.');
+end $$;
+
+-- Mencatat donasi Saweria secara manual. Tidak menghasilkan koin apa pun.
+create function public.pres_add_donation(p_name text, p_amount bigint, p_message text default null,
+                                         p_donated_at timestamptz default null) returns jsonb
+language plpgsql security definer set search_path = pg_catalog, nz, pg_temp as $$
+declare v_name text := nz.clean_text(p_name, 40); v_msg text := nullif(nz.censor(nz.clean_text(p_message, 200)), ''); v_id bigint;
+begin
+  perform nz.require_admin();
+  if char_length(v_name) < 1 then raise exception 'Nama donatur kosong.'; end if;
+  if p_amount is null or p_amount < 0 or p_amount > 1000000000 then raise exception 'Nominal tidak valid.'; end if;
+  if p_donated_at is not null and p_donated_at > now() + interval '1 day' then raise exception 'Tanggal donasi tidak valid.'; end if;
+  insert into nz.donations (donor_name, amount, message, donated_at, created_by)
+  values (v_name, p_amount, v_msg, coalesce(p_donated_at, now()), auth.uid()) returning id into v_id;
+  perform nz.news('Terima kasih ' || v_name || ' atas dukungan Rp' || replace(to_char(p_amount, 'FM999,999,999,999'), ',', '.') || ' untuk Republik Netizenia!', 'donasi', v_name);
+  return jsonb_build_object('id', v_id, 'msg', 'Donasi ' || v_name || ' dicatat.');
+end $$;
+
+create function public.pres_set_saweria(p_url text) returns jsonb
+language plpgsql security definer set search_path = pg_catalog, nz, pg_temp as $$
+declare v text := btrim(coalesce(p_url, ''));
+begin
+  perform nz.require_admin();
+  if v <> '' and v !~ '^https://(www\.)?saweria\.co/[A-Za-z0-9_.-]{1,40}/?$' then
+    raise exception 'Tautan harus berbentuk https://saweria.co/namakamu';
+  end if;
+  update nz.settings set saweria_url = nullif(v, ''), updated_at = now() where id = 1;
+  return jsonb_build_object('msg', case when v = '' then 'Tautan Saweria dihapus.' else 'Tautan Saweria disimpan.' end);
 end $$;
 
 create function public.admin_set_donation_goal(p_amount bigint) returns jsonb
@@ -2331,7 +2371,8 @@ declare
     'send_chat_message','get_chat','request_claim_v2','request_opt_out',
     'pres_approve','pres_veto','pres_open_district','pres_set_tax','pres_announce','pres_set_minister','pres_release',
     'admin_list_queue','admin_review_claim','admin_review_optout','admin_delete_donation',
-    'admin_set_donation_goal','admin_delete_chat','admin_sync_npcs','admin_run_tick'];
+    'admin_set_donation_goal','admin_delete_chat','admin_sync_npcs','admin_run_tick',
+    'pres_add_donation','pres_set_saweria'];
 begin
   for r in
     select p.oid::regprocedure as sig, p.proname from pg_proc p join pg_namespace n on n.oid = p.pronamespace
@@ -2390,6 +2431,22 @@ begin
   end if;
 exception when others then
   raise notice 'Chat lama tidak dipindahkan: %', sqlerrm;
+end $$;
+
+-- 5.4b Pindahkan donatur lama sekali saja (bila tabel public.donations ada di proyek ini).
+do $$
+begin
+  if to_regclass('public.donations') is not null
+     and not exists (select 1 from nz.meta where key = 'donasi_lama_dipindah') then
+    execute $q$
+      insert into nz.donations (donor_name, amount, message, donated_at)
+      select left(coalesce(donator_name, 'Donatur'), 40), greatest(coalesce(amount, 0), 0)::bigint, left(message, 200), coalesce(created_at, now())
+      from public.donations
+    $q$;
+    insert into nz.meta (key, value) values ('donasi_lama_dipindah', to_jsonb(now()));
+  end if;
+exception when others then
+  raise notice 'Donatur lama tidak dipindahkan: %', sqlerrm;
 end $$;
 
 -- 5.5  pg_cron: tick tiap jam (menit 0) dan bersih-bersih harian 03:10 WIB (20:10 UTC).
