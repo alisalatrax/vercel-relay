@@ -1,6 +1,6 @@
 # Republik Netizenia v2 — Rencana Tahap 1
 
-Status: Tahap 1 disetujui. Tahap 2 (SQL) selesai, menunggu tes dan persetujuan.
+Status: Tahap 1–2 disetujui. Tahap 3 (halaman v2: login, profil, bangun, voting, grafik baru) selesai, menunggu tes dan persetujuan.
 
 ## Keputusan yang sudah diambil
 

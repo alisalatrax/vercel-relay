@@ -1242,6 +1242,7 @@ language sql stable as $$
     'id', b.id, 'type', b.type, 'label', b.label, 'i', b.i, 'j', b.j, 'w', b.w, 'h', b.h, 'd', b.district,
     'owner_id', b.owner_id,
     'owner', coalesce(p.display_name, n.name),
+    'owner_color', p.color,
     'owner_kind', case when b.owner_id is not null then 'warga' when b.npc_owner_id is not null then 'npc' else 'negara' end,
     'stage', b.stage, 'started_at', b.started_at, 'build_hours', b.build_hours, 'boost', round(b.boost, 4),
     'progress', round(nz.progress(b), 4), 'wage', b.wage, 'job_open', b.job_open,
