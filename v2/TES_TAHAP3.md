@@ -8,10 +8,11 @@ Saat saya cek dari luar (5 November), proyek itu **belum** berisi perubahan v2:
 - RPC v2 seperti `get_city_snapshot` belum dikenal API (galat PGRST202).
 - RPC lama `request_claim` dan `increment_proposal_vote` masih bisa dipanggil tanpa login.
 
-Kemungkinan SQL dijalankan di proyek lain. Pilih salah satu:
+Penyebabnya sudah ketemu. SQL Editor menjalankan seluruh file sebagai satu transaksi. Versi lama gagal bila `public.residents` berisi nama ganda (beda huruf besar atau spasi), dengan galat `ON CONFLICT DO UPDATE command cannot affect row a second time`, sehingga semua perubahan dibatalkan. Versi sekarang sudah diperbaiki:
 
-1. Jalankan `v2/supabase_v2.sql` (versi terbaru, ada tambahan `owner_color`) di proyek `siyknwzzjtyykwhiqmeu`; **atau**
-2. Kirim URL proyek lain + publishable key-nya (keduanya publik). Saya ganti `CFG` di `v2/index.html`.
+1. Jalankan ulang `v2/supabase_v2.sql` versi terbaru di proyek `siyknwzzjtyykwhiqmeu`.
+2. Pastikan hasil akhirnya baris `OK | v2 terpasang …`.
+3. Buka `/v2/`. Spanduk kuning "Mode pratinjau" harus hilang.
 
 Selama SQL belum ada, `/v2/` tetap terbuka dalam **mode pratinjau**: kota contoh dengan spanduk kuning, dan semua aksi dimatikan.
 

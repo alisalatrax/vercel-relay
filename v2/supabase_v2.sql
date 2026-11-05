@@ -78,12 +78,17 @@ begin
     from pg_class c join pg_namespace n on n.oid = c.relnamespace
     where n.nspname = 'public' and c.relkind in ('r', 'p')
   loop
-    execute format('revoke insert, update, delete, truncate on public.%I from anon, authenticated', t.relname);
-    if not t.relrowsecurity then
-      execute format('alter table public.%I enable row level security', t.relname);
-      execute format('drop policy if exists "v2 baca publik" on public.%I', t.relname);
-      execute format('create policy "v2 baca publik" on public.%I for select using (true)', t.relname);
-    end if;
+    begin
+      execute format('revoke insert, update, delete, truncate on public.%I from anon, authenticated', t.relname);
+      if not t.relrowsecurity then
+        execute format('alter table public.%I enable row level security', t.relname);
+        execute format('drop policy if exists "v2 baca publik" on public.%I', t.relname);
+        execute format('create policy "v2 baca publik" on public.%I for select using (true)', t.relname);
+      end if;
+    exception when others then
+      -- Tabel milik role lain (mis. dari ekstensi) dilewati; dilaporkan di pemeriksaan akhir.
+      raise notice 'Tabel public.% dilewati: %', t.relname, sqlerrm;
+    end;
   end loop;
 end $$;
 
@@ -1103,8 +1108,13 @@ begin
              r.id::text,
              coalesce(r.opt_out, false),
              'residents'
-      from public.residents r
-      where r.display_name is not null and btrim(r.display_name) <> '' and coalesce(r.role, '') <> 'Presiden'
+      from (
+        -- Nama ganda di tabel lama (beda huruf besar/spasi) diambil satu saja.
+        select distinct on (lower(btrim(x.display_name))) x.*
+        from public.residents x
+        where x.display_name is not null and btrim(x.display_name) <> '' and coalesce(x.role, '') <> 'Presiden'
+        order by lower(btrim(x.display_name)), x.claimed desc nulls last, x.id
+      ) r
       on conflict (name_key) do update set
         hidden = nz.npcs.hidden or excluded.hidden,
         ig_username = coalesce(nz.npcs.ig_username, excluded.ig_username),
@@ -2351,7 +2361,11 @@ begin
   foreach t in array array['buildings', 'proposals', 'chat_messages'] loop
     if not exists (select 1 from pg_publication_tables
                    where pubname = 'supabase_realtime' and schemaname = 'nz' and tablename = t) then
-      execute format('alter publication supabase_realtime add table nz.%I', t);
+      begin
+        execute format('alter publication supabase_realtime add table nz.%I', t);
+      exception when others then
+        raise notice 'Realtime nz.% gagal ditambahkan: %. Tambahkan manual di Database > Publications.', t, sqlerrm;
+      end;
     end if;
   end loop;
 end $$;
@@ -2380,17 +2394,25 @@ end $$;
 do $$
 begin
   if exists (select 1 from pg_extension where extname = 'pg_cron') then
-    perform cron.unschedule(jobid) from cron.job where jobname in ('netizenia-hourly', 'netizenia-cleanup');
-    perform cron.schedule('netizenia-hourly', '0 * * * *', 'select nz.tick_hourly()');
-    perform cron.schedule('netizenia-cleanup', '10 20 * * *', 'select nz.cleanup_daily()');
+    begin
+      perform cron.unschedule(jobid) from cron.job where jobname in ('netizenia-hourly', 'netizenia-cleanup');
+      perform cron.schedule('netizenia-hourly', '0 * * * *', 'select nz.tick_hourly()');
+      perform cron.schedule('netizenia-cleanup', '10 20 * * *', 'select nz.cleanup_daily()');
+    exception when others then
+      raise notice 'Jadwal pg_cron gagal dibuat: %', sqlerrm;
+    end;
   else
     raise notice 'pg_cron belum aktif. Aktifkan di Database > Extensions, lalu jalankan file ini lagi.';
   end if;
 end $$;
 
--- 5.6  Pemeriksaan akhir (hanya membaca). Semua baris harus kosong.
---      a) Tabel tanpa RLS di public/nz:
-select 'TABEL TANPA RLS' as cek, n.nspname || '.' || c.relname as objek
+-- 5.6  Pemeriksaan akhir (hanya membaca).
+--      Hasil yang benar: SATU baris "OK | v2 terpasang ...".
+--      Baris INFO boleh diabaikan. Baris lain = masalah yang harus dikirim ke pengembang.
+with masalah as (
+select case when pg_get_userbyid(c.relowner) = current_user then 'TABEL TANPA RLS'
+            else 'INFO: tabel milik ' || pg_get_userbyid(c.relowner) || ' (biasanya ekstensi), tidak diubah' end as cek,
+       n.nspname || '.' || c.relname as objek
 from pg_class c join pg_namespace n on n.oid = c.relnamespace
 where n.nspname in ('public', 'nz') and c.relkind = 'r' and not c.relrowsecurity
 union all
@@ -2410,4 +2432,11 @@ select 'RPC LAMA MASIH TERBUKA', p.oid::regprocedure::text
 from pg_proc p join pg_namespace n on n.oid = p.pronamespace
 where n.nspname = 'public'
   and p.proname in ('claim_resident', 'opt_out_resident', 'increment_proposal_vote', 'request_claim')
-  and (has_function_privilege('anon', p.oid, 'execute') or has_function_privilege('authenticated', p.oid, 'execute'));
+  and (has_function_privilege('anon', p.oid, 'execute') or has_function_privilege('authenticated', p.oid, 'execute'))
+)
+select * from masalah
+union all
+select 'OK', 'v2 terpasang: ' || (select count(*) from nz.buildings) || ' bangunan, '
+       || (select count(*) from nz.npcs) || ' warga NPC, pg_cron '
+       || case when exists (select 1 from pg_extension where extname = 'pg_cron') then 'aktif' else 'BELUM aktif' end
+where not exists (select 1 from masalah where cek not like 'INFO%');

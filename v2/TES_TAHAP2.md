@@ -6,7 +6,7 @@ File yang dites: `v2/supabase_v2.sql`. Semua langkah di bawah Anda jalankan send
 
 1. **Database → Extensions → pg_cron: Enable.** Tanpa ini voting tidak pernah ditutup otomatis. File tetap jalan, tapi menampilkan NOTICE.
 2. Buka **SQL Editor**, tempel seluruh isi `supabase_v2.sql`, lalu **Run**.
-3. Hasil terakhir adalah tabel **"cek | objek"**. **Tabel itu harus kosong (0 baris).** Bila ada isinya, kirim ke saya.
+3. Hasil terakhir adalah tabel **"cek | objek"** dengan baris **`OK | v2 terpasang: … bangunan, … warga NPC, pg_cron aktif`**. Baris berawalan `INFO` boleh diabaikan. Bila tidak ada baris OK, atau muncul `ERROR` merah, kirim teksnya ke saya. Satu error membatalkan seluruh file, termasuk perbaikan celah.
 4. Hasil `hasil_isi_dunia` kira-kira berisi 56 bangunan dan sekitar 326 NPC. Jumlah NPC tergantung isi `public.residents` Anda.
 5. Jalankan file sekali lagi. Angka `rumah_npc_baru` harus 0 dan tidak ada error. Ini membuktikan file aman diulang.
 6. Cek jadwal cron:
