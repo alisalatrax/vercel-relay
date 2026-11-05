@@ -35,7 +35,7 @@ Buka situs mana saja (misalnya halaman lama), tekan F12, lalu buka tab **Console
 
 ```js
 const { createClient } = await import('https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.117.3/+esm');
-const sb = createClient('https://siyknwzzjtyykwhiqmeu.supabase.co', 'sb_publishable_OO0uiSC-bZ-pGaPTyFeIYw_eEQOFi56');
+const sb = createClient('https://bwubqnfvdxwhwwiibdzv.supabase.co', 'sb_publishable_cn9p-oE4k2FM9pdqF_tbcg_i0wqTWos');
 ```
 
 **2. Buat akun tes.** Kata sandi diketik di jendela prompt, bukan ditulis di kode. Pakai kata sandi sekali pakai, minimal 8 karakter.

@@ -1,20 +1,14 @@
 # Republik Netizenia v2 — Tes Tahap 3 (halaman v2 + login, profil, bangun, voting)
 
-## 0. Penting: SQL v2 belum ada di proyek yang dipakai halaman
+## 0. Proyek Supabase
 
-Halaman memakai proyek Supabase yang sama dengan index.html lama: `siyknwzzjtyykwhiqmeu`.
-Saat saya cek dari luar (5 November), proyek itu **belum** berisi perubahan v2:
+Halaman v2 memakai proyek baru `bwubqnfvdxwhwwiibdzv` (dibuat 5 November). Proyek lama `siyknwzzjtyykwhiqmeu` tidak dipakai v2. Index.html lama tidak diubah dan masih menunjuk ke proyek lama.
 
-- RPC v2 seperti `get_city_snapshot` belum dikenal API (galat PGRST202).
-- RPC lama `request_claim` dan `increment_proposal_vote` masih bisa dipanggil tanpa login.
+Dicek dari luar setelah SQL dijalankan:
 
-Penyebabnya sudah ketemu. SQL Editor menjalankan seluruh file sebagai satu transaksi. Versi lama gagal bila `public.residents` berisi nama ganda (beda huruf besar atau spasi), dengan galat `ON CONFLICT DO UPDATE command cannot affect row a second time`, sehingga semua perubahan dibatalkan. Versi sekarang sudah diperbaiki:
-
-1. Jalankan ulang `v2/supabase_v2.sql` versi terbaru di proyek `siyknwzzjtyykwhiqmeu`.
-2. Pastikan hasil akhirnya baris `OK | v2 terpasang …`.
-3. Buka `/v2/`. Spanduk kuning "Mode pratinjau" harus hilang.
-
-Selama SQL belum ada, `/v2/` tetap terbuka dalam **mode pratinjau**: kota contoh dengan spanduk kuning, dan semua aksi dimatikan.
+- 67 bangunan, 1.205 warga NPC, kas 9.000, dua usulan lama (Istana, Stadion) sedang divoting.
+- Tamu yang memanggil `vote_proposal` ditolak (permission denied), dan schema `nz` tidak terbuka lewat REST.
+- **Confirm email masih ON.** Daftar dengan username baru bisa langsung masuk setelah ini dimatikan (langkah 1 di bawah).
 
 ## 1. Langkah dashboard (sekali saja)
 
