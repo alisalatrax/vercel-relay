@@ -39,3 +39,29 @@ select (select count(*) from nz.buildings) as bangunan,
 - **Kecocokan nama:** 39 RPC yang dipanggil halaman cocok dengan fungsi dan parameter di SQL.
 
 Belum bisa saya uji dari sini: realtime chat sungguhan antar dua perangkat.
+
+## Perbaikan setelah laporan tes 6 November
+
+| Temuan | Penyebab | Perbaikan |
+|---|---|---|
+| Draf chat hilang | Kolom dikosongkan setelah jawaban server datang, sehingga pesan kedua yang diketik selama menunggu ikut terhapus. | Kolom hanya dikosongkan bila isinya masih pesan yang baru terkirim. |
+| Slider pajak kembali ke nilai lama, klik di tengah jadi 7% | Nilai slider sengaja tidak disimpan saat panel diperbarui, dan slider dibangun ulang saat diklik. | Slider diganti angka + tombol −1/+1. Semua kolom yang sedang diubah bertahan saat panel diperbarui. |
+| "Tunggu 5 detik" tidak terlihat | Pesan hanya muncul sebagai toast sesaat. | Halaman menahan kirim ulang dalam 5 detik dan menulis peringatan tetap di bawah kolom chat, draf tetap tersimpan. |
+| Pengumuman tes tidak bisa dihapus | Belum ada caranya. | RPC baru `admin_delete_announcement` + tombol Hapus di Panel presiden (pengumuman dan kabar ticker-nya ikut terhapus). |
+| Bilah target tidak terlihat di menu Kota | Bilah ada tapi terisi 1% dengan warna terlalu pucat. | Bilah lebih tebal dan kontras, selalu tampil minimal. |
+
+Perbaikan pengumuman butuh SQL dijalankan ulang (kode pemuat baru di chat).
+
+## Tes ulang
+
+1. **Chat:** kirim satu pesan, langsung ketik pesan kedua sebelum yang pertama muncul. Pesan kedua tetap di kolom. Tekan Enter sebelum 5 detik: muncul tulisan merah "Tunggu … detik" di bawah kolom, draf tetap ada. Setelah 5 detik pesan terkirim.
+2. **Pajak:** Panel presiden → −1/+1 beberapa kali, tunggu 1–2 menit (panel diperbarui otomatis), angka tetap. Simpan, angka di menu Kota berubah.
+3. **Pengumuman:** Panel presiden → Pajak & pengumuman → Hapus pada pengumuman tes (ketuk 2x). Ticker dan menu Kota tidak lagi menampilkannya.
+4. **Langkah 9, 11, 14** dari tabel di atas, memakai akun tes baru (lihat di bawah).
+
+## Akun tes
+
+Akun username tidak punya email sungguhan, jadi kata sandinya **tidak bisa direset**. Kalau login akun tes gagal:
+
+- Buat akun baru lewat **Masuk → Daftar baru** di pratinjau, misalnya `tesa6` dan `tesb6`. Kata sandi diketik langsung, minimal 8 karakter. Tidak perlu email.
+- Akun tes lama bisa dihapus di Supabase: Authentication → Users → pilih → Delete user. Tokoh, bangunan, dan suaranya ikut terhapus.

@@ -1311,7 +1311,7 @@ begin
       'pres_set_minister','pres_release',
       'admin_list_queue','admin_review_claim','admin_review_optout','admin_delete_donation',
       'admin_set_donation_goal','admin_delete_chat','admin_sync_npcs','admin_run_tick',
-      'pres_add_donation','pres_set_saweria')
+      'pres_add_donation','pres_set_saweria','admin_delete_announcement')
   loop
     execute format('drop function if exists %s', r.sig);
   end loop;
@@ -2302,6 +2302,18 @@ begin
   return jsonb_build_object('id', v_id, 'msg', 'Donasi ' || v_name || ' dicatat.');
 end $$;
 
+-- Menghapus pengumuman (mis. pengumuman tes) beserta kabar ticker-nya.
+create function public.admin_delete_announcement(p_id bigint) returns jsonb
+language plpgsql security definer set search_path = pg_catalog, nz, pg_temp as $$
+declare v text;
+begin
+  perform nz.require_admin();
+  delete from nz.announcements where id = p_id returning text into v;
+  if not found then raise exception 'Pengumuman tidak ditemukan.'; end if;
+  delete from nz.news where kind = 'presiden' and text = 'Pengumuman Presiden: ' || v;
+  return jsonb_build_object('msg', 'Pengumuman dihapus.');
+end $$;
+
 create function public.pres_set_saweria(p_url text) returns jsonb
 language plpgsql security definer set search_path = pg_catalog, nz, pg_temp as $$
 declare v text := btrim(coalesce(p_url, ''));
@@ -2372,7 +2384,7 @@ declare
     'pres_approve','pres_veto','pres_open_district','pres_set_tax','pres_announce','pres_set_minister','pres_release',
     'admin_list_queue','admin_review_claim','admin_review_optout','admin_delete_donation',
     'admin_set_donation_goal','admin_delete_chat','admin_sync_npcs','admin_run_tick',
-    'pres_add_donation','pres_set_saweria'];
+    'pres_add_donation','pres_set_saweria','admin_delete_announcement'];
 begin
   for r in
     select p.oid::regprocedure as sig, p.proname from pg_proc p join pg_namespace n on n.oid = p.pronamespace

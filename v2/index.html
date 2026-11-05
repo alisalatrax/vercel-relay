@@ -225,6 +225,9 @@ button{cursor:pointer}
 input[type=range]{accent-color:var(--gold)}
 body.photo #hud,body.photo .fabs,body.photo #labels,body.photo #sheet{display:none!important}
 .goal{display:flex;flex-direction:column;gap:6px;background:linear-gradient(135deg,#FFF8E1,#FFF0C2);border-radius:14px;padding:12px}
+.goal .meter{background:rgba(122,78,0,.16);height:11px}.goal .meter i{min-width:6px}
+.stepper{display:flex;gap:8px;align-items:center}.stepper input{width:84px;text-align:center;font:600 20px var(--f-display);border:1.5px solid var(--line);border-radius:12px;min-height:44px}
+.stepper .btn{min-width:52px;flex:none}
 .field textarea{border:1.5px solid var(--line);background:#fff;border-radius:13px;padding:11px 13px;min-height:70px;font-weight:700;resize:vertical}
 #toast{position:fixed;left:50%;top:calc(118px + var(--safe-t));transform:translateX(-50%);z-index:30;background:var(--ink);color:#fff;padding:10px 16px;border-radius:14px;font-weight:800;font-size:13.5px;max-width:calc(100% - 32px);box-shadow:var(--shadow);text-align:center;pointer-events:none}
 #toast.bad{background:var(--red)}
@@ -1248,7 +1251,7 @@ function renderSheet(toBottom){
   if (!sheetKind) return; const f = SHEETS[sheetKind]; if (!f) return; const res = f(sheetArg); if (!res) return closeSheet();
   const [title, body, sub, icon] = res; const el = $('#sheet'); const sc = el.querySelector('.sheet-b')?.scrollTop || 0;
   const focusId = document.activeElement?.id, selS = document.activeElement?.selectionStart;
-  const keep = {}; el.querySelectorAll('input[id],textarea[id]').forEach(x => { if (x.type !== 'range' && x.value) keep[x.id] = x.value; });
+  const keep = {}; el.querySelectorAll('input[id],textarea[id]').forEach(x => { if (x.value !== x.defaultValue) keep[x.id] = x.value; });
   el.innerHTML = `<div class="grab" data-grab><i></i></div><div class="sheet-h"><span class="hi" style="background:${SHEET_COLOR[sheetKind] || '#2F8F5B'}">${svg(icon || (sheetKind in ICON ? sheetKind : 'info'))}</span><h2>${title}${sub ? `<small>${sub}</small>` : ''}</h2><button class="x" data-act="close" aria-label="Tutup">${svg('x')}</button></div><div class="sheet-b">${body}</div>`;
   for (const [k, v] of Object.entries(keep)){ const x = document.getElementById(k); if (x && x.closest('#sheet')) x.value = v; }
   const sb2 = el.querySelector('.sheet-b'); sb2.scrollTop = (toBottom || (sheetKind === 'chat' && sheetArg === 'baru')) ? sb2.scrollHeight : sc; if (sheetKind === 'chat') sheetArg = null;
@@ -1424,7 +1427,8 @@ const SHEETS = {
   chat(){
     const list = (S.session && S.chat) ? S.chat : (S.snap?.chat || []), myName = S.me?.name;
     let h = `<div class="chatlist">${list.length ? list.map(m => `<div class="msg${m.name === myName ? ' me' : ''}"><span class="av" style="width:30px;height:30px;font-size:11px;background:${profColor(m.prof)}">${esc(initials(m.name))}</span><div class="bub"><b>${esc(m.name)}${m.prof ? ` <small>${esc(m.prof)}</small>` : ''}<small>${m.at ? fmtAgo(m.at) : ''}</small></b><span>${esc(m.text)}</span>${isAdmin() ? ` <button class="btn sm red" style="min-height:26px;padding:2px 8px;margin-top:4px" data-act="chat-del" data-id="${m.id}">Hapus</button>` : ''}</div></div>`).join('') : '<div class="empty">Belum ada pesan. Sapa warga duluan!</div>'}</div>`;
-    h += registered() ? `<form class="chatbar" id="chatForm" autocomplete="off"><input id="cmsg" maxlength="200" placeholder="Tulis pesan untuk semua warga" aria-label="Pesan"><button class="btn gold" type="submit">Kirim</button></form><p class="note">Nama otomatis dari tokohmu. Satu pesan tiap 5 detik. Pesan lebih dari 7 hari terhapus otomatis.</p>`
+    const wait = Math.max(0, 5000 - (Date.now() - chatSentAt));
+    h += registered() ? `<form class="chatbar" id="chatForm" autocomplete="off"><input id="cmsg" maxlength="200" placeholder="Tulis pesan untuk semua warga" aria-label="Pesan"><button class="btn gold" type="submit">Kirim</button></form><span class="hint${chatHint ? ' bad' : ''}" id="chatHint" role="status">${chatHint ? esc(chatHint) : wait ? 'Bisa kirim lagi dalam ' + Math.ceil(wait / 1000) + ' detik.' : ''}</span><p class="note">Nama otomatis dari tokohmu. Satu pesan tiap 5 detik. Pesan lebih dari 7 hari terhapus otomatis.</p>`
       : `<button class="btn gold wide" data-act="${S.session ? 'register' : 'login'}">${S.session ? 'Buat tokoh untuk ikut ngobrol' : 'Masuk untuk ikut ngobrol'}</button>`;
     return ['Pesan rakyat', h, S.session ? 'Langsung, untuk warga yang masuk' : 'Pesan terbaru', 'chat'];
   },
@@ -1443,7 +1447,8 @@ const SHEETS = {
     h += `<div class="lab">Antrean klaim tokoh</div>` + (!q ? '<div class="empty">Memuat…</div>' : q.claims.length ? `<div class="list">${q.claims.map(c => `<div class="item"><div class="grow"><b>${esc(c.name)}</b><small>${c.linked ? 'Akun: ' + esc(c.account || '-') + (c.username ? ' (@' + esc(c.username) + ')' : '') : 'Klaim lama tanpa akun'}${c.ig ? ' · IG @' + esc(c.ig) : ''}</small>${c.note ? `<small style="white-space:normal">“${esc(c.note)}”</small>` : ''}</div><div class="acts"><button class="btn sm green" data-act="adm-claim" data-id="${c.id}" data-v="1">Setujui</button><button class="btn sm red" data-act="adm-claim" data-id="${c.id}" data-v="0">Tolak</button></div></div>`).join('')}</div>` : '<div class="empty">Tidak ada klaim menunggu.</div>');
     h += `<div class="lab">Permintaan hapus nama</div>` + (!q ? '' : q.optouts.length ? `<div class="list">${q.optouts.map(o => `<div class="item"><div class="grow"><b>${esc(o.name)}</b><small>Dari ${esc(o.account || 'akun tanpa tokoh')}${o.reason ? ' · “' + esc(o.reason) + '”' : ''}</small></div><div class="acts"><button class="btn sm green" data-act="adm-optout" data-id="${o.id}" data-v="1">Hapus nama</button><button class="btn sm red" data-act="adm-optout" data-id="${o.id}" data-v="0">Tolak</button></div></div>`).join('')}</div>` : '<div class="empty">Tidak ada permintaan.</div>');
     h += `<div class="lab">Tahanan</div>` + (!q ? '' : q.jailed.length ? `<div class="list">${q.jailed.map(j => `<div class="item"><div class="grow"><b>${esc(j.name)}</b><small>Bebas ${fmtWib(j.until)}</small></div><button class="btn sm dark" data-act="release" data-u="${j.id}">Bebaskan</button></div>`).join('')}</div>` : '<div class="empty">Penjara kosong.</div>');
-    h += `<div class="lab">Pajak & pengumuman</div><div class="field"><label for="atax">Tarif pajak: <b id="ataxv">${s.tax ?? 10}%</b> (di atas 10% menurunkan kepuasan)</label><input type="range" id="atax" min="0" max="30" value="${s.tax ?? 10}"></div><button class="btn" data-act="adm-tax">Simpan pajak</button>
+    h += `<div class="lab">Pajak & pengumuman</div><div class="field"><label for="atax">Tarif pajak (0–30%, sekarang ${s.tax ?? 10}%). Di atas 10% menurunkan kepuasan.</label><div class="stepper"><button class="btn" type="button" data-act="tax-step" data-d="-1" aria-label="Kurangi 1%">−1</button><input id="atax" type="number" inputmode="numeric" min="0" max="30" step="1" value="${s.tax ?? 10}"><button class="btn" type="button" data-act="tax-step" data-d="1" aria-label="Tambah 1%">+1</button><span class="note">%</span></div></div><button class="btn" data-act="adm-tax">Simpan pajak</button>
+      ${(s.announcements || []).length ? `<div class="list">${s.announcements.map(a => `<div class="item"><div class="grow"><b style="white-space:normal">📢 ${esc(a.text)}</b><small>${fmtAgo(a.at)}</small></div><button class="btn sm red" data-act="adm-ann-del" data-id="${a.id}">Hapus</button></div>`).join('')}</div>` : ''}
       <div class="field"><label for="aann">Pengumuman untuk seluruh rakyat</label><textarea id="aann" maxlength="160" placeholder="Maks 160 karakter"></textarea></div><button class="btn gold" data-act="adm-ann">Siarkan</button>`;
     h += `<div class="lab">Catat donasi Saweria</div><div class="field"><label for="dnm">Nama donatur</label><input id="dnm" maxlength="40"></div><div class="field"><label for="damt">Nominal (Rupiah)</label><input id="damt" type="number" inputmode="numeric" min="0" step="1000" placeholder="mis. 50000"></div><div class="field"><label for="dmsg">Pesan (opsional)</label><input id="dmsg" maxlength="200"></div><button class="btn gold" data-act="adm-don-add">Catat donasi</button>
       <div class="field"><label for="dgoal">Target donasi (Rupiah, 0 = tanpa target)</label><input id="dgoal" type="number" inputmode="numeric" min="0" value="${s.donation_goal || 0}"></div><button class="btn" data-act="adm-goal">Simpan target</button>
@@ -1488,6 +1493,9 @@ function manageHTML(b){
     <button class="btn sm" data-act="jobopen" data-id="${b.id}" data-v="${b.job_open === false ? 1 : 0}">${b.job_open === false ? 'Buka lowongan' : 'Tutup lowongan'}</button></div>`;
 }
 
+let chatSentAt = 0, chatSending = false, chatHint = '', chatHintT = null;
+function setChatHint(m){ chatHint = m; const h = $('#chatHint'); if (h){ h.textContent = m; h.className = 'hint' + (m ? ' bad' : ''); } clearTimeout(chatHintT); if (m) chatHintT = setTimeout(() => setChatHint(''), 6000); }
+function tickChatHint(){ const h = $('#chatHint'); if (!h || chatHint) return; const w = 5000 - (Date.now() - chatSentAt); h.className = 'hint'; h.textContent = w > 0 ? 'Bisa kirim lagi dalam ' + Math.ceil(w / 1000) + ' detik.' : ''; if (w > 0) setTimeout(tickChatHint, 500); }
 async function loadQueue(){ if (!isAdmin()) return; try { const q = await rpc('admin_list_queue'); if (sheetKind === 'admin'){ sheetArg = { ...(sheetArg || {}), queue: q }; renderSheet(); } } catch (e) { toast(e.message, 'bad'); } }
 function photoOn(){ closeSheet(); if (place) cancelPlace(); photoHour = wibHours(); document.body.classList.add('photo'); $('#photobar').hidden = false; $('#phour').value = photoHour; $('#phourv').textContent = wibClock(); }
 function photoOff(){ photoHour = null; document.body.classList.remove('photo'); $('#photobar').hidden = true; applyTime(true); renderHud(); }
@@ -1639,7 +1647,9 @@ document.addEventListener('click', async e => {
     case 'chat-del': await busy(() => act('admin_delete_chat', { p_id: id }, { refresh: false })); if (S.chat) S.chat = S.chat.filter(m => m.id !== id); loadSnapshot(); break;
     case 'adm-claim': await busy(() => act('admin_review_claim', { p_request_id: id, p_approve: el.dataset.v === '1' }, { refresh: false })); loadQueue(); loadNpcs(); break;
     case 'adm-optout': await busy(() => act('admin_review_optout', { p_id: id, p_approve: el.dataset.v === '1' }, { refresh: false })); loadQueue(); loadNpcs(); break;
-    case 'adm-tax': await busy(() => act('pres_set_tax', { p_pct: Number($('#atax').value) }, { refresh: false })); loadSnapshot(); break;
+    case 'tax-step': { const x = $('#atax'); x.value = clamp((parseInt(x.value, 10) || 0) + Number(el.dataset.d), 0, 30); break; }
+    case 'adm-tax': { const v = parseInt($('#atax').value, 10); if (!(v >= 0 && v <= 30)){ toast('Pajak 0 sampai 30%.', 'bad'); break; } await busy(() => act('pres_set_tax', { p_pct: v }, { refresh: false })); $('#atax').defaultValue = String(v); await loadSnapshot(); break; }
+    case 'adm-ann-del': if (el.dataset.sure){ await busy(() => act('admin_delete_announcement', { p_id: id }, { refresh: false })); await loadSnapshot(); rotateTicker(); } else { el.dataset.sure = '1'; el.textContent = 'Yakin?'; } break;
     case 'adm-ann': { const t = $('#aann').value.trim(); if (t.length < 3){ toast('Pengumuman terlalu pendek.', 'bad'); break; } await busy(() => act('pres_announce', { p_text: t }, { refresh: false })); $('#aann').value = ''; loadSnapshot(); break; }
     case 'adm-don-add': { const nm = $('#dnm').value.trim(), am = Number($('#damt').value); if (!nm || !(am >= 0)){ toast('Isi nama dan nominal.', 'bad'); break; } const r = await act('pres_add_donation', { p_name: nm, p_amount: Math.round(am), p_message: $('#dmsg').value.trim() || null }, { refresh: false }); if (r){ $('#dnm').value = $('#damt').value = $('#dmsg').value = ''; await loadSnapshot(); } break; }
     case 'adm-don-del': if (el.dataset.sure){ await busy(() => act('admin_delete_donation', { p_id: id }, { refresh: false })); loadSnapshot(); } else { el.dataset.sure = '1'; el.textContent = 'Yakin?'; } break;
@@ -1667,15 +1677,22 @@ document.addEventListener('click', async e => {
   }
 });
 document.addEventListener('submit', async e => {
-  if (e.target.id === 'chatForm'){ e.preventDefault(); const inp = $('#cmsg'), t = inp.value.trim(); if (!t) return; const btn = e.target.querySelector('button'); btn.classList.add('busy');
-    try { await rpc('send_chat_message', { p_text: t }); inp.value = ''; setTimeout(loadChat, 700); } catch (err) { toast(err.message, 'bad'); } finally { btn.classList.remove('busy'); } return; }
+  if (e.target.id === 'chatForm'){ e.preventDefault(); const t = ($('#cmsg')?.value || '').trim(); if (!t || chatSending) return;
+    const wait = 5000 - (Date.now() - chatSentAt);
+    if (wait > 0){ setChatHint('Tunggu ' + Math.ceil(wait / 1000) + ' detik sebelum mengirim lagi. Pesanmu masih tersimpan di kolom.'); return; }
+    chatSending = true; setChatHint('');
+    try { await rpc('send_chat_message', { p_text: t }); chatSentAt = Date.now();
+      const now2 = $('#cmsg'); if (now2 && now2.value.trim() === t){ now2.value = ''; now2.defaultValue = ''; }   // hanya hapus bila belum diganti pesan baru
+      setTimeout(loadChat, 700); tickChatHint(); }
+    catch (err) { setChatHint(err.message); toast(err.message, 'bad'); }
+    finally { chatSending = false; } return; }
   if (e.target.id !== 'loginForm') return; e.preventDefault(); const btn = e.target.querySelector('button[type=submit]'), hint = $('#lhint');
   btn.classList.add('busy'); hint.className = 'hint'; hint.textContent = loginMode === 'daftar' ? 'Membuat akun…' : 'Masuk…';
   try { await loginUser(loginMode, $('#lu').value, $('#lp').value); hint.textContent = 'Berhasil!'; hint.className = 'hint ok'; }
   catch (err) { hint.textContent = err.message; hint.className = 'hint bad'; }
   finally { btn.classList.remove('busy'); }
 });
-document.addEventListener('input', e => { if (e.target.id === 'atax') $('#ataxv').textContent = e.target.value + '%'; if (e.target.id === 'phour'){ photoHour = Number(e.target.value); applyTime(true); $('#phourv').textContent = wibClock(); } if (e.target.id === 'wq' && sheetKind === 'warga'){ sheetArg.q = e.target.value; clearTimeout(citT); citT = setTimeout(loadCitizens, 350); } if (e.target.id === 'rn') draft.name = e.target.value; if (e.target.id === 'lu' && loginMode === 'daftar'){ const v = e.target.value.trim().toLowerCase(); const ok = /^[a-z0-9_.]{3,20}$/.test(v); $('#lhint').textContent = v ? (ok ? 'Format username oke.' : 'Huruf kecil, angka, titik, atau garis bawah (3–20).') : ''; $('#lhint').className = 'hint ' + (v ? (ok ? 'ok' : 'bad') : ''); } });
+document.addEventListener('input', e => { if (e.target.id === 'phour'){ photoHour = Number(e.target.value); applyTime(true); $('#phourv').textContent = wibClock(); } if (e.target.id === 'wq' && sheetKind === 'warga'){ sheetArg.q = e.target.value; clearTimeout(citT); citT = setTimeout(loadCitizens, 350); } if (e.target.id === 'rn') draft.name = e.target.value; if (e.target.id === 'lu' && loginMode === 'daftar'){ const v = e.target.value.trim().toLowerCase(); const ok = /^[a-z0-9_.]{3,20}$/.test(v); $('#lhint').textContent = v ? (ok ? 'Format username oke.' : 'Huruf kecil, angka, titik, atau garis bawah (3–20).') : ''; $('#lhint').className = 'hint ' + (v ? (ok ? 'ok' : 'bad') : ''); } });
 document.addEventListener('visibilitychange', () => { if (!document.hidden && S.snap && !S.preview) poll(); });
 
 /* =====================================================================
