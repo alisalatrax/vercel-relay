@@ -17,6 +17,8 @@ Status: Tahap 1–2 disetujui. Tahap 3 (halaman v2: login, profil, bangun, votin
 - 22 fasilitas lama (`CONFIG.fas`) dipetakan ke grid baru sebagai bangunan negara yang dilindungi.
 - Antrean klaim memakai `public.claim_requests` yang sudah ada, ditambah kolom `user_id` dan `npc_id`.
 - Donatur tetap dibaca dari `public.donations`, dan `admin_add_donation` lama tetap dipakai.
+- Warga NPC kini juga diisi dari PDF komentar parsial (1.661 komentar terurai, 882 nama baru). Totalnya 1.205 warga benih, ditambah isi `public.residents` bila tabel itu ada. Hanya nama dan profesi yang disimpan; isi komentar tidak. Pengurai ada di `v2/tools/parse_komen.py` untuk batch berikutnya.
+- `supabase_v2.sql` bisa dijalankan di proyek Supabase baru yang kosong (tanpa tabel lama).
 
 ## 0. Temuan penting sebelum mulai
 
