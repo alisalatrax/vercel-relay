@@ -1,0 +1,2996 @@
+<!doctype html>
+<html lang="id">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Republik Netizenia — Kota Radial, Sungai & PLN</title>
+<meta name="description" content="Kota claymation yang dihuni rakyat dari Instagram. Follow = jadi rakyat. Komen = usulan.">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;700&family=Nunito:wght@600;700&display=swap">
+<style>
+:root{--bg:#FFF1D0;--card:#FFFAEC;--text:#20301F;--brand:#1F4D36;--onb:#FFF4DA;--gold:#F0B52E;--ongold:#2B2100;--shd:rgba(31,77,54,.3);--line:#E6D3A3;--ok:#2E7D32;--warn:#E65100;--bad:#B3261E;color-scheme:light}
+@media(prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#12231A;--card:#1B3326;--text:#FFF1D0;--brand:#F0B52E;--onb:#2B2100;--shd:rgba(0,0,0,.5);--line:#2D4A3A;--ok:#81C784;--warn:#FFB74D;--bad:#FFB4A9;color-scheme:dark}}
+:root[data-theme="dark"]{--bg:#12231A;--card:#1B3326;--text:#FFF1D0;--brand:#F0B52E;--onb:#2B2100;--shd:rgba(0,0,0,.5);--line:#2D4A3A;--ok:#81C784;--warn:#FFB74D;--bad:#FFB4A9;color-scheme:dark}
+*{box-sizing:border-box}
+html,body{margin:0;height:100%;overflow:hidden;background:#8FCB7A;color:var(--text);font:600 15px/1.4 Nunito,system-ui,sans-serif;user-select:none;-webkit-user-select:none}
+#cv{position:fixed;inset:0;width:100%;height:100%;display:block;touch-action:none;cursor:grab}
+#cv:active{cursor:grabbing}
+.top{position:fixed;top:0;left:0;right:0;padding:calc(10px + env(safe-area-inset-top,0px)) 12px 0;pointer-events:none;display:grid;gap:6px;z-index:3;transition:opacity .25s}
+.top>*{pointer-events:auto}
+.bar{display:flex;align-items:stretch;justify-content:space-between;gap:8px;flex-wrap:wrap}
+.pill{background:var(--card);border-radius:18px;padding:7px 12px;box-shadow:inset 0 2px 0 rgba(255,255,255,.5),0 4px 0 var(--shd);border:1px solid var(--line)}
+h1{font:700 1.08rem/1 Fredoka,sans-serif;color:var(--brand);margin:0;display:flex;align-items:center;gap:6px}
+small{font-size:.75rem;opacity:.88}
+.ig{font:700 .8rem Fredoka,sans-serif;text-decoration:none;color:var(--text);display:flex;align-items:center;gap:5px}
+.chips{display:flex;gap:6px;flex-wrap:nowrap;overflow-x:auto;scrollbar-width:none;-webkit-overflow-scrolling:touch;align-items:center}
+.chips::-webkit-scrollbar{display:none}
+.chips .pill{flex-shrink:0}
+.chips .pill{font-size:.77rem;padding:4px 10px;border-radius:14px;cursor:pointer;border:1px solid var(--line);font:700 .77rem Nunito,sans-serif;color:var(--text)}
+.chips .pill:active{transform:translateY(2px)}
+#banner{background:var(--gold);color:var(--ongold);font:700 .74rem Nunito,sans-serif;padding:4px 10px;border-radius:14px;display:flex;align-items:center;justify-content:space-between;gap:8px;box-shadow:0 3px 0 var(--shd)}
+#feed{position:fixed;left:12px;bottom:calc(132px + env(safe-area-inset-bottom,0px));display:flex;flex-direction:column;gap:4px;max-width:min(72vw,320px);z-index:6;pointer-events:none;transition:opacity .25s}
+body:not(.notif-open) #feed{display:none}
+#leftMenu{position:fixed;left:12px;bottom:calc(84px + env(safe-area-inset-bottom,0px));z-index:7;display:flex;gap:8px}
+#leftMenu button{width:auto;height:48px;border-radius:999px;border:2px solid rgba(255,255,255,.35);font-size:15px;font-weight:700;cursor:pointer;box-shadow:0 3px 8px rgba(0,0,0,.4);position:relative;padding:0 14px;display:flex;align-items:center;gap:6px}
+#leftChatBtn{background:#C8553D;color:#fff}
+#leftNotifBtn{background:#2E7D6B;color:#fff}
+#leftMenu .mbadge{position:absolute;top:-4px;right:-4px;background:#F0B52E;color:#1A1A1A;font:700 .68rem Nunito,sans-serif;border-radius:999px;padding:1px 6px;display:none}
+#leftMenu .mbadge.show{display:inline-block}
+body:not(.chat-open) #liveChatBox{display:none}
+#feed span{background:rgba(18,28,18,.80);border-radius:12px;padding:7px 12px;font-size:.82rem;font-weight:700;box-shadow:0 2px 6px rgba(0,0,0,.35);border:1px solid rgba(255,255,255,.25);color:#FFFFFF;text-shadow:0 1px 3px rgba(0,0,0,.7)}
+.dock{position:fixed;left:0;right:0;bottom:0;padding:0 10px calc(10px + env(safe-area-inset-bottom,0px));display:flex;gap:6px;z-index:6;justify-content:flex-start;overflow-x:auto;scrollbar-width:none;-webkit-overflow-scrolling:touch;max-width:760px;margin:0 auto;transition:transform .25s, opacity .25s}
+.dock::-webkit-scrollbar{display:none}
+.dock .btn{flex-shrink:0}
+#fab{position:fixed;right:12px;bottom:76px;z-index:6;display:flex;flex-direction:column;gap:6px}
+@media(max-width:767px){#fab{bottom:calc(170px + env(safe-area-inset-bottom,0px));gap:8px}#fab .btn{min-width:48px;width:48px;height:48px;min-height:48px;padding:0}}
+#fab .btn{min-width:44px;width:44px;padding:0}
+body.photo-mode #fab{opacity:0;pointer-events:none}
+@media(max-width:767px){body.livechat-focus .dock{display:none}#liveChatBox{width:min(86vw,320px)}}
+#liveChatBox{position:fixed;left:12px;bottom:calc(132px + env(safe-area-inset-bottom,0px));width:min(86vw,320px);z-index:6;background:rgba(18,28,18,.94);color:#FFFFFF;backdrop-filter:none;border:1px solid rgba(255,255,255,.25);border-radius:16px;padding:8px;box-shadow:0 3px 8px rgba(0,0,0,.4)}
+#liveChatStream{display:flex;flex-direction:column;justify-content:flex-end;gap:4px;min-height:90px;max-height:160px;overflow:hidden;-webkit-mask-image:linear-gradient(to bottom,transparent 0%,black 28%);mask-image:linear-gradient(to bottom,transparent 0%,black 28%)}
+.live-msg{font-size:.88rem;line-height:1.45;font-weight:600;color:#FFFFFF;animation:liveUp .25s ease}
+.live-msg b{color:#FFFFFF}
+#liveChatBox b{color:#FFFFFF}
+#liveChatBox input{background:#FFFFFF;color:#1A1A1A}
+.live-msg.sys{opacity:1;font-style:italic;color:#E0E0E0}
+@keyframes liveUp{from{transform:translateY(8px);opacity:0}to{transform:none;opacity:1}}
+body.livechat-hidden #liveChatStream,body.livechat-hidden #liveChatInputRow,body.livechat-hidden #liveChatBox #feed,body.livechat-hidden #notifHeading{display:none}
+#liveChatBox{max-height:min(62vh,430px);overflow-y:auto}
+#liveChatBox #feed{position:static;max-width:none;width:100%;pointer-events:auto;margin-bottom:10px}
+#liveChatBox #feed span{display:block}
+#liveChatMenuBadge{display:none;background:#F0B52E;color:#1A1A1A;font:700 .72rem Nunito,sans-serif;border-radius:999px;padding:1px 7px;margin-left:6px}
+body.livechat-hidden #liveChatMenuBadge{display:inline-block}
+#liveChatBoxHeader{cursor:pointer}
+body.photo-mode #liveChatBox{opacity:0;pointer-events:none}
+body.dock-hidden .dock{transform:translateX(-120%);pointer-events:none}
+#dockTab{position:fixed;left:0;bottom:calc(20px + env(safe-area-inset-bottom,0px));z-index:7;border-radius:0 14px 14px 0}
+body.text-hidden #dockTab,body.photo-mode #dockTab{display:none}
+body.donor-hidden #donorBar{display:none}
+#chatToast{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(190px + env(safe-area-inset-bottom,0px));z-index:7;background:rgba(18,28,18,.94);color:#FFFFFF;border:1px solid rgba(255,255,255,.25);border-radius:14px;padding:8px 14px;font-size:.88rem;font-weight:700;box-shadow:0 3px 8px rgba(0,0,0,.4);max-width:88vw;pointer-events:none;opacity:0;transition:opacity .3s;text-align:center}
+#chatToast.show{opacity:1}
+.chat-item{text-align:left;border:1px solid rgba(255,255,255,.25);border-radius:14px;background:#1E2E1E;color:#FFFFFF;padding:9px 12px;font:700 .9rem Nunito,sans-serif}
+.btn{font:700 .9rem Fredoka,sans-serif;border:0;border-radius:999px;min-height:46px;padding:0 14px;background:var(--brand);color:var(--onb);cursor:pointer;box-shadow:inset 0 3px 0 rgba(255,255,255,.3),inset 0 -4px 0 rgba(0,0,0,.18),0 5px 0 var(--shd);display:inline-flex;align-items:center;justify-content:center;gap:5px;white-space:nowrap}
+.btn:active{transform:translateY(3px)}
+.btn.gold{background:var(--gold);color:var(--ongold)}
+.btn.soft{background:var(--card);color:var(--text);min-width:44px;padding:0 11px;border:1px solid var(--line)}
+.dock .gold{flex:1}
+:focus-visible{outline:3px solid var(--gold);outline-offset:2px}
+#sheet{position:fixed;left:0;right:0;top:145px;bottom:12px;max-height:calc(100vh - 157px);overflow:auto;overflow-y:auto;overflow-x:hidden;overscroll-behavior:contain;-webkit-overflow-scrolling:touch;background:var(--card) !important;border:2px solid var(--line);border-radius:26px 26px 0 0;padding:18px 16px calc(86px + env(safe-area-inset-bottom,0px));transform:translateY(105%);transition:transform .25s;box-shadow:0 -6px 0 var(--shd);z-index:50;max-width:680px;margin:0 auto;}
+#sheet *{overflow-wrap:break-word;min-width:0}
+#sheet.open{z-index:50}
+body.sheet-open .top{z-index:60}
+body.sheet-open #fab,body.sheet-open #leftMenu,body.sheet-open #liveChatBox,body.sheet-open #feed,body.sheet-open #chatToast,body.sheet-open .dock,body.sheet-open #dockTab,body.sheet-open .top-collapsible,body.sheet-open #topHandle,body.sheet-open #ig{opacity:0 !important;pointer-events:none !important;visibility:hidden !important}
+body:has(#sheet.open) #fab,body:has(#sheet.open) #leftMenu,body:has(#sheet.open) #liveChatBox,body:has(#sheet.open) #feed,body:has(#sheet.open) #chatToast,body:has(#sheet.open) .dock,body:has(#sheet.open) #dockTab,body:has(#sheet.open) .top-collapsible,body:has(#sheet.open) #topHandle,body:has(#sheet.open) #ig{opacity:0 !important;pointer-events:none !important;visibility:hidden !important}
+#sheet.full{max-height:calc(100vh - 157px)}
+@media(min-width:768px){#sheet.full{width:480px;max-height:calc(100vh - 80px)}}
+#sheet.open{transform:none}
+@media(min-width:768px){#sheet{left:auto;right:16px;top:80px;bottom:84px;width:390px;max-height:calc(100vh - 164px);border-radius:22px;margin:0;transform:translateX(110%)}#sheet.open{transform:none}}
+@media(prefers-reduced-motion:reduce){#sheet{transition:none}}
+#sheet h3{font:700 1.25rem/1.15 Fredoka,sans-serif;color:var(--brand);margin:0 0 8px;padding-right:42px}
+.sheet-closebar{position:sticky;top:0;z-index:5;display:flex;justify-content:space-between;gap:8px;background:var(--card);padding:4px 0 8px;margin:-4px 0 4px}
+.sheet-closebar .xbig{height:48px;padding:0 14px;border-radius:999px;border:1px solid var(--line);background:var(--bg);color:var(--text);font-size:14px;font-weight:700;cursor:pointer}
+.sheet-closebar .x{position:static;width:auto;height:48px;padding:0 18px;border-radius:999px;border:0;background:var(--gold);color:var(--ongold);font-size:15px;cursor:pointer;font-weight:700;box-shadow:0 3px 8px rgba(0,0,0,.25)}
+label{display:grid;gap:5px;font-weight:700;margin-bottom:10px;font-size:.9rem}
+input,select,textarea{font:600 15px Nunito,sans-serif;color:var(--text);background:var(--bg);border:2px solid var(--line);border-radius:14px;padding:10px 12px;width:100%;user-select:text;-webkit-user-select:text;touch-action:manipulation}
+#liveChatBox,#liveChatBox input{pointer-events:auto}
+.roles{display:grid;grid-template-columns:repeat(auto-fill,minmax(135px,1fr));gap:7px;margin:6px 0 12px}
+.role{border:2px solid var(--line);background:var(--bg);color:var(--text);border-radius:14px;padding:8px 10px;font:700 .88rem Fredoka,sans-serif;cursor:pointer;text-align:left;min-height:42px}
+.role[aria-pressed=true]{background:var(--gold);color:var(--ongold);border-color:var(--brand)}
+.tag{display:inline-block;border-radius:11px;padding:2px 9px;background:var(--gold);color:var(--ongold);font:700 .76rem Fredoka,sans-serif;margin:0 5px 5px 0}
+.tag.ok{background:#C8E6C9;color:#1B5E20}
+.tag.warn{background:#FFE0B2;color:#E65100}
+.tag.bad{background:#FFCDD2;color:#B71C1C}
+.q{margin:8px 0;padding:9px 12px;border-radius:14px;background:var(--bg);font-style:italic;border-left:4px solid var(--gold)}
+.bar2{height:10px;border-radius:6px;background:var(--line);overflow:hidden;margin:4px 0 8px}
+.bar2 i{display:block;height:100%;background:var(--brand)}
+.err{color:var(--bad);min-height:1.2em;font-size:.86rem;font-weight:700}
+.note{font-size:.82rem;opacity:.86;margin:6px 0 0}
+.res{display:grid;gap:7px;margin-top:8px}
+.res button,.card-item{text-align:left;border:1px solid var(--line);border-radius:14px;background:var(--bg);color:var(--text);padding:9px 12px;font:700 .9rem Nunito,sans-serif;cursor:pointer;min-height:42px;display:flex;align-items:center;justify-content:space-between;gap:8px;flex-wrap:wrap;overflow-wrap:break-word}
+.res button>*{min-width:0;flex-shrink:1}
+.res button .tag{flex-shrink:0}
+.grid2{display:grid;grid-template-columns:repeat(2,1fr);gap:8px;margin:8px 0}
+.stat-box{background:var(--bg);border:1px solid var(--line);border-radius:14px;padding:8px 10px;text-align:center}
+.stat-box b{display:block;font:700 1.12rem Fredoka,sans-serif;color:var(--brand)}
+.tabs{display:flex;gap:6px;overflow-x:auto;padding-bottom:6px;margin-bottom:10px}
+.tabs button{border:1px solid var(--line);background:var(--bg);color:var(--text);border-radius:99px;padding:6px 12px;font:700 .8rem Fredoka,sans-serif;cursor:pointer;white-space:nowrap}
+.tabs button.act{background:var(--brand);color:var(--onb)}
+body.photo-mode .top,body.photo-mode #feed,body.photo-mode .dock,body.photo-mode #sheet{opacity:0;pointer-events:none}
+body.text-hidden .top,body.text-hidden #feed{opacity:0;pointer-events:none}
+.top-handle{justify-self:center;background:var(--card);border:1px solid var(--line);border-radius:999px;padding:4px 14px;font:700 .75rem Fredoka,sans-serif;color:var(--text);cursor:pointer;box-shadow:0 3px 0 var(--shd);touch-action:none}
+body.top-collapsed .top-collapsible{display:none}
+#donorBar{background:var(--gold);color:var(--ongold);font:700 .74rem Nunito,sans-serif;padding:4px 10px;border-radius:14px;display:flex;align-items:center;justify-content:space-between;gap:8px;box-shadow:0 3px 0 var(--shd)}
+.donor-item{text-align:left;border:1px solid var(--line);border-radius:14px;background:var(--bg);color:var(--text);padding:9px 12px;font:700 .9rem Nunito,sans-serif}
+#exitPhoto{position:fixed;top:calc(14px + env(safe-area-inset-top,0px));right:14px;z-index:20;display:none}
+body.photo-mode #exitPhoto{display:inline-flex}
+
+.top-fixed{display:grid;gap:4px}
+.top-collapsible{display:grid;gap:6px}
+#donorTicker{background:var(--card);border:1px solid var(--line);border-radius:14px;overflow:hidden;padding:5px 0;box-shadow:0 3px 0 var(--shd);font:700 .78rem Nunito,sans-serif;white-space:nowrap}
+#donorTickerTrack{display:inline-block;padding-left:12px;animation:donorScroll 28s linear infinite}
+@keyframes donorScroll{from{transform:translateX(0)}to{transform:translateX(-50%)}}
+@media(prefers-reduced-motion:reduce){#donorTickerTrack{animation:none}}
+#wilayahBar,#pklBar,#keamananBar{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:5px 12px;font:700 .78rem Nunito,sans-serif;display:flex;align-items:center;justify-content:space-between;gap:8px;box-shadow:0 3px 0 var(--shd)}
+#wilayahBar span,#pklBar span,#keamananBar span{flex:1}
+</style>
+</head>
+<body class="chat-open">
+<canvas id="cv" aria-label="Peta Kota Radial Republik Netizenia. Geser untuk menjelajah, ketuk warga, rumah, sungai, PLN, kendaraan, atau bangunan untuk melihat detailnya."></canvas>
+
+<div class="top">
+  <div class="top-fixed">
+    <div class="pill">
+      <h1>🇮🇩 REPUBLIK NETIZENIA <span class="tag" id="epTag" style="margin:0">HARI 3</span> <button class="pill" id="topCollapseBtn" type="button" style="cursor:pointer;font:700 .78rem Fredoka,sans-serif" title="Sembunyikan panel atas">▲</button></h1>
+      <small id="sub">Memuat kota radial...</small>
+    </div>
+  <div id="donorBar">
+    <span id="donorBarTxt">💛 Donatur: memuat…</span>
+    <div style="display:flex;gap:6px;align-items:center">
+      <button class="btn soft" id="donorBarBtn" type="button" style="min-height:28px;padding:0 9px;font-size:.75rem">💛 Donatur</button>
+      <button class="btn soft" id="donorBarHide" type="button" style="min-height:28px;padding:0 9px;font-size:.75rem" title="Sembunyikan bar donatur">✕</button>
+    </div>
+  </div>
+  <button class="pill" id="donorBarMini" type="button" style="display:none;cursor:pointer;font:700 .78rem Fredoka,sans-serif" title="Tampilkan bar donatur">💛</button>
+    <div id="donorTicker" aria-label="Nama-nama donatur berjalan"><span id="donorTickerTrack">💛 Donatur: belum ada — jadilah yang pertama!</span></div>
+  </div>
+  <button class="top-handle" id="topHandle" type="button" title="Ketuk atau tarik untuk menciutkan atau melebarkan panel atas">▼ REPUBLIK NETIZENIA</button>
+  <div class="top-collapsible">
+    <div class="bar">
+    <div style="display:flex;gap:6px;align-items:center;flex-wrap:wrap">
+      <button class="pill" id="bZone" type="button" style="cursor:pointer;font:700 .78rem Fredoka,sans-serif">🧭 Zona Kota</button>
+      <button class="pill" id="bDir" type="button" style="cursor:pointer;font:700 .78rem Fredoka,sans-serif">🎬 Tur Kamera</button>
+      <span class="pill" id="sbChip" title="Status koneksi Supabase" style="cursor:default">💾 Mode Lokal</span>
+      <a class="pill ig" id="ig" target="_blank" rel="noopener">@republiknetizenia</a>
+    </div>
+    </div>
+  <div class="chips">
+    <button class="pill" id="c1" type="button" title="Cari & Klaim Rakyat"></button>
+    <button class="pill" id="c2" type="button" title="Lihat rumah sedang dibangun"></button>
+    <button class="pill" id="c3" type="button" title="Lihat fasilitas kota"></button>
+    <button class="pill" id="cPuas" type="button" title="Lihat Indeks Kepuasan Rakyat"></button>
+    <button class="pill" id="cPln" type="button" title="Status Listrik PLN & Air Sungai"></button>
+    <button class="pill" id="cGov" type="button" title="Wilayah dan pemerintahan">🏛️ Pemerintahan</button>
+    <button class="pill" id="cPkl" type="button" title="Pedagang kaki lima dan gerobak kopi">☕ PKL &amp; Kopi</button>
+    <button class="pill" id="cAman" type="button" title="Polisi, TNI dan penjara">🚓 Keamanan &amp; Penjara</button>
+    <button class="pill" id="cKabul" type="button" title="Rekap semua usulan yang dikabulkan">✅ Kabul Semua</button>
+  </div>
+  <div id="banner">
+    <span id="bannerTxt">📢 Presiden Pak Mulyo di Pusat Kota! Sungai Ikan Mas, Gardu PLN, Sawah & 8 Klaster Rumah Warga Aktif.</span>
+    <div style="display:flex;gap:6px;align-items:center">
+      <button class="btn soft" id="bDay" type="button" style="min-height:28px;padding:0 9px;font-size:.75rem">⏪ H1–H3</button>
+    </div>
+  </div>
+  </div>
+</div>
+
+<div id="leftMenu" aria-label="Menu kiri bawah">
+  <button id="leftChatBtn" type="button" title="Pesan Rakyat"><span id="leftChatIcon">✕</span> Chat<span class="mbadge" id="chatMenuBadge"></span></button>
+  <button id="leftNotifBtn" type="button" title="Notifikasi"><span id="leftNotifIcon">🔔</span> Notif<span class="mbadge" id="notifMenuBadge"></span></button>
+</div>
+<div id="feed" aria-live="polite"></div>
+<div id="liveChatBox" aria-live="polite">
+  <div id="liveChatBoxHeader" style="display:flex;align-items:center;justify-content:space-between;gap:6px;margin-bottom:6px">
+    <b style="font:700 .82rem Fredoka,sans-serif">✉️ Pesan Rakyat <span style="opacity:.6;font-size:.65rem">v13:05</span></b>
+    <button class="btn soft" id="liveChatMin" type="button" style="min-height:28px;padding:0 9px;font-size:.75rem" title="Sembunyikan / tampilkan live chat">—</button>
+  </div>
+  <div id="liveChatStream"></div>
+  <div id="liveChatInputRow" style="display:flex;gap:6px;margin-top:6px">
+    <input id="liveChatName" type="text" inputmode="text" enterkeyhint="next" autocomplete="off" placeholder="@nama" maxlength="30" style="width:64px;flex-shrink:0;padding:12px 8px;font-size:15px">
+    <input id="liveChatText" type="text" inputmode="text" enterkeyhint="send" autocomplete="off" placeholder="Ketik pesan..." maxlength="200" style="flex:1;min-width:0;padding:12px 10px;font-size:16px">
+    <button class="btn gold" id="liveChatSend" type="button" style="min-height:44px;padding:0 12px;font-size:15px;flex-shrink:0">Kirim</button>
+  </div>
+</div>
+<div id="chatToast" aria-live="polite"></div>
+<section id="sheet" aria-live="polite"></section>
+<button class="btn gold" id="exitPhoto" type="button">✕ Selesai Mode Foto / Tur</button>
+
+<nav class="dock">
+  <button class="btn soft" id="dockHide" type="button" title="Sembunyikan menu bawah">‹</button>
+  <button class="btn gold" id="bDaftar" type="button">➕ Jadi Rakyat</button>
+  <button class="btn soft" id="bUsul" type="button" title="Papan Usulan & Voting">📋 Usulan</button>
+  <button class="btn soft" id="bPuas" type="button" title="Kepuasan & Aktivitas Warga">😊 Kepuasan</button>
+  <button class="btn soft" id="bCari" type="button" aria-label="Cari atau Klaim Nama">🔍 Cari</button>
+  <button class="btn soft" id="bFoto" type="button" title="Simpan PNG Story">📸</button>
+  <button class="btn soft" id="bIn" type="button" aria-label="Perbesar">+</button>
+  <button class="btn soft" id="bOut" type="button" aria-label="Perkecil">−</button>
+  <button class="btn soft" id="bTeks" type="button" title="Tampilkan/sembunyikan teks layar">🙈 Teks</button>
+  <button class="btn soft" id="bDonatur" type="button" title="Papan Donatur">💛 Donatur</button>
+  <button class="btn soft" id="bChat" type="button" title="Pesan Rakyat">💬 <span id="chatBadge" style="display:none;background:var(--bad);color:#fff;border-radius:99px;padding:0 6px;font-size:.7rem">0</span></button>
+  <button class="btn soft" id="bAdmin" type="button" title="Panel Admin & Schema">⚙️</button>
+</nav>
+<button class="btn soft" id="dockTab" type="button" title="Tampilkan menu bawah" style="display:none">☰</button>
+</nav>
+
+<script>
+/* ====== DATA UTAMA & REKAP KOMENTAR 1 NOV 2026 ====== */
+const CONFIG = {
+  ig: 'https://www.instagram.com/republiknetizenia/',
+  hari: 3,
+  stats: { rakyat: 1500, followers: 2012 },
+  kapasitas: 144,
+  supabaseUrl: 'https://siyknwzzjtyykwhiqmeu.supabase.co',
+  supabaseAnonKey: 'sb_publishable_OO0uiSC-bZ-pGaPTyFeIYw_eEQOFi56',
+  warga: [
+    { n: 'David', p: 'Tukang', k: 'Tukang utama kepercayaan Pak Mulyo' },
+    { n: 'Ali Akbar Rafsanjani', p: 'Warga', k: 'Rakyat pertama pengusul Rumah Pak Mulyo' }
+  ],
+  seed: {
+    "Dokter": ["Dion Gabriel S.Parhusip","korizen_Diya🤍💛","KarShikii","adtya_","kyutt_👅","raaa","bg_bhy","Eliya J.M","riri rianty💞","Octa Galuh","apiin_","fiii","AZ - Zahra","princess anggian","Aiccio","Putra Anfield","Tiara Putri Cikita","Agus Susanto","Darlene Winata Ho","pitsby hsvau","kentung","qheyra athalita","£SM₱S_$D€L","fabian","Airin Indrianingsih","dadaaa_zflaa","bim_boysss","jungkook wife♡🩷","Raniaairaa","Gavrilla Anabel juniko","Dyajeng Rahayu","Wahyu Latipah"],
+    "Warga": ["Sekedar Hobi","Firzz Ajh","ell🐣","Hasby Shohibul Risky","Alqias Kurniawan","tamaa_stronggboyss","𝕬𝖓𝖙𝖊𝖝𝖝 𝕸𝖚𝖘𝖆𝖉𝖉","Zulfan","YES","dho","Ugal","deentaabotolyakultt🐾🐧","Rahmad Rinaldo Rais","sigit","Da Ar","elang","Anggi Senja","Deni Syahputra","Bang Pais","Harry Axl Il Principino","Muhammad Rizky","alfi_gt1","Muh Arie","Ardi Ris","maal_dii","𝘕𝘦𝘵𝘸𝘰𝘳𝘬 𝘌𝘯𝘨𝘪𝘯𝘦𝘦𝘳","Bangun Dwi Wiratomo","Arka Masrizal","esjeeee","أندي إلهام","rafiii","Saragih Faudi","Udo iam","Hengky Situmorang","Oddysey Hub","TEMANBAIKBAPAK.","chrs","Jaa","danda","Yeremia Malaru","mut","Mochamad Deanira Magustira","rafi","RIN 1%","A----17","Andri.","si kasep","Bintang Utama Putra","ヨリム","Amel Ramadhani","Maz Kun","ttt","דוטה","Faldi Kase","ANCU jhi","Nathan ardra faviandigna","Pi Yan","ʚɞ miraa || pretty ʚɞ","Imam IJ","Spotting Cars Batam","larassukamatch","wahyu","Conell Grip","putra sarusuk","Fahri 27","oktaviajiwo","Muh.reyhan rafid","Dissleksia!","Yura","Abu Kurir Gowa","yoGex","Mj fishing","J4sunn__","rnda_zahrial","Ahmad Afani","Siti Fatimah","Baale","Babah Zharif","Fakri Nur","Qhotim Salavizer","Herin Supardi","Wahyu S","Jonatan Natan","KakLOOK","ANGGI","Betaubun","Sifak Ardi","Abdul Ghoni Muzakki","Fajar Mitha","م. ريزال فاه‍مي","Richie Mikyano","Zulfikar"],
+    "Guru": ["Rerey Rio Lia","Wahyu YU","Mapril Van Lapan","rulli amarullah","a fizh 🐟🐠","24_Sul💫","acha_chaa","Fazril","Hanna Digital Printing","aisyhn","Ilham Siregar","@Ahmad 20","~pukiszz!","aboutzaaaaa","_COBRA_","إندر ملك","manggong_72","vian","Siswandi Fathurrahman","yiddd____zzz","maul_uull","𝓡𝓸𝓯𝓲𝓷𝓪 𝓔𝓵𝓲𝓼𝓪𝓫𝓮𝓽𝓱 𝓜𝓲𝓵𝓪𝓷𝓲𝓼𝓽𝔂 𝓒𝓸𝓶𝓮","norainah","Gery Ramadhan Pamungkas","Ari Pangestu II","иваль Джульфикар","୨୧˙˚","Iqlima Salsabila Oktaviani","Ginanjar Eka Saputra","Egi Walker","basap_wau","883176","atifa meisya","@#48","bee","rilla","Deni Elva Riani","𝓐𝓵𝓭𝓸𝓿𝓪","ubai_da","laetampu","dw_arfafebrian_211"],
+    "Menteri": ["alinda","Budhi Sutanto Nugroho","Nata","m. rizky aulia pratama","wait for my revenge","mesak_m@rin_","raymondsss","T W Riau","Kha_ka13","Muhammad Asril","Nehemia Edoard legi","Febri Muchdian Kusuma","Muhammad Nur Ichsan","Ahmad Fausan","Raga Alif","Yulie Bilqis","rafycoa02","DwiPangestu","Elv Riani","Sfyn Thok","Danexh","Chu_Chan🌼🍀","Heryyadriaan","𝓶𝓾𝓱𝓪𝓶𝓶𝓪𝓭 𝓱𝓪𝓭𝓲 𝓳𝓪𝓷𝓾𝓪𝓻","Wancutrss","dek relll","Ryan Moh Rizqi","𝕸𝖚𝖍𝖆𝖒𝖆𝖉 𝕱𝖆𝖏𝖆𝖗 𝕬𝖑 𝕻𝖆𝖘𝖑𝖆🐧","Warwer _Yit","yusrilihzmhndra","Mentri_Keuang4n","Menyerah","Zulfahmi_375","jangga","Dooo!","Bagus Baseperi","andrean","Wawasan Luas","Fahdya'Sub Farras","Farial","M'nakang","Egy Nopranda","mas"],
+    "Tukang": ["Azhari_nst","David🧢","yo  aj","pijat cianjur","محمد الفاتح ناز","fathur","Arifinzzz","Apu","alexa dra nur dinissa","JOSUA GANTENG","Bayzur Rohman","AONE ☁️","piziinyalagibobo","Aditya Fadjar Wullan","fr1d4snn_","utramen","denzzbrengsekk👾","Bihar Efendi","R17","Ahmad D4RIZZZ","Netizen +62","Dwi Yansyah Putra","Púťŕ4śóháńďšömë","Mohong","anotherm4nn⚜️","heri septian","wolf_the_balck","toto__pamalastenar","Ibnu Muzacky","pecintaamericogabegula","Kholip Farzeky","Ruby Ahmad","Muhammad Aditya Wanzir","Rikki rikardo Napitupulu","Dion Tempalo","KRISTIAN SILALAHI","San7","Muhammad Ridhuan","JAISYUL USRAH","yuspun_06","Jack Kurnia Pratama","Bangeza.s__"],
+    "Mandor": ["resha mokong","al","Berseri_","Imam Herman","Afif Musthafa","alex"],
+    "Polisi": ["Nothing","rayan.jak","Fanji Giovanski","Tarigan","Bintang","Arham's DarkSide","Ilham Harahap","Shendy Ongkowijaya","#speedwil","bang ris","Leman Sopiyan","Fitrah","Samsari Smsari","Ilham aja sih","Adi Wijaya","dullll","BigStar","★~-Anugerahh-~★","David🌻","walid",">mobil mbg<"],
+    "Arsitek": ["Wahyu April Putra","chocolate luv matcha🍫🍵","Rafka Febrian","Z"],
+    "Murid": ["271210___","CARI_TAU_SENDIRI","si botak kyo kiano","fanny","namanya4adel🍃"],
+    "Pasien": ["pnggil_aj_Sr.Mariaellah","l0vlyara🦖","Didia elan"],
+    "Penjahat": ["YR","the bung's","Jull","soekamto","M Bachrull Ulum","aby"],
+    "Pedagang": ["Fory Coffee","Jhoon","s","Pelajar Cupang","Alfie Rizkiyansyah","manusia favorit 🤍","Murialdo","Nhidea Dzaffira","Z 41 N","apa aja","incov","Raffi","Bengki Gustiawan","Rangga","Ahmad fajar risky","Aras","lutpit","dede.","Mura_Cloth","Maru","Nadhy Badhol","RIZKI SEPTIYANTO","𝒊𝒕𝒔_𝒛𝒊𝒅𝒏","muhamad agung","ayam bakar","s4answho"]
+  },
+  fas: [
+    { id: 'kantor', n: 'Rumah Pak Mulyo', e: '🏠', x: 0, y: -15, w: 136, h: 88, c: '#F2E2B5', st: 'jadi', pr: 1, day: 1, k: 'Titik Nol Pusat Kota Republik Netizenia! Presiden bangun rumah sendiri dulu. Plakat usulan: Ali Akbar Rafsanjani.' },
+    { id: 'istana', n: 'Istana Negara', e: '🏛️', x: 0, y: -165, w: 150, h: 92, c: '#F0B52E', st: 'usulan', pr: 0.15, day: 3, k: 'Masih usulan di Papan Usulan. Terletak di utara Rumah Pak Mulyo (Usulan V, Sukma Syari, PAPITO CUAN).' },
+    { id: 'tugu', n: 'Alun-Alun & Tugu Kuda', e: '🐎', x: 0, y: 115, w: 112, h: 74, c: '#D7E8BA', st: 'jadi', pr: 1, day: 2, k: 'Bundaran Pusat Kota dengan Tugu Kuda Nasional (usulan Yura) & Bendera Merah-Hijau-Putih (usulan Dissleksia!).' },
+    { id: 'sekolah', n: 'Sekolah', e: '🏫', x: -250, y: -90, w: 146, h: 86, c: '#E8B04A', st: 'sebagian', pr: 0.55, day: 2, k: 'Pondasi dan dinding sudah berdiri, sedang dikebut Tukang (Usulan 45 warga, kepsek 𝕮.𝖍.𝖊.𝖓.𝖙👾 & Ari Pangestu II).' },
+    { id: 'kosan', n: 'Kosan & Daycare Sekolah', e: '🏘️', x: -415, y: -90, w: 116, h: 74, c: '#F6D3E0', st: 'jadi', pr: 1, day: 3, k: 'Kosan dekat sekolah milik Ibu Kos @larassukamatch & Daycare anak @cahayamalam.' },
+    { id: 'ibadah', n: 'Tempat Ibadah', e: '🛐', x: -250, y: 75, w: 136, h: 82, c: '#9ED0B5', st: 'sebagian', pr: 0.45, day: 2, k: 'Kompleks Rumah Ibadah 6 Agama yang sedang dibangun sebagian (Usulan panggil_ajafrillaa, chocolate luv matcha🍫🍵).' },
+    { id: 'lapangan', n: 'Tanah Lapang', e: '⚽', x: -250, y: 230, w: 130, h: 95, c: '#A6DB8F', st: 'jadi', pr: 1, day: 1, k: 'Tanah kosong buat santai sore, main bola murid, & panggung konser rock ttt.' },
+    { id: 'stadion', n: 'Stadion Netizenia FC', e: '🏟️', x: -430, y: 230, w: 144, h: 96, c: '#81C784', st: 'usulan', pr: 0.2, day: 3, k: 'Stadion sepak bola standar PIPA kapasitas 90.000 penonton (Usulan Abu Kurir Gowa & 44yyiii).' },
+    { id: 'rs', n: 'Rumah Sakit', e: '🏥', x: 250, y: -90, w: 148, h: 86, c: '#F4F4EE', st: 'jadi', pr: 1, day: 2, k: 'Sudah jadi di Hari 2. RS Gratis Tanpa BPJS & Apotek (Kepala Dokter KarShikii, Apoteker Dyajeng Rahayu).' },
+    { id: 'posko', n: 'Posko Tukang', e: '⛺', x: 250, y: 75, w: 114, h: 74, c: '#F29E6E', st: 'jadi', pr: 1, day: 1, k: 'Tenda tempat tukang dan rakyat makan siang serta tempat kumpul warga yang belum dapat kerja.' },
+    { id: 'polisi', n: 'Kantor Polisi & Damkar', e: '🚓', x: 420, y: -90, w: 132, h: 80, c: '#90CAF9', st: 'sebagian', pr: 0.6, day: 3, k: 'Markas PRN & Pemadam Kebakaran (Kapolri Bintang, Ilham Harahap, Fanji Giovanski, Damkar dullll).' },
+    { id: 'bank', n: 'Bank Negara & Pajak 0%', e: '🏦', x: 420, y: 75, w: 122, h: 76, c: '#FFE082', st: 'sebagian', pr: 0.4, day: 3, k: 'Bank Sentral & Kas Negara Bebas Pajak (Menkeu Mentri_Keuang4n, rafycoa02, Pakageeee).' },
+    { id: 'pln', n: 'Gardu Induk PLN & WiFi', e: '⚡', x: 245, y: -250, w: 134, h: 78, c: '#FFF59D', st: 'jadi', pr: 1, day: 2, k: 'Pembangkit Listrik Kabel Bawah Tanah & Tower Internet Cepat (J4sunn__, Ahmad Afani, Oddysey Hub, Siti Fatimah).' },
+    { id: 'waduk', n: 'Bendungan & Sungai', e: '🌊', x: -210, y: -265, w: 140, h: 76, c: '#80DEEA', st: 'jadi', pr: 1, day: 2, k: 'Bendungan air irigasi & sungai jernih berisi ikan mas (Usulan yoGex, Mj fishing, arkhan, Muh.reyhan rafid).' },
+    { id: 'tani', n: 'Zona Pangan & Ternak', e: '🌾', x: -425, y: -255, w: 148, h: 84, c: '#C5E1A5', st: 'jadi', pr: 1, day: 2, k: 'Sawah padi, kebun pangan bebas sawit, kolam lele & sapi perah (RIN 1%, Maz Kun, Pelajar Cupang, Dicky Zanuar).' },
+    { id: 'barak', n: 'Barak TNI Kaki Gunung', e: '🪖', x: 430, y: -250, w: 132, h: 78, c: '#A5D6A7', st: 'sebagian', pr: 0.5, day: 3, k: 'Markas Pertahanan & Paspampres di pegunungan (Jendral esjeeee, Hasby Shohibul Risky, Yeremia Malaru).' },
+    { id: 'pasar', n: 'Ruko UMKM & Kopi', e: '🏪', x: 250, y: 230, w: 154, h: 84, c: '#FFCC80', st: 'jadi', pr: 1, day: 2, k: 'Ruko PaluGada (Alfie Rizkiyansyah), Fory Coffee, Warung Madura 24 Jam, Martabak Perintis, & Barber.' },
+    { id: 'penjara', n: 'Penjara Netizenia', e: '🔒', x: 0, y: 235, w: 140, h: 80, c: '#B0BEC5', st: 'sebagian', pr: 0.5, day: 3, k: 'Penjara kota di selatan pusat kota. Tahanan peran: penjahat dan perampok yang mendaftar sendiri di komen. Hukuman di kota ini penjara, bukan eksekusi.' },
+    { id: 'pkl', n: 'Zona PKL Pinggir Jalan', e: '🛒', x: 0, y: 335, w: 220, h: 70, c: '#FFCC80', st: 'jadi', pr: 1, day: 3, k: 'Dagang pinggir jalan: Gerobak Kopi Fory Coffee (dorong), Warteg (s), Pecel Lele (Pelajar Cupang), PKL Jhoon, plus Ruko PaluGada & Warung Madura di Pasar.' },
+    { id: 'tamanlove', n: 'Taman Love Pencari Jodoh', e: '💕', x: -180, y: 335, w: 140, h: 70, c: '#F6D3E0', st: 'jadi', pr: 1, day: 3, k: 'Taman kenalan & cari jodoh: warga nongkrong sore, kenalan, bukan pasangan resmi yang ditetapkan presiden.' },
+    { id: 'apartemen', n: 'Apartemen Netizenia', e: '🏢', x: -340, y: 390, w: 320, h: 200, c: '#E8DCC8', st: 'jadi', pr: 1, day: 3, k: 'Apartemen gede: kamar-kamar kelihatan, penghuni di dalam, kolam renang, parkiran mobil banyak, satpam jaga gerbang.' },
+    { id: 'pabrik', n: 'Pabrik & Bengkel Otomotif', e: '🏭', x: 435, y: 230, w: 136, h: 82, c: '#B0BEC5', st: 'sebagian', pr: 0.5, day: 3, k: 'Pabrik perakitan mobil Vanguard AutoWorks (Spotting Cars Batam) & Bengkel Racing (GARASI ROTOM).' }
+  ],
+  proposals: [
+    { id: 'p_rumah', title: 'Perumahan Rakyat & Rumah Subsidi Gratis', votes: 130, status: 'building', day: 2, proposer: 'Amarra, wintersky, Ruby Ahmad' },
+    { id: 'p_sekolah', title: 'Sekolah Modern, Kampus & Perpustakaan', votes: 45, status: 'building', day: 2, proposer: '𝕮.𝖍.𝖊.𝖓.𝖙👾, Riyan Saputra, cepra' },
+    { id: 'p_jalan', title: 'Jalan Aspal Mulus & Jembatan Sungai', votes: 24, status: 'done', day: 2, proposer: 'rap_bae, 45_pasti_terb4ng🚀🚀, Farial' },
+    { id: 'p_rs', title: 'Rumah Sakit VIP Gratis & Apotek Rakyat', votes: 21, status: 'done', day: 2, proposer: 'andra, Raniaairaa, Dyajeng Rahayu' },
+    { id: 'p_pln', title: 'Listrik Kabel Bawah Tanah, Air Bersih & WiFi', votes: 18, status: 'done', day: 3, proposer: 'Ahmad Afani, Siti Fatimah, yoGex' },
+    { id: 'p_lapangan', title: 'Lapangan Olahraga, Voli & Taman Kota', votes: 16, status: 'done', day: 2, proposer: 'Indonesian, alexa dra nur dinissa, Al Huda' },
+    { id: 'p_ibadah', title: 'Tempat Ibadah Lengkap 6 Agama', votes: 13, status: 'building', day: 2, proposer: 'panggil_ajafrillaa, chocolate luv matcha🍫🍵' },
+    { id: 'p_istana', title: 'Istana Negara & Gedung MPN Megah', votes: 10, status: 'open', day: 4, proposer: 'V, Sukma Syari, PAPITO CUAN' },
+    { id: 'p_bendera', title: 'Bendera 3 Strip (Merah-Hijau-Putih) & Tugu Kuda', votes: 10, status: 'done', day: 2, proposer: 'Dissleksia!, Yura' },
+    { id: 'p_polisi', title: 'Kantor Polisi Jujur, Damkar & Barak TNI', votes: 7, status: 'building', day: 3, proposer: 'esjeeee, bang ris, Fanji Giovanski' },
+    { id: 'p_stadion', title: 'Stadion Sepak Bola Netizenia FC (90.000 Kursi)', votes: 6, status: 'open', day: 4, proposer: 'Abu Kurir Gowa, 44yyiii' },
+    { id: 'p_pasar', title: 'Pasar Tradisional, Ruko PaluGada & Fory Coffee', votes: 6, status: 'done', day: 3, proposer: 'Fory Coffee, Alfie Rizkiyansyah, manusia favorit 🤍' }
+  ]
+};
+
+const PERAN = {
+  Tukang:   { e: '🔨', c: '#F0B52E' },
+  Mandor:   { e: '📐', c: '#E8833A' },
+  Arsitek:  { e: '✏️', c: '#3FA37B' },
+  Menteri:  { e: '💼', c: '#6B4EA3' },
+  Guru:     { e: '📚', c: '#8A5A3C' },
+  Murid:    { e: '🎒', c: '#3C7FD1' },
+  Dokter:   { e: '🩺', c: '#DADAD2' },
+  Pasien:   { e: '🤒', c: '#E7A6B8' },
+  Polisi:   { e: '🚓', c: '#2B3A67' },
+  Penjahat: { e: '🦹', c: '#37474F' },
+  Pedagang: { e: '🍜', c: '#FF8F00' },
+  Warga:    { e: '🏠', c: '#79B94F' },
+  Presiden: { e: '🇮🇩', c: '#1E2A44' }
+};
+
+const ACTR = {
+  Tukang:   'membangun',
+  Mandor:   'mengawasi tukang',
+  Arsitek:  'menggambar denah',
+  Menteri:  'rapat urusan negara',
+  Guru:     'mengajar',
+  Murid:    'belajar',
+  Dokter:   'merawat pasien',
+  Pasien:   'antre berobat',
+  Polisi:   'patroli',
+  Penjahat: 'mengendap di kota',
+  Pedagang: 'dagang di lapak',
+  Warga:    'jalan-jalan',
+  Presiden: 'meninjau pembangunan'
+};
+
+const THO = {
+  Tukang:   ['Satu bata lagi, satu usulan netizen jadi.', 'Tembok ini harus lurus, netizen pasti ngecek.', 'Bareng David kebut bangun rumah warga & sekolah!'],
+  Mandor:   ['Tukang baru banyak, harus diatur biar nggak numpuk.', 'Denah radial Pak Mulyo sudah sesuai usulan teratas.'],
+  Arsitek:  ['Usulan paling banyak di-vote, denahnya kugambar sekarang.', 'Tata kota radial bikin rumah Pak Mulyo di tengah makin rapi.'],
+  Menteri:  ['Anggaran negara masih satu ember, harus hemat.', 'Rapat sama Pak Mulyo di pusat kota, bebas korupsi!'],
+  Guru:     ['Pelajaran pertama hari ini: cara antre.', 'Muridnya nambah terus, papan tulis belum cukup.'],
+  Murid:    ['Semoga hari ini nggak ada PR.', 'Sekolahnya belum jadi, semangatnya sudah.'],
+  Dokter:   ['Rumah sakit sudah buka, pasien dilayani gratis.', 'Stok obat dari apotek cukup untuk semua warga.'],
+  Pasien:   ['Cuma pusing mikirin usulan, tapi tetap antre.', 'Untung berobat di RS Netizenia gratis tanpa BPJS.'],
+  Polisi:   ['Aman terkendali, kecuali kucing yang nebeng itu.', 'Patroli jaga bahan bangunan dari incaran preman.'],
+  Penjahat: ['Ampun Pak Mulyo, kapok maling bata!', 'Di penjara dikasih makan gratis ga ya?', 'Mengendap dulu, jangan sampai polisi lihat.'],
+  Pedagang: ['Kopi dingin/panas siap!', 'Pecel lele hangat!', 'Warteg buka 24 jam!', 'Dagangan segar, mampir dulu!'],
+  Warga:    ['Enak tinggal di negara yang dibangun dari komen.', 'Sungai jernih ada ikan mas, listrik PLN juga di bawah tanah!'],
+  Presiden: ['Rumah saya di tengah supaya dekat menjenguk semua rakyat.', 'Besok usulan teratas dibangun, janji.']
+};
+
+/* ====== UTILITAS & SINKRONISASI REALTIME ====== */
+const $ = s => document.querySelector(s), cv = $('#cv'), ctx = cv.getContext('2d');
+const esc = s => String(s).replace(/[&<>"']/g, c => ({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;' }[c]));
+const store = {
+  get(k, d) { try { const v = localStorage.getItem(k); return v ? JSON.parse(v) : d; } catch (e) { return d; } },
+  set(k, v) { try { localStorage.setItem(k, JSON.stringify(v)); } catch (e) {} }
+};
+const hs = n => (Math.imul(n ^ 61, 2654435761) >>> 0) / 4294967296;
+const pick = a => a[Math.random() * a.length | 0];
+const bc = typeof BroadcastChannel !== 'undefined' ? new BroadcastChannel('republik_netizenia_sync') : null;
+/* ====== TAHAP 1 SUPABASE — Dunia Bersama (opsional; tanpa kunci = Mode Lokal persis seperti biasa) ====== */
+/* Isi CONFIG.supabaseUrl dan CONFIG.supabaseAnonKey untuk mengaktifkan. Kunci anon bersifat publik
+   by design dan aman HANYA karena RLS + RPC di supabase_migration_tahap1.sql membatasi jalur tulis.
+   JANGAN PERNAH menempel service_role key di halaman ini. */
+/* ====== TAHAP 2 SUPABASE — Panel Admin (Google OAuth + RPC admin) ======
+   KEAMANAN: tidak ada PIN di halaman ini. PIN yang ditulis di halaman bisa
+   dibaca siapa pun lewat view-source, jadi itu bukan pengaman.
+   Kekuatan admin berasal dari: (1) Supabase Auth lewat login Google,
+   (2) tabel public.admins (hanya user_id yang terdaftar), (3) RPC
+   SECURITY DEFINER yang menolak pemanggil yang bukan admin.
+   JANGAN PERNAH menempel service_role key di halaman ini.
+   Login Google butuh provider Google aktif di Supabase Dashboard >
+   Authentication > Providers + Client ID/Secret dari Google Cloud
+   Console, dan halaman dibuka lewat https (hasil deploy) — Google
+   tidak bisa redirect kembali ke file lokal (file://). */
+let sbSettingsChannel = null, sbClaimsChannel = null;
+const sbPendingClaims = store.get('ntz_claims_pending_v1', {});
+let sbClient = null, sbMode = false, sbChannel = null;
+const sbMyIds = new Set();
+const sbDeviceId = (() => {
+  let id = null;
+  try { id = localStorage.getItem('ntz_device_id'); } catch (e) {}
+  if (!id) {
+    id = 'dev_' + Math.random().toString(36).slice(2, 10) + Date.now().toString(36);
+    try { localStorage.setItem('ntz_device_id', id); } catch (e) {}
+  }
+  return id;
+})();
+const sbHasKeys = () => !!(CONFIG.supabaseUrl && CONFIG.supabaseAnonKey);
+function sbSetChip(txt) { const el = document.getElementById('sbChip'); if (el) el.textContent = txt; }
+
+/* Muat SDK lewat dynamic import di dalam fungsi (script tetap classic, bukan module,
+   jadi semua variabel top-level tetap global). Gagal import / gagal fetch = Mode Lokal. */
+async function sbInit() {
+  if (!sbHasKeys()) return null;
+  try {
+    const mod = await import('https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm');
+    sbClient = mod.createClient(CONFIG.supabaseUrl, CONFIG.supabaseAnonKey);
+    const q = Promise.all([
+      sbClient.from('residents').select('*').order('created_at', { ascending: true }).limit(5000),
+      sbClient.from('proposals').select('*'),
+      sbClient.from('buildings').select('*')
+    ]);
+    const timeout = new Promise((_, rej) => setTimeout(() => rej(new Error('timeout 8 detik')), 8000));
+    const [rRes, rProp, rBld] = await Promise.race([q, timeout]);
+    const err = rRes.error || rProp.error || rBld.error;
+    if (err) throw new Error(err.message);
+    sbMode = true;
+    sbSetChip('🌐 Dunia Bersama Aktif');
+    return { residents: rRes.data || [], proposals: rProp.data || [], buildings: rBld.data || [] };
+  } catch (e) {
+    sbClient = null; sbMode = false;
+    sbSetChip('💾 Mode Lokal (Supabase tidak terjangkau)');
+    return null;
+  }
+}
+
+function sbFindAgentByName(name) {
+  const low = String(name).toLowerCase();
+  return ag.find(a => a.origName.toLowerCase() === low || a.n.toLowerCase() === low) || null;
+}
+/* Jalur masuk yang sama persis dengan daftar lokal: muncul di Gerbang Utara (0,-500),
+   lalu berjalan lewat jalan menuju pintu rumahnya. */
+function sbSpawnFromGate(a) {
+  const d = door(a, 'home');
+  a.x = 0; a.y = -500;
+  a.path = buildRoadPath(0, -500, d.x, d.y, a.ox, a.oy);
+  a.dest = 'home';
+}
+function sbOnResidentInsert(row) {
+  if (!row || row.opt_out) return;
+  if (row.id != null && sbMyIds.has(row.id)) return; /* insert dari perangkat ini sendiri */
+  if (sbFindAgentByName(row.display_name)) return; /* sudah ada via snapshot awal */
+  const role = PERAN[row.role] ? row.role : 'Warga';
+  const a = addAgent(row.display_name, role, Number.isInteger(row.plot_id) ? row.plot_id : null, false, false);
+  if (!a) return;
+  if (typeof a.home === 'number' && plots[a.home] && typeof row.house_progress === 'number' && row.house_progress >= 0 && row.house_progress <= 1) plots[a.home].pr = row.house_progress;
+  sbSpawnFromGate(a);
+  updateChips();
+  noteLive('@' + row.display_name + ' resmi menjadi Rakyat Netizenia (' + role + ') di Rumah No. ' + (a.home + 1));
+}
+function sbOnResidentUpdate(row) {
+  if (!row) return;
+  const a = sbFindAgentByName(row.display_name);
+  if (!a) return;
+  if (row.opt_out) {
+    if (typeof a.home === 'number' && plots[a.home]) plots[a.home].a = null;
+    const idx = ag.indexOf(a); if (idx >= 0) ag.splice(idx, 1);
+    updateChips();
+    note('Nama ' + row.display_name + ' dihapus dari kota.');
+    return;
+  }
+  if (row.claimed && row.ig_username) { a.n = row.ig_username; a.ig = true; if (sbPendingClaims[row.display_name]) { delete sbPendingClaims[row.display_name]; store.set('ntz_claims_pending_v1', sbPendingClaims); } }
+  if (typeof a.home === 'number' && plots[a.home] && typeof row.house_progress === 'number' && row.house_progress >= 0 && row.house_progress <= 1) plots[a.home].pr = row.house_progress;
+  updateChips();
+}
+function sbOnProposalUpdate(row) {
+  if (!row) return;
+  const p = CONFIG.proposals.find(x => x.id === row.id);
+  if (p) { p.votes = row.votes; p.status = row.status; }
+  if (mode === 'usulan') openProposals();
+}
+function sbOnProposalInsert(row) {
+  if (!row || CONFIG.proposals.some(x => x.id === row.id)) return;
+  CONFIG.proposals.push({ id: row.id, title: row.title, proposer: row.proposer || 'Warga', votes: row.votes || 0, status: row.status || 'open', day: row.build_day || 3 });
+  if (mode === 'usulan') openProposals();
+}
+function sbOnBuildingUpdate(row) {
+  if (!row) return;
+  const f = FAS[row.id];
+  if (!f) return;
+  if (['usulan', 'sebagian', 'jadi'].indexOf(row.status) >= 0) f.st = row.status;
+  if (typeof row.progress === 'number') f.pr = Math.max(0, Math.min(1, row.progress));
+  if (mode === 'info' && selP === f) infoF(f);
+  updateChips();
+}
+function sbSubscribe() {
+  if (!sbClient || sbChannel) return;
+  sbChannel = sbClient.channel('netizenia-world')
+    .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'residents' }, p => sbOnResidentInsert(p.new))
+    .on('postgres_changes', { event: 'UPDATE', schema: 'public', table: 'residents' }, p => sbOnResidentUpdate(p.new))
+    .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'proposals' }, p => sbOnProposalInsert(p.new))
+    .on('postgres_changes', { event: 'UPDATE', schema: 'public', table: 'proposals' }, p => sbOnProposalUpdate(p.new))
+    .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'buildings' }, p => sbOnBuildingUpdate(p.new))
+    .on('postgres_changes', { event: 'UPDATE', schema: 'public', table: 'buildings' }, p => sbOnBuildingUpdate(p.new))
+    .subscribe(st => { if (st !== 'SUBSCRIBED') sbSetChip('💾 Mode Lokal (Realtime: ' + st + ')'); });
+  /* TAHAP 2: kanal terpisah untuk settings — gagal di sini tidak boleh merusak kanal utama. */
+  if (!sbSettingsChannel) {
+    sbSettingsChannel = sbClient.channel('netizenia-settings')
+      .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'settings' }, p => { sbApplySettingsRow(p.new.key, p.new.value); updateChips(); })
+      .on('postgres_changes', { event: 'UPDATE', schema: 'public', table: 'settings' }, p => { sbApplySettingsRow(p.new.key, p.new.value); updateChips(); })
+      .subscribe();
+  }
+}
+async function sbRegisterInsert(u, role, home, housePr) {
+  const { data, error } = await sbClient.from('residents').insert({ display_name: u, claimed: true, role, plot_id: home, house_progress: housePr }).select('id').single();
+  if (error) throw new Error(error.message);
+  if (data && data.id != null) sbMyIds.add(data.id);
+  return data;
+}
+async function sbRpc(name, args) {
+  const { data, error } = await sbClient.rpc(name, args);
+  if (error) throw new Error(error.message);
+  return typeof data === 'string' ? data : '';
+}
+/* TAHAP 2: terapkan satu baris settings ke CONFIG + tampilan. Nilai
+   settings selalu angka (hari / total rakyat / followers). */
+function sbApplySettingsRow(key, value) {
+  if (key === 'saweria_url' && typeof value === 'string') { let v = value.trim(); if (v && !/^https?:\/\//i.test(v)) v = 'https://' + v; saweriaUrl = v; return; }
+  if (typeof value !== 'number' || !isFinite(value)) return;
+  if (key === 'hari') {
+    CONFIG.hari = value;
+    if (value >= 1) {
+      viewDay = value;
+      const el = document.getElementById('epTag'); if (el) el.textContent = 'HARI ' + value;
+      const epTitles = { 1: '📢 HARI 1: Rakyatnya nol. Yang berkuasa satu (Pak Mulyo di Pusat Kota).', 2: '📢 HARI 2: Rumah warga, RS gratis, Sungai & Gardu PLN mulai berdiri.', 3: '📢 HARI 3: Pelamar menteri banyak, tukang lembur bangun rumah & fasilitas!' };
+      const bt = document.getElementById('bannerTxt'); if (bt) bt.textContent = epTitles[value] || ('📢 HARI ' + value + ': Kota terus dibangun rakyat!');
+    }
+  } else if (key === 'stats_rakyat') { CONFIG.stats.rakyat = value; }
+  else if (key === 'followers') { CONFIG.stats.followers = value; }
+}
+/* TAHAP 2: tarik settings (tidak fatal — tabel belum ada karena migrasi
+   Tahap 2 belum jalan = abaikan, kota tetap jalan dengan Tahap 1). */
+async function sbLoadSettings() {
+  if (!sbClient) return;
+  try {
+    const { data, error } = await sbClient.from('settings').select('key,value');
+    if (error) return;
+    (data || []).forEach(r => sbApplySettingsRow(r.key, r.value));
+    updateChips();
+  } catch (e) { /* abaikan */ }
+}
+
+
+$('#ig').href = CONFIG.ig;
+let W, H, dpr;
+const cam = { x: 0, y: 15, z: 0.58 };
+let fly = null, follow = null, dirTour = false, dirStep = 0, dirTimer = 0;
+
+function resize() {
+  dpr = Math.min(devicePixelRatio || 1, 2);
+  W = innerWidth; H = innerHeight;
+  cv.width = W * dpr; cv.height = H * dpr;
+}
+addEventListener('resize', resize); resize();
+
+/* ====== DUNIA RADIAL, SUNGAI, PLN & KLASTER RUMAH MENYEBAR ====== */
+const FAS = Object.fromEntries(CONFIG.fas.map(f => [f.id, f]));
+const DOOR = { gate: { x: 0, y: -520 } };
+CONFIG.fas.forEach(f => {
+  DOOR[f.id] = { x: f.x, y: f.y + f.h / 2 + 12 };
+});
+
+function riverY(x) {
+  return -245 + Math.sin((x + 350) * 0.0045) * 42 + (x + 600) * 0.05;
+}
+const fishes = Array.from({ length: 18 }, (_, i) => ({
+  x: -750 + i * 85,
+  sp: 14 + (i % 5) * 4,
+  dir: i % 2 ? 1 : -1,
+  off: (i % 3 - 1) * 8
+}));
+
+const CLUSTERS = [
+  { name: 'Klaster Barat Laut (Tepi Sungai)', cx: -700, cy: -160, cols: 6 },
+  { name: 'Klaster Barat (Dekat Sekolah)',    cx: -700, cy:  40,  cols: 6 },
+  { name: 'Klaster Barat Daya (Stadion)',     cx: -700, cy:  240, cols: 6 },
+  { name: 'Klaster Timur Laut (Bukit PLN)',   cx:  700, cy: -160, cols: 6 },
+  { name: 'Klaster Timur (Dekat RS)',         cx:  700, cy:  40,  cols: 6 },
+  { name: 'Klaster Tenggara (Dekat Pasar)',   cx:  700, cy:  240, cols: 6 },
+  { name: 'Klaster Selatan Barat',            cx: -310, cy:  435, cols: 6 },
+  { name: 'Klaster Selatan Timur',            cx:  310, cy:  435, cols: 6 },
+  { name: 'Klaster Selatan Utama',            cx:    0, cy:  435, cols: 6 },
+  { name: 'Klaster Puncak Selatan Barat',     cx: -310, cy:  595, cols: 6 },
+  { name: 'Klaster Puncak Selatan Utama',     cx:    0, cy:  595, cols: 6 },
+  { name: 'Klaster Puncak Selatan Timur',     cx:  310, cy:  595, cols: 6 }
+];
+
+const plots = [];
+function ensurePlots(n) {
+  while (plots.length < n) {
+    const i = plots.length;
+    const cIdx = (i / 12 | 0) % CLUSTERS.length;
+    const ringExtra = (i / (12 * CLUSTERS.length) | 0);
+    const cl = CLUSTERS[cIdx];
+    const k = i % 12;
+    const col = k % 6;
+    const row = (k / 6 | 0);
+    const x = cl.cx + (col - 2.5) * 62;
+    const y = cl.cy + (row === 0 ? -36 : 36) + ringExtra * 155;
+    const dy = cl.cy + ringExtra * 155;
+    const r = hs(i + 17);
+    const arch = i === 12 ? 'batak' : i === 5 || r > 0.84 ? 'tingkat' : r < 0.16 ? 'kayu' : 'reguler';
+    const built = i < 38 || r > 0.32 ? 1 : 0.35 + (r * 0.45);
+    plots.push({ i, x, y, dy, st: hs(i + 3), arch, pr: built, clName: cl.name, a: null });
+  }
+}
+
+const WALL = ['#FFE9B8','#F7CFA6','#CFE8D5','#CBE0F5','#F6D3E0','#EFEAD8'];
+const ROOF = ['#C8553D','#2E7D6B','#D9A21B','#3E6FB0','#7A5AA6','#B5473A'];
+
+const ag = [];
+let selA = null, selP = null, pickPlot = null, NIGHT = 0, tg = 90, mode = '', viewDay = 3;
+let blackout = false;
+
+const cat = { x: 25, y: 10, tx: 60, ty: 40, wait: 2, name: 'Maru / Pampam / Dodi (Kucing Pak Mulyo)' };
+
+const cars = [
+  { id: 'c_pres', n: 'Sedan Pak Mulyo (Sopir: sigit / ell🐣)', c: '#1A1A1A', flag: true, type: 'ring', ang: 0.4, r: 125, sp: 0.42, x: 90, y: 20 },
+  { id: 'c_pol',  n: 'Patroli Polisi PRN (Fanji Giovanski)',  c: '#2B3A67', siren: true, type: 'h', y: 0, x: -400, dir: 1, sp: 68 },
+  { id: 'c_amb',  n: 'Ambulans RS Gratis (Saragih Faudi)',    c: '#F4F4EE', cross: true, type: 'h', y: -155, x: 220, dir: -1, sp: 62 },
+  { id: 'c_trk',  n: 'Truk Material & Logistik (si kasep / Isan)', c: '#E8833A', type: 'v', x: 0, y: 320, dir: -1, sp: 52 },
+  { id: 'c_wrg',  n: 'Innova Hitam Warga (™®©•_•)',            c: '#263238', type: 'h', y: 155, x: -180, dir: 1, sp: 58 }
+];
+
+
+const carts = [
+  { n: 'Gerobak Kopi Fory Coffee', e: '☕', type: 'h', y: 164, x: -300, dir: 1, sp: 26 },
+  { n: 'PKL Jhoon (dorong)', e: '🛒', type: 'v', x: 0, y: -200, dir: 1, sp: 22 },
+  { n: 'Warteg (s)', e: '🍛', type: 'park', x: 120, y: 164 },
+  { n: 'Pecel Lele Pelajar Cupang', e: '🐟', type: 'park', x: -140, y: 164 }
+];
+function drawCart(c) {
+  ctx.save(); ctx.translate(c.x, c.y);
+  ctx.fillStyle = '#6D4C41'; ctx.fillRect(-16, -2, 32, 12);
+  ctx.fillStyle = '#8D6E63'; ctx.fillRect(-16, -6, 32, 4);
+  ctx.fillStyle = '#1F4D36'; ctx.beginPath(); ctx.arc(-9, 12, 4, 0, 7); ctx.arc(9, 12, 4, 0, 7); ctx.fill();
+  const px = c.type === 'v' ? 0 : (c.dir > 0 ? -24 : 24);
+  const py = c.type === 'v' ? (c.dir > 0 ? -18 : 18) : 0;
+  ctx.fillStyle = '#F1C7A0'; ctx.beginPath(); ctx.arc(px, py - 10, 4, 0, 7); ctx.fill();
+  ctx.fillStyle = '#1F4D36'; ctx.fillRect(px - 4, py - 6, 8, 10);
+  ctx.font = '16px sans-serif'; ctx.textAlign = 'center'; ctx.fillText(c.e, 0, -8);
+  if (cam.z >= 0.75) { ctx.font = '700 10px Nunito,sans-serif'; ctx.fillStyle = 'rgba(255,250,236,.94)'; const w = ctx.measureText(c.n).width + 10; rr(-w / 2, 18, w, 16, 7); ctx.fill(); ctx.fillStyle = '#1F4D36'; ctx.fillText(c.n, 0, 29); }
+  ctx.restore();
+}
+
+function assignSubJob(name, role, idx) {
+  const low0 = name.toLowerCase();
+  if (role === 'Polisi' && /dullll|bigstar|anugerahh|david🌻|walid|mobil mbg/.test(low0)) return { sub: 'Pemadam Kebakaran', status: 'kerja', workLoc: 'polisi' };
+  if (role === 'Penjahat') return { sub: 'Penjahat Kota', status: 'kerja', workLoc: null };
+  if (role === 'Pedagang') {
+    if (/fory/.test(low0)) return { sub: 'Kopi Fory Coffee', status: 'kerja', workLoc: 'pkl' };
+    if (/jhoon/.test(low0)) return { sub: 'Pedagang Kaki Lima', status: 'kerja', workLoc: 'pkl' };
+    if (low0 === 's') return { sub: 'Warteg', status: 'kerja', workLoc: 'pkl' };
+    if (/cupang/.test(low0)) return { sub: 'Pecel Lele', status: 'kerja', workLoc: 'pkl' };
+    if (/alfie/.test(low0)) return { sub: 'Ruko PaluGada', status: 'kerja', workLoc: 'pasar' };
+    if (/manusia favorit/.test(low0)) return { sub: 'Warung Madura', status: 'kerja', workLoc: 'pasar' };
+    if (/murialdo/.test(low0)) return { sub: 'Martabak Perintis', status: 'kerja', workLoc: 'pasar' };
+    if (/nhidea/.test(low0)) return { sub: 'Seblak Prasmanan', status: 'kerja', workLoc: 'pasar' };
+    if (/z 41 n/.test(low0)) return { sub: 'Mie Ayam', status: 'kerja', workLoc: 'pasar' };
+    if (/apa aja/.test(low0)) return { sub: 'Miso Pak Ziss', status: 'kerja', workLoc: 'pasar' };
+    if (/raffi/.test(low0)) return { sub: 'Nasi Padang', status: 'kerja', workLoc: 'pasar' };
+    if (/bengki/.test(low0)) return { sub: 'Gorengan', status: 'kerja', workLoc: 'pasar' };
+    if (/rangga/.test(low0)) return { sub: 'Angkringan', status: 'kerja', workLoc: 'pasar' };
+    if (/maru/.test(low0)) return { sub: 'Koki Istana', status: 'kerja', workLoc: 'kantor' };
+    if (/nadhy/.test(low0)) return { sub: 'Koki Kantin Tukang', status: 'kerja', workLoc: 'posko' };
+    if (/ayam bakar/.test(low0)) return { sub: 'Ayam Bakar', status: 'kerja', workLoc: 'pasar' };
+    return { sub: 'Pedagang UMKM', status: 'kerja', workLoc: 'pasar' };
+  }
+  if (role !== 'Warga') return { sub: role, status: 'kerja', workLoc: null };
+  const low = name.toLowerCase();
+  if (/baale|babah zharif|fakri nur|qhotim|herin supardi|wahyu s|jonatan natan|kaklook|^anggi$/.test(low)) return { sub: 'Pemuka Agama', status: 'kerja', workLoc: 'ibadah' };
+  if (/betaubun|sifak ardi|abdul ghoni|fajar mitha|ريزال|richie mikyano|zulfikar/.test(low)) return { sub: 'Hakim / KPK / Pengadilan', status: 'kerja', workLoc: 'polisi' };
+  if (/fory|kopi|austin|tristan/.test(low)) return { sub: 'Pengusaha Kopi (Fory Coffee)', status: 'kerja', workLoc: 'pasar' };
+  if (/jhoon/.test(low)) return { sub: 'Pedagang Kaki Lima', status: 'kerja', workLoc: 'pkl' };
+  if (/alfie|palugada|manusia favorit|madura|murialdo|martabak|dede/.test(low)) return { sub: 'Pedagang Ruko & UMKM', status: 'kerja', workLoc: 'pasar' };
+  if (/rin 1%|maz kun|surya|bangun dwi|angg|petani/.test(low)) return { sub: 'Petani Pangan & Sawah', status: 'kerja', workLoc: 'tani' };
+  if (/cupang|dicky|tedi|lele|ternak/.test(low)) return { sub: 'Peternak Lele & Sapi', status: 'kerja', workLoc: 'tani' };
+  if (/oddysey|network|alqias|j4sunn|rnda|listrik|wifi|siti fatimah/.test(low)) return { sub: 'Teknisi PLN & WiFi', status: 'kerja', workLoc: 'pln' };
+  if (/yogex|mj fishing|arkhan|reyhan/.test(low)) return { sub: 'Pengelola Bendungan & Sungai', status: 'kerja', workLoc: 'waduk' };
+  if (/esjeeee|hasby|yeremia|da ar|elang|rafiii|imam ij|tamaa|andri/.test(low)) return { sub: 'Paspampres & TNI', status: 'kerja', workLoc: 'barak' };
+  if (/sigit|ell|si kasep|bintang utama|saragih|rizky/.test(low)) return { sub: 'Sopir Presiden & Logistik', status: 'kerja', workLoc: 'kantor' };
+  if (/spotting|rotom|pi yan|fajri/.test(low)) return { sub: 'Mekanik Vanguard AutoWorks', status: 'kerja', workLoc: 'pabrik' };
+  if (/laras/.test(low)) return { sub: 'Ibu Kos Sekolah', status: 'kerja', workLoc: 'kosan' };
+  if (/wahyu|conell|bihar|nganggur|soekamto/.test(low) || idx % 7 === 0) return { sub: 'Warga Nganggur (Nongkrong di Posko)', status: 'nganggur', workLoc: 'posko' };
+  const pool = [
+    { sub: 'Petani Sawah & Kebun', status: 'kerja', workLoc: 'tani' },
+    { sub: 'Pedagang UMKM Pasar', status: 'kerja', workLoc: 'pasar' },
+    { sub: 'Teknisi Listrik & Air', status: 'kerja', workLoc: 'pln' },
+    { sub: 'Pekerja Bengkel & Pabrik', status: 'kerja', workLoc: 'pabrik' }
+  ];
+  return pool[idx % pool.length];
+}
+
+function freePlot() {
+  let i = plots.findIndex(p => !p.a);
+  if (i < 0) { ensurePlots(plots.length + 24); i = plots.findIndex(p => !p.a); }
+  return i;
+}
+
+const claimsMap = store.get('ntz_claims_v3', {});
+const optOutMap = store.get('ntz_optout_v3', {});
+
+function addAgent(n, p, h, atHome, sys) {
+  if (optOutMap[n]) return null;
+  if (!sys) { if (h == null || !plots[h] || plots[h].a) h = freePlot(); }
+  const hd = sys ? 'kantor' : h;
+  const info = assignSubJob(n, p, ag.length);
+  const claimedUser = claimsMap[n] || null;
+  const a = {
+    id: ag.length,
+    n: claimedUser || n,
+    origName: n,
+    ig: !!claimedUser,
+    p,
+    sub: info.sub,
+    workStatus: sys ? 'kerja' : info.status,
+    workLoc: info.workLoc,
+    home: hd,
+    sys: !!sys,
+    x: 0, y: -15,
+    path: [],
+    loc: sys ? 'kantor' : 'home',
+    act: sys ? 'memimpin negara di pusat kota' : 'bersiap kegiatan',
+    th: '',
+    lapar: (hs(ag.length + 5) * 0.35),
+    sp: 55 + (hs(ag.length + 11) * 25),
+    wait: hs(ag.length + 19) * 6,
+    say: '', sayT: 0,
+    ox: (hs(ag.length + 23) - 0.5) * 58,
+    oy: (hs(ag.length + 29) - 0.5) * 24,
+    mv: false,
+    chrono: (ag.length % 7 === 2) ? 'gadang' : 'pagi',
+    crimePhase: 'idle', stealTarget: null, chaseThief: null, escortThief: null, buyT: 0, buyFrom: '',
+    shift: ag.length % 3,
+    inside: false,
+    dayJoined: ag.length < 45 ? 1 : ag.length < 135 ? 2 : 3
+  };
+  if (!sys && plots[h]) plots[h].a = a;
+  if (atHome) {
+    const d = door(a, 'home');
+    a.x = d.x + a.ox * 0.4;
+    a.y = d.y + a.oy * 0.4;
+    a.loc = 'home';
+  }
+  ag.push(a);
+  return a;
+}
+
+function door(a, l) {
+  if (l === 'home') l = a.home;
+  if (typeof l === 'number') {
+    const p = plots[l] || plots[0];
+    return { x: p.x, y: p.dy };
+  }
+  if (l === 'avenue') {
+    const ang = Math.random() * Math.PI * 2;
+    return { x: Math.cos(ang) * 125, y: Math.sin(ang) * 125 };
+  }
+  return DOOR[l] || { x: 0, y: 0 };
+}
+
+const locName = (a, l) => l === 'home' ? 'Rumah no. ' + (a.home + 1) : l === 'avenue' ? 'Bundaran Pusat Kota' : l === 'gate' ? 'Gerbang Utara' : (FAS[l] ? FAS[l].n : 'Kota');
+
+/* ====== INDEKS KEPUASAN RAKYAT (PUAS / TIDAK PUAS) ====== */
+function calcSatisfaction(a) {
+  let score = 78;
+  const reasons = [];
+  const hp = typeof a.home === 'number' ? plots[a.home] : null;
+  if (hp) {
+    if (hp.pr >= 1) {
+      score += 12;
+      reasons.push('✅ Rumah sudah 100% jadi (' + hp.arch + ')');
+    } else {
+      score -= 22;
+      reasons.push('🔨 Rumah no. ' + (hp.i + 1) + ' masih dibangun (' + Math.round(hp.pr * 100) + '%)');
+    }
+  }
+  if (a.workStatus === 'nganggur') {
+    score -= 18;
+    reasons.push('☕ Masih nganggur & nongkrong di Posko Tukang');
+  } else {
+    score += 8;
+    reasons.push('💼 Aktif bekerja sebagai ' + a.sub);
+  }
+  if (blackout) {
+    score -= 25;
+    reasons.push('⚡ Gardu PLN sedang pemeliharaan (mati lampu)');
+  } else {
+    score += 5;
+    reasons.push('⚡ Listrik bawah tanah & air sungai lancar');
+  }
+  if (a.lapar > 0.72) {
+    score -= 12;
+    reasons.push('🍛 Perut lapar, butuh makan di Posko/Warung');
+  }
+  score = Math.max(15, Math.min(100, score));
+  const label = score >= 80 ? 'Sangat Puas' : score >= 65 ? 'Puas' : score >= 48 ? 'Biasa' : 'Kurang Puas';
+  const emoji = score >= 80 ? '😍' : score >= 65 ? '😊' : score >= 48 ? '😐' : '😤';
+  return { score, label, emoji, reasons };
+}
+
+function citySatisfaction() {
+  if (!ag.length) return { avg: 85, puas: 0, komplain: 0, unfinishedHouses: 0, nganggurCount: 0 };
+  let sum = 0, puas = 0, komplain = 0, nganggurCount = 0;
+  for (let i = 0; i < ag.length; i++) {
+    const s = calcSatisfaction(ag[i]).score;
+    sum += s;
+    if (s >= 65) puas++; else komplain++;
+    if (ag[i].workStatus === 'nganggur') nganggurCount++;
+  }
+  const unfinishedHouses = plots.filter(p => p.a && p.pr < 1).length;
+  return { avg: Math.round(sum / ag.length), puas, komplain, unfinishedHouses, nganggurCount };
+}
+
+/* ====== JADWAL HARIAN & KEPUTUSAN AGEN SESUAI PROFESI ====== */
+const hour = () => ((7 * 60 + tg) / 60) % 24;
+const jam = () => {
+  const h = hour();
+  return String(h | 0).padStart(2, '0') + '.' + String((h % 1) * 60 | 0).padStart(2, '0');
+};
+
+function pickBuildTarget(a) {
+  const unfHouses = plots.filter(p => p.a && p.pr < 1);
+  if (unfHouses.length && Math.random() < 0.45) {
+    const targetPlot = unfHouses[a.id % unfHouses.length];
+    return [targetPlot.i, 'membangun rumah @' + targetPlot.a.n];
+  }
+  const unfFas = CONFIG.fas.filter(f => f.st === 'sebagian');
+  if (unfFas.length) {
+    const f = unfFas[a.id % unfFas.length];
+    return [f.id, 'membangun ' + f.n];
+  }
+  return ['sekolah', 'merawat bangunan'];
+}
+
+function roleWork(a) {
+  const p = a.p;
+  if (p === 'Tukang' || p === 'Mandor' || p === 'Arsitek') {
+    const bt = pickBuildTarget(a);
+    return [bt[0], p === 'Mandor' ? 'mengawasi ' + bt[1] : p === 'Arsitek' ? 'menggambar denah lokasi' : bt[1]];
+  }
+  if (p === 'Menteri') return [hour() < 14 ? 'kantor' : 'bank', 'rapat kabinet & anggaran'];
+  if (p === 'Guru') return ['sekolah', 'mengajar murid'];
+  if (p === 'Dokter') return ['rs', 'merawat pasien gratis'];
+  if (p === 'Polisi') {
+    const list = ['avenue','polisi','pasar','kantor','waduk'];
+    return [list[(a.id + (hour() | 0)) % list.length], 'patroli keamanan kota'];
+  }
+  if (a.workStatus === 'nganggur') return [['posko','pasar','kantor'][a.id % 3], 'cari loker'];
+  return [a.workLoc || 'pasar', 'bekerja sebagai ' + a.sub];
+}
+
+function goal(a) {
+  const h = hour(), p = a.p;
+  if (p === 'Presiden') {
+    if (h < 6 || h >= 22) return ['kantor', 'istirahat di Rumah Presiden'];
+    if (h >= 10 && h < 15) {
+      const insp = ['tugu','sekolah','rs','waduk','pln','pasar','posko'][((h | 0) + a.id) % 7];
+      return [insp, 'blusukan meninjau ' + FAS[insp].n];
+    }
+    return ['kantor', 'memimpin rapat di Pusat Kota'];
+  }
+  const gadang = a.chrono === 'gadang';
+  const nganggur = a.workStatus === 'nganggur';
+  const shift = a.shift || 0;
+  const workStart = 8 + shift * 0.5;
+  const workEnd = workStart + 8;
+  const soreList = ['tugu','lapangan','ibadah','waduk','tamanlove','apartemen'];
+  const sore = soreList[a.id % soreList.length];
+  const soreAct = sore === 'tamanlove' ? 'kenalan di Taman Love' : sore === 'apartemen' ? 'nongkrong di Apartemen Netizenia' : 'jalan-jalan sore di ' + FAS[sore].n;
+  const makanList = ['posko','pasar','pkl'];
+  const makan = makanList[a.id % makanList.length];
+  if (a.lapar > 0.85 && h >= 7 && h < 21) return [makan, 'makan karena lapar'];
+  if (gadang) {
+    if (h >= 3 && h < 11) return ['home', 'tidur di rumah'];
+    if (h < 12) return ['home', 'masak sarapan siang di rumah'];
+    if (h < 13) return [makan, 'makan siang'];
+    if (nganggur) {
+      if (h < 18) return [['posko','pasar','kantor'][a.id % 3], 'cari loker'];
+    } else if (p === 'Murid') {
+      if (h < 17) return ['sekolah', 'belajar di kelas'];
+    } else if (p === 'Pasien') {
+      if (h < 16) return ['rs', 'antre berobat gratis'];
+    } else if (h < 18) return roleWork(a);
+    if (h < 19) return [sore, soreAct];
+    if (h < 20) return ['home', 'masak makan malam di rumah'];
+    const begadangList = ['tugu','lapangan','posko','pkl','tamanlove'];
+    const bg = begadangList[a.id % begadangList.length];
+    return [bg, bg === 'tamanlove' ? 'begadang kenalan di Taman Love' : 'begadang nongkrong di ' + FAS[bg].n];
+  }
+  if (h < 6 || h >= 22) return ['home', 'tidur di rumah'];
+  if (h < 7) return ['home', 'masak sarapan di rumah'];
+  if (p === 'Murid') {
+    if (h < 13.5) return ['sekolah', 'belajar di kelas'];
+    if (h < 18) return [sore, soreAct];
+    if (h < 19) return ['home', 'makan malam di rumah'];
+    return ['home', 'santai di rumah'];
+  }
+  if (p === 'Pasien') {
+    if (h >= 8 && h < 12) return ['rs', 'antre berobat gratis'];
+    return ['home', 'istirahat pemulihan di rumah'];
+  }
+  if (typeof a.home === 'number' && plots[a.home] && plots[a.home].pr < 1 && h < 10.5) return ['home', 'ikut tukang bangun rumah sendiri'];
+  if (h < workStart) return [roleWork(a)[0], 'berangkat kerja'];
+  if (nganggur) {
+    if (h < 12) return [['posko','pasar','kantor'][a.id % 3], 'cari loker'];
+    if (h < 13) return [makan, 'makan siang'];
+    if (h < 18) return [['posko','lapangan','tugu'][a.id % 3], 'nongkrong & cari loker'];
+    if (h < 19) return ['home', 'masak makan malam di rumah'];
+    return ['home', 'santai di rumah'];
+  }
+  if (h < 12) return roleWork(a);
+  if (h < 13) return [makan, 'makan siang'];
+  if (h < workEnd) return roleWork(a);
+  if (h < 18) return [sore, soreAct];
+  if (h < 19) return ['home', 'masak makan malam di rumah'];
+  return [a.id % 2 ? 'home' : 'posko', a.id % 2 ? 'santai di rumah' : 'nongkrong malam di Posko'];
+}
+
+let feedThinkCount = 0;
+function think(a) {
+  const sat = calcSatisfaction(a);
+  if (sat.score < 55 && Math.random() < 0.5) {
+    a.th = sat.reasons[0].replace(/^[^\s]+\s/, '');
+  } else if (/tidur/.test(a.act)) {
+    a.th = 'Zzz... mimpi indah di Netizenia.';
+  } else if (/makan|ngopi/.test(a.act)) {
+    a.th = 'Mampir Fory Coffee & Warung Madura dulu biar segar!';
+  } else {
+    a.th = pick(THO[a.p] || THO.Warga);
+  }
+  a.th = censorText(a.th);
+  a.say = a.th;
+  a.sayT = 5.5;
+  if (a.th && ++feedThinkCount % 25 === 0) note(a.n + ': ' + a.th);
+}
+
+function buildRoadPath(x0, y0, x1, y1, ox, oy) {
+  const pts = [];
+  if (Math.abs(x0 - x1) > 90 && Math.abs(y0 - y1) > 90) {
+    pts.push({ x: x0, y: 0 });
+    pts.push({ x: x1, y: 0 });
+  } else {
+    pts.push({ x: (x0 + x1) * 0.5, y: (y0 + y1) * 0.5 });
+  }
+  pts.push({ x: x1 + ox * 0.55, y: y1 + oy * 0.55 });
+  return pts;
+}
+
+function decide(a) {
+  if (a.p === 'Penjahat') {
+    if (a.crimePhase === 'jailed') { a.crimePhase = 'rest'; a.act = 'bebas dari penjara, istirahat di rumah'; const Dh = door(a, 'home'); a.path = buildRoadPath(a.x, a.y, Dh.x, Dh.y, a.ox, a.oy); a.dest = 'home'; a.inside = false; return; }
+    if (a.crimePhase === 'rest') { a.crimePhase = 'idle'; }
+    if (a.crimePhase === 'escorted') { a.act = 'dikawal polisi ke penjara ⛓️'; const D = door(a, 'penjara'); a.path = buildRoadPath(a.x, a.y, D.x, D.y, a.ox, a.oy); a.dest = 'penjara'; a.inside = false; return; }
+    if (a.crimePhase === 'stealing') {
+      const pol = ag.find(p => p.p === 'Polisi' && p.chaseThief === a && p.loc === a.loc);
+      if (pol) {
+        pol.chaseThief = null; pol.escortThief = a; pol.sp = 55 + (hs(pol.id + 11) * 25);
+        a.crimePhase = 'escorted';
+        noteLive('🚓 Polisi ' + pol.n + ' berhasil menangkap ' + a.n + ' dan menggiringnya ke Penjara!');
+        a.act = 'tertangkap basah & diborgol polisi! ⛓️';
+        const D2 = door(a, 'penjara'); a.path = buildRoadPath(a.x, a.y, D2.x, D2.y, a.ox, a.oy); a.dest = 'penjara'; a.inside = false; return;
+      }
+      a.act = 'mencuri bahan bangunan / kas! 💰';
+      if (a.loc === a.stealTarget) { a.wait = 7; return; }
+      const D3 = door(a, a.stealTarget); a.path = buildRoadPath(a.x, a.y, D3.x, D3.y, a.ox, a.oy); a.dest = a.stealTarget; a.inside = false; return;
+    }
+    if (a.crimePhase === 'toTarget') { a.act = 'mengendap-endap mau mencuri 🕵️'; const D4 = door(a, a.stealTarget); a.path = buildRoadPath(a.x, a.y, D4.x, D4.y, a.ox, a.oy); a.dest = a.stealTarget; a.inside = false; return; }
+    const targets = ['posko','pasar','bank'];
+    a.stealTarget = targets[a.id % targets.length]; a.crimePhase = 'toTarget';
+    a.act = 'mengendap-endap mau mencuri 🕵️';
+    const D5 = door(a, a.stealTarget); a.path = buildRoadPath(a.x, a.y, D5.x, D5.y, a.ox, a.oy); a.dest = a.stealTarget; a.inside = false; return;
+  }
+  if (a.p === 'Polisi' && a.escortThief) {
+    const th = a.escortThief;
+    if (th && th.crimePhase === 'escorted') { a.act = 'mengawal pencuri ke penjara'; const D = door(a, 'penjara'); a.path = buildRoadPath(a.x, a.y, D.x, D.y, a.ox, a.oy); a.dest = 'penjara'; a.inside = false; return; }
+    a.escortThief = null;
+  }
+  if (a.p === 'Polisi' && a.chaseThief) {
+    const th = a.chaseThief;
+    if (th && (th.crimePhase === 'stealing' || th.crimePhase === 'toTarget')) {
+      a.act = 'mengejar pencuri! 🚨 Berhenti kau pencuri!';
+      const D = door(a, th.stealTarget || th.loc); a.path = buildRoadPath(a.x, a.y, D.x, D.y, a.ox, a.oy); a.dest = th.stealTarget || th.loc; a.inside = false; return;
+    }
+    a.chaseThief = null;
+  }
+  if (a.p === 'Pedagang') {
+    const sub = a.sub || '';
+    const shout = /Kopi/.test(sub) ? 'Kopi dingin/panas siap!' : /Warteg/.test(sub) ? 'Warteg buka 24 jam!' : /Lele/.test(sub) ? 'Pecel lele hangat!' : /Seblak/.test(sub) ? 'Seblak prasmanan pedas!' : /Martabak/.test(sub) ? 'Martabak manis gurih!' : /Mie/.test(sub) ? 'Mie ayam hangat!' : /Padang/.test(sub) ? 'Nasi padang rendang!' : /Gorengan/.test(sub) ? 'Gorengan hangat!' : /Angkringan/.test(sub) ? 'Angkringan buka, mampir!' : 'Dagangan segar, mampir!';
+    a.act = 'dagang: ' + shout;
+    const tgt = a.workLoc || 'pkl';
+    if (tgt === a.loc) { a.wait = 18 + Math.random() * 14; think(a); return; }
+    const D = door(a, tgt); a.path = buildRoadPath(a.x, a.y, D.x, D.y, a.ox, a.oy); a.dest = tgt; a.inside = false; return;
+  }
+  const g = goal(a);
+  a.act = g[1];
+  const target = g[0];
+  if (target === a.loc && target !== 'avenue') {
+    a.inside = target === 'home' && /tidur|santai di rumah|istirahat/.test(a.act);
+    a.wait = /mencuri/.test(a.act) ? 7 : 18 + Math.random() * 14;
+    think(a);
+    return;
+  }
+  const D = typeof target === 'number' ? { x: plots[target].x, y: plots[target].dy } : door(a, target);
+  a.inside = false;
+  a.path = buildRoadPath(a.x, a.y, D.x, D.y, a.ox, a.oy);
+  a.dest = target;
+}
+
+function arrive(a) {
+  a.loc = a.dest;
+  a.inside = a.dest === 'home' && /tidur|santai di rumah|istirahat/.test(a.act);
+  a.wait = /mencuri/.test(a.act) ? 7 : 18 + Math.random() * 14;
+  if (a.p === 'Penjahat' && a.crimePhase === 'toTarget' && a.loc === a.stealTarget) {
+    a.crimePhase = 'stealing'; a.act = 'mencuri bahan bangunan / kas! 💰';
+    const pols = ag.filter(p => p.p === 'Polisi' && !p.chaseThief && !p.escortThief);
+    let bestPol = null, bd = 1e9;
+    pols.forEach(p => { const d = Math.hypot(p.x - a.x, p.y - a.y); if (d < bd) { bd = d; bestPol = p; } });
+    if (bestPol) { bestPol.chaseThief = a; bestPol.sp = 95; }
+    note(a.n + ' (Penjahat) mengendap di ' + locName(a, a.loc) + '!');
+  }
+  if (a.p === 'Penjahat' && a.crimePhase === 'escorted' && a.loc === 'penjara') {
+    a.crimePhase = 'jailed'; a.act = 'dipenjara di Penjara Netizenia ⛓️'; a.wait = 45;
+    const pol = ag.find(p => p.escortThief === a); if (pol) pol.escortThief = null;
+    noteLive('🔒 ' + a.n + ' resmi mendekam di Penjara Netizenia selama 45 detik.');
+  }
+  if (a.p === 'Polisi' && a.escortThief && a.loc === 'penjara') { a.escortThief = null; }
+  if (/makan|ngopi/.test(a.act) && (a.loc === 'pkl' || a.loc === 'pasar' || a.loc === 'posko')) {
+    const ped = ag.find(p => p.p === 'Pedagang' && p.loc === a.loc);
+    if (ped) { a.buyT = 5; a.buyFrom = ped.n; a.act = 'membeli & makan di lapak @' + ped.n; a.lapar = 0; ped.buyT = 5; }
+  }
+  think(a);
+  if (/makan|ngopi/.test(a.act)) a.lapar = 0;
+  if (a.p === 'Tukang' || a.p === 'Mandor') {
+    if (typeof a.loc === 'number' && plots[a.loc] && plots[a.loc].pr < 1) {
+      plots[a.loc].pr = Math.min(1, plots[a.loc].pr + 0.08);
+    } else if (FAS[a.loc] && FAS[a.loc].st === 'sebagian') {
+      FAS[a.loc].pr = Math.min(1, FAS[a.loc].pr + 0.015);
+      if (FAS[a.loc].pr >= 1) FAS[a.loc].st = 'jadi';
+    }
+  }
+  if (Math.random() < 0.14 || a.me) {
+    const place = typeof a.loc === 'number' ? 'Rumah no. ' + (a.loc + 1) : locName(a, a.loc);
+    note(a.n + ' (' + a.p + ') ' + a.act + ' di ' + place);
+  }
+}
+
+function stepA(a, dt) {
+  if (a.buyT > 0) a.buyT -= dt;
+  a.lapar = Math.min(1, a.lapar + 0.005 * dt);
+  if (a.sayT > 0) a.sayT -= dt;
+  if (!a.sys && typeof a.home === 'number' && plots[a.home] && plots[a.home].pr < 1) {
+    plots[a.home].pr = Math.min(1, plots[a.home].pr + 0.0012 * dt);
+  }
+  if (a.path.length) {
+    const q = a.path[0], dx = q.x - a.x, dy = q.y - a.y, d = Math.hypot(dx, dy), s = a.sp * dt;
+    a.mv = true;
+    if (d <= s) {
+      a.x = q.x; a.y = q.y; a.path.shift();
+      if (!a.path.length) { a.mv = false; arrive(a); }
+    } else {
+      a.x += dx / d * s; a.y += dy / d * s;
+    }
+  } else {
+    a.mv = false; a.wait -= dt;
+    if (a.wait <= 0) decide(a);
+  }
+}
+
+function stepWorldEntities(dt) {
+  fishes.forEach(f => {
+    f.x += f.sp * f.dir * dt;
+    if (f.x > 880) f.dir = -1;
+    if (f.x < -880) f.dir = 1;
+  });
+  const cdx = cat.tx - cat.x, cdy = cat.ty - cat.y, cd = Math.hypot(cdx, cdy);
+  if (cd < 4) {
+    cat.wait -= dt;
+    if (cat.wait <= 0) {
+      cat.tx = (Math.random() - 0.5) * 180;
+      cat.ty = (Math.random() - 0.5) * 160;
+      cat.wait = 3 + Math.random() * 5;
+    }
+  } else {
+    cat.x += cdx / cd * 22 * dt;
+    cat.y += cdy / cd * 22 * dt;
+  }
+  carts.forEach(c => {
+    if (c.type === 'h') { c.x += c.sp * c.dir * dt; if (c.x > 820) c.dir = -1; if (c.x < -820) c.dir = 1; }
+    else if (c.type === 'v') { c.y += c.sp * c.dir * dt; if (c.y > 620) c.dir = -1; if (c.y < -420) c.dir = 1; }
+  });
+  cars.forEach(c => {
+    if (c.type === 'ring') {
+      c.ang += c.sp * dt;
+      c.x = Math.cos(c.ang) * c.r;
+      c.y = Math.sin(c.ang) * c.r;
+    } else if (c.type === 'h') {
+      c.x += c.sp * c.dir * dt;
+      if (c.x > 820) c.dir = -1;
+      if (c.x < -820) c.dir = 1;
+    } else if (c.type === 'v') {
+      c.y += c.sp * c.dir * dt;
+      if (c.y > 620) c.dir = -1;
+      if (c.y < -420) c.dir = 1;
+    }
+  });
+}
+
+/* ====== RENDERING CLAYMATION 2D ====== */
+const sc = {};
+function shade(c, f) {
+  const k = c + f; if (sc[k]) return sc[k];
+  const n = parseInt(c.slice(1), 16), m = f < 0 ? 0 : 255, t = Math.abs(f);
+  return sc[k] = 'rgb(' + [n >> 16, n >> 8 & 255, n & 255].map(v => Math.round(v + (m - v) * t)).join(',') + ')';
+}
+function rr(x, y, w, h, r, keep) { if (!keep) ctx.beginPath(); ctx.roundRect(x, y, w, h, r); }
+function clay(x, y, w, h, r, c, d) {
+  d = d || 4;
+  ctx.fillStyle = shade(c, -0.3); rr(x, y + d, w, h, r); ctx.fill();
+  ctx.fillStyle = c; rr(x, y, w, h, r); ctx.fill();
+  ctx.fillStyle = 'rgba(255,255,255,.3)'; rr(x + w * 0.1, y + h * 0.1, w * 0.8, Math.max(2, h * 0.14), r / 2); ctx.fill();
+}
+
+function drawHouse(p, t) {
+  if (p.a && p.a.dayJoined > viewDay) return;
+  const x = p.x, y = p.y, w = WALL[p.st * 6 | 0], ro = ROOF[hs(p.i + 9) * 6 | 0];
+  ctx.globalAlpha = p.a ? 1 : 0.38;
+
+  if (p.a && p.pr < 1) {
+    ctx.fillStyle = 'rgba(120,95,65,.45)';
+    rr(x - 26, y - 16, 52, 38, 7); ctx.fill();
+    const hh = Math.max(8, 30 * p.pr);
+    clay(x - 22, y + 18 - hh, 44, hh, 5, w, 3);
+    ctx.strokeStyle = '#D9822B'; ctx.lineWidth = 2;
+    ctx.strokeRect(x - 24, y - 18, 48, 36);
+    clay(x + 14, y + 10, 12, 8, 2, '#C8553D', 2);
+    if (cam.z >= 0.55) {
+      const bounce = Math.sin(t * 9 + p.i) * 3;
+      ctx.font = '13px sans-serif'; ctx.textAlign = 'center';
+      ctx.fillText('🔨', x, y - 22 + bounce);
+    }
+  } else if (p.arch === 'batak') {
+    clay(x - 22, y - 10, 44, 28, 5, '#D7B38C');
+    ctx.fillStyle = '#8B3A2B';
+    ctx.beginPath();
+    ctx.moveTo(x - 30, y - 8);
+    ctx.quadraticCurveTo(x, y - 22, x + 30, y - 8);
+    ctx.lineTo(x + 24, y - 34);
+    ctx.quadraticCurveTo(x, y - 18, x - 24, y - 34);
+    ctx.closePath(); ctx.fill();
+  } else if (p.arch === 'tingkat') {
+    clay(x + 16, y + 2, 16, 16, 4, '#4FC3F7', 2);
+    clay(x - 22, y - 26, 40, 46, 6, '#FFFDF7');
+    clay(x - 26, y - 36, 48, 15, 7, '#3E6FB0');
+    ctx.fillStyle = (!blackout && NIGHT > 0.3) ? '#FFD36A' : '#BFE6F2';
+    ctx.fillRect(x - 15, y - 18, 9, 7); ctx.fillRect(x + 2, y - 18, 9, 7);
+  } else if (p.arch === 'kayu') {
+    clay(x - 22, y - 12, 44, 32, 6, '#C89B6E');
+    clay(x - 26, y - 27, 52, 19, 8, '#5D4037');
+  } else {
+    if (p.st > 0.6) clay(x + 10, y - 34, 8, 12, 2, '#B9A58A', 2);
+    clay(x - 22, y - 12, 44, 32, 6, w);
+    clay(x - 27, y - 28, 54, 20, 9, ro);
+  }
+
+  if (!p.a || p.pr >= 1) {
+    ctx.fillStyle = shade(w, -0.4); rr(x - 4, y + 6, 8, 14, 3); ctx.fill();
+    ctx.fillStyle = (!blackout && NIGHT > 0.3) ? '#FFD36A' : '#BFE6F2';
+    ctx.beginPath(); rr(x - 17, y - 2, 9, 8, 2, 1); rr(x + 8, y - 2, 9, 8, 2, 1); ctx.fill();
+  }
+  ctx.globalAlpha = 1;
+  if (p.a && /tidur/.test(p.a.act) && cam.z >= 0.55) {
+    ctx.font = '700 13px Nunito,sans-serif'; ctx.textAlign = 'center'; ctx.fillStyle = '#1F4D36';
+    const zo = Math.sin(t * 2 + p.i) * 3;
+    ctx.fillText('Z', x + 12, y - 34 + zo); ctx.fillText('z', x + 20, y - 44 + zo);
+  }
+  if (p.a && /masak/.test(p.a.act) && cam.z >= 0.55) {
+    for (let si = 0; si < 3; si++) {
+      const sy2 = y - 30 - ((t * 12 + si * 8) % 22);
+      ctx.fillStyle = 'rgba(255,255,255,' + (0.55 - si * 0.15) + ')';
+      ctx.beginPath(); ctx.arc(x - 10 + si * 3, sy2, 3 + si, 0, 7); ctx.fill();
+    }
+  }
+
+  if (selP === p || pickPlot === p.i) {
+    ctx.strokeStyle = '#F0B52E'; ctx.lineWidth = 4; ctx.setLineDash([]);
+    rr(x - 32, y - 38, 64, 64, 14); ctx.stroke();
+  }
+}
+
+function drawSpecialZones(t) {
+  ctx.save();
+  ctx.lineCap = 'round';
+  ctx.strokeStyle = '#B8A88A'; ctx.lineWidth = 58;
+  ctx.beginPath();
+  for (let x = -1100; x <= 1100; x += 50) {
+    const y = riverY(x);
+    if (x === -1100) ctx.moveTo(x, y); else ctx.lineTo(x, y);
+  }
+  ctx.stroke();
+  ctx.strokeStyle = '#4FC3F7'; ctx.lineWidth = 44;
+  ctx.stroke();
+  ctx.strokeStyle = 'rgba(255,255,255,.45)'; ctx.lineWidth = 3; ctx.setLineDash([18, 24]);
+  ctx.lineDashOffset = -t * 28;
+  ctx.stroke();
+  ctx.setLineDash([]);
+  fishes.forEach(f => {
+    const fy = riverY(f.x) + f.off;
+    ctx.fillStyle = '#FF7043';
+    ctx.beginPath(); ctx.ellipse(f.x, fy, 5, 2.5, 0, 0, 7); ctx.fill();
+  });
+  ctx.restore();
+
+  if (!blackout) {
+    ctx.save();
+    ctx.strokeStyle = 'rgba(240,181,46,.55)';
+    ctx.lineWidth = 3;
+    ctx.setLineDash([6, 10]);
+    ctx.lineDashOffset = -t * 20;
+    const pln = FAS.pln;
+    ['kantor','rs','sekolah','pasar','ibadah'].forEach(id => {
+      const target = FAS[id];
+      ctx.beginPath();
+      ctx.moveTo(pln.x, pln.y);
+      ctx.lineTo(target.x, target.y);
+      ctx.stroke();
+    });
+    ctx.restore();
+  }
+
+  const tani = FAS.tani;
+  for (let r = 0; r < 3; r++) {
+    for (let c = 0; c < 4; c++) {
+      clay(tani.x - 62 + c * 32, tani.y + 48 + r * 20, 26, 14, 4, '#9CCC65', 2);
+    }
+  }
+  clay(tani.x + 85, tani.y - 20, 56, 38, 10, '#29B6F6', 3);
+
+  ctx.fillStyle = '#7C7E74';
+  ctx.beginPath(); ctx.arc(0, 0, 142, 0, 7); ctx.fill();
+  ctx.fillStyle = '#A3A59A';
+  ctx.beginPath(); ctx.arc(0, 0, 136, 0, 7); ctx.fill();
+  ctx.fillStyle = '#9ED687';
+  ctx.beginPath(); ctx.arc(0, 0, 96, 0, 7); ctx.fill();
+
+  const fx = 72, fy = -28;
+  ctx.fillStyle = '#5D4037'; ctx.fillRect(fx, fy - 48, 4, 52);
+  ctx.fillStyle = '#D32F2F'; ctx.fillRect(fx + 4, fy - 48, 28, 6);
+  ctx.fillStyle = '#1B5E20'; ctx.fillRect(fx + 4, fy - 42, 28, 6);
+  ctx.fillStyle = '#FFFFFF'; ctx.fillRect(fx + 4, fy - 36, 28, 6);
+}
+
+function drawFas(f, t) {
+  if (f.day > viewDay) return;
+  const x = f.x - f.w / 2, y = f.y - f.h / 2;
+  if (f.st === 'usulan') {
+    ctx.setLineDash([9, 7]); ctx.strokeStyle = 'rgba(31,77,54,.75)'; ctx.lineWidth = 3;
+    rr(x, y, f.w, f.h, 14); ctx.fillStyle = 'rgba(255,255,255,.32)'; ctx.fill(); ctx.stroke(); ctx.setLineDash([]);
+  } else if (f.id === 'lapangan' || f.id === 'tugu') {
+    ctx.fillStyle = f.c; rr(x, y, f.w, f.h, 16); ctx.fill();
+    ctx.strokeStyle = 'rgba(255,255,255,.8)'; ctx.lineWidth = 3; rr(x + 8, y + 8, f.w - 16, f.h - 16, 10); ctx.stroke();
+  } else if (f.st === 'sebagian') {
+    ctx.fillStyle = 'rgba(120,100,70,.35)'; rr(x - 6, y - 6, f.w + 12, f.h + 12, 14); ctx.fill();
+    const hh = f.h * f.pr; clay(x, y + f.h - hh, f.w, hh, 8, f.c);
+    ctx.strokeStyle = '#E8833A'; ctx.lineWidth = 4; ctx.setLineDash([10, 8]); ctx.strokeRect(x, y, f.w, f.h); ctx.setLineDash([]);
+    ctx.strokeStyle = '#E8833A'; ctx.lineWidth = 3; ctx.beginPath();
+    ctx.moveTo(x + f.w - 10, y + f.h); ctx.lineTo(x + f.w - 10, y - 22);
+    ctx.lineTo(x + f.w - 46, y - 22); ctx.stroke();
+  } else {
+    clay(x, y, f.w, f.h, 12, f.c);
+    clay(x - 6, y - 14, f.w + 12, f.h * 0.34, 10, f.id === 'posko' ? '#C8553D' : f.id === 'pln' ? '#F57F17' : '#8E4B3A');
+  }
+
+  if (f.id === 'rs') {
+    ctx.fillStyle = '#D9362B'; ctx.fillRect(f.x - 3, y - 11, 6, 16); ctx.fillRect(f.x - 8, y - 6, 16, 6);
+  } else if (f.id === 'pln') {
+    ctx.strokeStyle = '#37474F'; ctx.lineWidth = 3;
+    ctx.beginPath(); ctx.moveTo(x + f.w - 18, y); ctx.lineTo(x + f.w - 10, y - 34); ctx.lineTo(x + f.w - 2, y); ctx.stroke();
+    ctx.fillStyle = (!blackout && (Math.sin(t * 6) > 0)) ? '#00E676' : '#FF5252';
+    ctx.beginPath(); ctx.arc(x + f.w - 10, y - 36, 4.5, 0, 7); ctx.fill();
+  } else if (f.id === 'pasar') {
+    clay(x - 28, y + f.h - 18, 22, 16, 4, '#6D4C41', 2);
+  }
+
+  ctx.font = Math.min(f.w, f.h) * 0.4 + 'px sans-serif';
+  ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+  ctx.fillText(f.e, f.x, f.y + 4);
+
+  if (f.id === 'apartemen') {
+    const aw = f.w, ah = f.h;
+    ctx.fillStyle = '#E8DCC8'; rr(x + 8, y + 8, aw * 0.58, ah - 16, 8); ctx.fill();
+    for (let r = 0; r < 4; r++) for (let c2 = 0; c2 < 5; c2++) {
+      const rw = (aw * 0.58 - 20) / 5, rh = (ah - 36) / 4;
+      const rx = x + 12 + c2 * (rw + 2), ry = y + 12 + r * (rh + 2);
+      const occ = (r * 5 + c2) % 3 !== 0;
+      ctx.fillStyle = occ ? '#FFE082' : '#5D6D7E'; rr(rx, ry, rw, rh, 3); ctx.fill();
+      if (occ && (r + c2) % 2 === 0) { ctx.fillStyle = '#37474F'; ctx.beginPath(); ctx.arc(rx + rw / 2, ry + rh / 2 - 2, 3, 0, 7); ctx.fill(); ctx.fillRect(rx + rw / 2 - 3, ry + rh / 2 + 1, 6, 5); }
+    }
+    ctx.fillStyle = '#455A64'; rr(x + aw * 0.64, y + 8, aw * 0.32, ah - 68, 6); ctx.fill();
+    const carCols = ['#D32F2F','#1976D2','#F0B52E','#2F7A52','#7B1FA2','#FF7043'];
+    for (let i = 0; i < 6; i++) {
+      const cx = x + aw * 0.66 + (i % 2) * (aw * 0.16), cy = y + 12 + Math.floor(i / 3) * ((ah - 76) / 3);
+      ctx.fillStyle = carCols[i]; rr(cx, cy, aw * 0.13, 14, 3); ctx.fill();
+      ctx.fillStyle = '#BFE6F2'; ctx.fillRect(cx + 2, cy + 3, aw * 0.13 - 4, 5);
+    }
+    ctx.fillStyle = '#4FC3F7'; rr(x + aw * 0.64, y + ah - 52, aw * 0.32, 40, 8); ctx.fill();
+    ctx.fillStyle = '#FFFFFF'; ctx.font = '10px sans-serif'; ctx.textAlign = 'center'; ctx.fillText('🏊', x + aw * 0.80, y + ah - 32);
+    const sx2 = x + aw * 0.58, sy2 = y + ah - 8;
+    ctx.fillStyle = '#1F4D36'; ctx.fillRect(sx2 - 4, sy2 - 12, 8, 12);
+    ctx.fillStyle = '#F1C7A0'; ctx.beginPath(); ctx.arc(sx2, sy2 - 14, 4, 0, 7); ctx.fill();
+    ctx.fillStyle = '#0D47A1'; ctx.fillRect(sx2 - 5, sy2 - 18, 10, 3);
+  }
+  if (f.id === 'penjara') {
+    ctx.strokeStyle = '#37474F'; ctx.lineWidth = 3;
+    for (let bi = 0; bi < 7; bi++) { const bx2 = x + 12 + bi * ((f.w - 24) / 6); ctx.beginPath(); ctx.moveTo(bx2, y + 8); ctx.lineTo(bx2, y + f.h - 8); ctx.stroke(); }
+  }
+  if (cam.z >= 0.42) {
+    ctx.font = '700 12.5px Fredoka,sans-serif';
+    const stTxt = f.st === 'sebagian' ? ' (' + Math.round(f.pr * 100) + '%)' : f.st === 'usulan' ? ' (Usulan)' : '';
+    const label = f.n + stTxt;
+    const tw = ctx.measureText(label).width + 14;
+    ctx.fillStyle = 'rgba(255,250,236,.94)';
+    rr(f.x - tw / 2, y + f.h + 7, tw, 20, 9); ctx.fill();
+    ctx.fillStyle = '#1F4D36';
+    ctx.fillText(label, f.x, y + f.h + 17);
+  }
+  if (selP === f) {
+    ctx.strokeStyle = '#F0B52E'; ctx.lineWidth = 4;
+    rr(x - 8, y - 18, f.w + 16, f.h + 26, 16); ctx.stroke();
+  }
+}
+
+function drawCar(c, t) {
+  ctx.save();
+  ctx.translate(c.x, c.y);
+  clay(-20, -8, 40, 16, 6, c.c, 3);
+  ctx.fillStyle = '#BFE6F2'; ctx.fillRect(-10, -6, 20, 8);
+  ctx.fillStyle = '#F0B52E'; ctx.fillRect(17, -4, 3, 5);
+  if (c.flag) {
+    ctx.fillStyle = '#CFCFCF'; ctx.fillRect(12, -14, 1.5, 10);
+    ctx.fillStyle = '#2F7A52'; ctx.fillRect(13.5, -14, 8, 5);
+    ctx.fillStyle = '#F0B52E'; ctx.beginPath(); ctx.arc(20, -4, 2.5, 0, 7); ctx.fill();
+  }
+  if (c.siren) {
+    ctx.fillStyle = Math.sin(t * 15) > 0 ? '#D32F2F' : '#1976D2';
+    ctx.fillRect(-4, -11, 8, 3);
+  }
+  if (c.cross) {
+    ctx.fillStyle = '#D32F2F';
+    ctx.fillRect(-2, -5, 4, 8); ctx.fillRect(-4, -3, 8, 4);
+  }
+  ctx.restore();
+}
+
+function drawPerson(a, t) {
+  if (a.dayJoined > viewDay) return;
+  if (a.inside && selA !== a) {
+    if (/tidur/.test(a.act)) {
+      ctx.fillStyle = '#4A3A2A'; rr(a.x - 10, a.y + 2, 20, 6, 3); ctx.fill();
+      ctx.fillStyle = '#F1C7A0'; ctx.beginPath(); ctx.arc(a.x - 12, a.y, 4, 0, 7); ctx.fill();
+      ctx.fillStyle = '#1F4D36'; ctx.font = '700 11px Nunito,sans-serif'; ctx.textAlign = 'center';
+      ctx.fillText('Z', a.x + 10, a.y - 10 + Math.sin(t * 2 + a.id) * 2);
+      return;
+    }
+    if (/masak/.test(a.act)) { /* jatuh ke gambar normal di teras, tidak disembunyikan */ }
+    else return;
+  }
+  if (cam.z < 0.38 && selA !== a && a.p !== 'Presiden') {
+    ctx.fillStyle = PERAN[a.p].c;
+    ctx.beginPath(); ctx.arc(a.x, a.y, 6, 0, 7); ctx.fill();
+    return;
+  }
+  const c = PERAN[a.p], k = Math.max(1, 0.8 / cam.z), w = a.mv ? Math.sin(t * 11 + a.id) : 0;
+  const x = a.x, y = a.y - Math.abs(w) * 1.2 * k, P = a.p;
+  ctx.fillStyle = 'rgba(0,0,0,.24)';
+  ctx.beginPath(); ctx.ellipse(x, a.y + 6.5 * k, 6 * k, 2.6 * k, 0, 0, 7); ctx.fill();
+  ctx.fillStyle = '#4A3A2A';
+  rr(x - 3.8 * k + w * 1.6 * k, a.y + 1 * k, 3 * k, 5.5 * k, 1.4 * k);
+  rr(x + 0.8 * k - w * 1.6 * k, a.y + 1 * k, 3 * k, 5.5 * k, 1.4 * k, 1);
+  ctx.fill();
+
+  if (P === 'Murid') { ctx.fillStyle = '#E8833A'; rr(x + 3.6 * k, y - 5 * k, 3.6 * k, 7 * k, 1.6 * k); ctx.fill(); }
+  ctx.fillStyle = c.c; rr(x - 5 * k, y - 6.5 * k, 10 * k, 11 * k, 4.5 * k); ctx.fill();
+  ctx.fillStyle = 'rgba(255,255,255,.3)'; rr(x - 3.6 * k, y - 5.6 * k, 7.2 * k, 2.6 * k, 1.3 * k); ctx.fill();
+
+  if (P === 'Presiden') {
+    ctx.strokeStyle = '#2E9C94'; ctx.lineWidth = 2.4 * k;
+    ctx.beginPath(); ctx.moveTo(x - 4 * k, y - 5 * k); ctx.lineTo(x + 4 * k, y + 4 * k); ctx.stroke();
+    ctx.fillStyle = '#F0B52E'; ctx.beginPath(); ctx.arc(x + 2.5 * k, y - 2 * k, 1.5 * k, 0, 7); ctx.fill();
+  }
+  if (P === 'Dokter') {
+    ctx.fillStyle = '#D9362B'; ctx.fillRect(x - 1 * k, y - 4.5 * k, 2 * k, 5 * k); ctx.fillRect(x - 2.5 * k, y - 3 * k, 5 * k, 2 * k);
+  }
+  ctx.fillStyle = '#F1C7A0'; ctx.beginPath(); ctx.arc(x, y - 10 * k, 4.6 * k, 0, 7); ctx.fill();
+  ctx.fillStyle = '#2A2018';
+  ctx.beginPath(); ctx.arc(x - 1.7 * k, y - 10 * k, 0.65 * k, 0, 7); ctx.arc(x + 1.7 * k, y - 10 * k, 0.65 * k, 0, 7); ctx.fill();
+
+  const hat = P === 'Tukang' || P === 'Mandor' ? '#FFD23F' : P === 'Presiden' || P === 'Menteri' ? '#161616' : shade(c.c, -0.38);
+  ctx.fillStyle = hat; ctx.beginPath(); ctx.arc(x, y - 11.2 * k, 4.9 * k, Math.PI, 0); ctx.fill();
+  if (P === 'Tukang' || P === 'Mandor' || P === 'Polisi') ctx.fillRect(x - 5.6 * k, y - 11.4 * k, 11.2 * k, 1.6 * k);
+
+  if (a.buyT > 0 && cam.z >= 0.55) { ctx.font = (11 * k) + 'px sans-serif'; ctx.textAlign = 'center'; ctx.fillText('💵🍜', x, y - 20 * k); }
+  if (a.crimePhase === 'jailed') { ctx.strokeStyle = '#37474F'; ctx.lineWidth = 2 * k; for (let bi = -1; bi <= 1; bi++) { ctx.beginPath(); ctx.moveTo(x + bi * 6 * k, y - 16 * k); ctx.lineTo(x + bi * 6 * k, y + 8 * k); ctx.stroke(); } ctx.font = (10 * k) + 'px sans-serif'; ctx.textAlign = 'center'; ctx.fillText('⛓️', x, y - 20 * k); }
+  if (a.p === 'Polisi' && a.chaseThief) { ctx.font = (11 * k) + 'px sans-serif'; ctx.textAlign = 'center'; ctx.fillText('🚨', x, y - 20 * k); }
+  if (/masak/.test(a.act) && cam.z >= 0.55) {
+    ctx.font = (11 * k) + 'px sans-serif'; ctx.textAlign = 'center'; ctx.fillText('🍳', x + 8 * k, y - 8 * k);
+    for (let si = 0; si < 3; si++) { const sy3 = y - 18 * k - ((t * 12 + si * 8 + a.id) % 22); ctx.fillStyle = 'rgba(255,255,255,' + (0.55 - si * 0.15) + ')'; ctx.beginPath(); ctx.arc(x + si * 2, sy3, 3 + si, 0, 7); ctx.fill(); }
+  }
+  if (!a.mv && cam.z >= 0.75) {
+    const tool = P === 'Tukang' ? '🔨' : P === 'Mandor' ? '🔨' : a.workStatus === 'nganggur' ? '☕' : /Petani/.test(a.sub) ? '🌾' : /Peternak/.test(a.sub) ? '🐟' : /Teknisi/.test(a.sub) ? '⚡' : P === 'Dokter' ? '🩺' : P === 'Guru' ? '📚' : P === 'Murid' ? '✏️' : P === 'Pasien' ? '🤒' : P === 'Pedagang' ? '🏪' : P === 'Penjahat' ? '💰' : '';
+    if (tool) {
+      ctx.font = (9 * k) + 'px sans-serif';
+      ctx.fillText(tool, x + 7 * k, y - 2 * k + Math.sin(t * 8 + a.id) * 1.5);
+    }
+  }
+
+  if (selA === a) {
+    ctx.strokeStyle = '#F0B52E'; ctx.lineWidth = 2.5 * k;
+    ctx.beginPath(); ctx.arc(x, y - 3 * k, 13 * k, 0, 7); ctx.stroke();
+  }
+}
+
+let donorCloudHit = [];
+function activeDonorClouds() {
+  const now = Date.now();
+  const act = donorList.filter(d => {
+    const amt = Number(d.amount) || 0;
+    if (amt < 1000) return false;
+    const hours = Math.max(1, Math.floor(amt / 1000));
+    const exp = new Date(d.created_at).getTime() + hours * 3600 * 1000;
+    return now < exp;
+  });
+  if (act.length) {
+    if (act.length > 10) {
+      const wins = Math.ceil(act.length / 10);
+      const wi = Math.floor(now / 30000) % wins;
+      const doubled = act.concat(act);
+      return doubled.slice(wi * 10, wi * 10 + 10);
+    }
+    return act.slice(0, 10);
+  }
+  return []; /* tidak ada awan contoh lagi — awan hanya muncul untuk donatur asli */
+}
+function drawDonorClouds(t) {
+  donorCloudHit = [];
+  const clouds = activeDonorClouds();
+  clouds.forEach((d, idx) => {
+    const amt = Number(d.amount) || 0;
+    const hours = Math.max(1, Math.floor(amt / 1000));
+    const exp = new Date(d.created_at).getTime() + hours * 3600 * 1000;
+    const remainMs = Math.max(0, exp - Date.now());
+    const rh = Math.floor(remainMs / 3600000), rm = Math.floor((remainMs % 3600000) / 60000);
+    const cycle = ((Date.now() / 1000) * 40 + idx * 240) % 1960;
+    const cx = 980 - cycle;
+    const cy = -120 + (idx % 4) * 120;
+    donorCloudHit.push({ x: cx, y: cy, d, hours, exp, remainMs });
+    ctx.save();
+    ctx.fillStyle = 'rgba(0,0,0,.12)'; ctx.beginPath(); ctx.ellipse(cx, cy + 22, 52, 8, 0, 0, 7); ctx.fill();
+    ctx.fillStyle = '#FFF8E1';
+    ctx.beginPath(); ctx.arc(cx - 28, cy, 18, 0, 7); ctx.arc(cx, cy - 10, 24, 0, 7); ctx.arc(cx + 28, cy, 18, 0, 7); ctx.fill();
+    ctx.fillStyle = '#FFECB3'; ctx.beginPath(); ctx.ellipse(cx, cy + 12, 48, 10, 0, 0, 7); ctx.fill();
+    ctx.font = '700 11px Nunito,sans-serif'; ctx.textAlign = 'center'; ctx.fillStyle = '#1F4D36';
+    const nameTxt = '☁️💛 ' + d.donator_name;
+    ctx.fillText(nameTxt, cx, cy - 2);
+    ctx.font = '700 10px Nunito,sans-serif'; ctx.fillStyle = '#B7791F';
+    ctx.fillText(fmtRp(amt) + ' • ⏳ ' + rh + 'j ' + rm + 'm lagi', cx, cy + 10);
+    if (d.message) {
+      const msg = d.message.length > 28 ? d.message.slice(0, 27) + '…' : d.message;
+      const mw = ctx.measureText(msg).width + 16;
+      ctx.fillStyle = 'rgba(18,28,18,.94)'; rr(cx - mw / 2, cy + 26, mw, 18, 9); ctx.fill();
+      ctx.fillStyle = '#FFFFFF'; ctx.font = '700 10px Nunito,sans-serif'; ctx.fillText(msg, cx, cy + 37);
+    }
+    ctx.restore();
+  });
+}
+function openDonorCloudPopup(d, hours, remainMs) {
+  const amt = Number(d.amount) || 0;
+  const hrs = hours || Math.max(1, Math.floor(amt / 1000));
+  const rem = remainMs != null ? remainMs : Math.max(0, (new Date(d.created_at).getTime() + hrs * 3600 * 1000) - Date.now());
+  const rh = Math.floor(rem / 3600000), rm = Math.floor((rem % 3600000) / 60000);
+  const saweriaBtn = saweriaUrl
+    ? '<a class="btn gold" href="' + esc(saweriaUrl) + '" target="_blank" rel="noopener" style="width:100%;text-decoration:none;margin-bottom:12px">💸 Donasi via Saweria & Terbangkan Awan</a>'
+    : '<p class="note" style="margin-bottom:12px">Link Saweria belum dipasang presiden. Setelah link dipasang lewat Panel Admin, tombol ini langsung membuka Saweria.</p>';
+  const sim = !sbMode ? '<label>Nama (simulasi lokal)<input id="simDonNama" placeholder="nama kamu"></label><label>Nominal (Rp)<input id="simDonAmt" type="number" min="1000" step="1000" value="5000"></label><label>Pesan<input id="simDonMsg" placeholder="pesan di awan"></label><button class="btn gold" id="simDonBtn" type="button" style="width:100%;margin-bottom:12px">☁️ Terbangkan Awan (Simulasi Lokal)</button>' : '';
+  openSheet('<h3>☁️💛 Awan Donatur Saweria</h3>' +
+    '<p><b>' + esc(d.donator_name) + '</b> • <b>' + fmtRp(amt) + '</b></p>' +
+    (d.message ? '<div class="q">“' + esc(d.message) + '”</div>' : '') +
+    '<p class="note">Total jam tayang: <b>' + hrs + ' jam</b> • Sisa di langit: <b>' + rh + 'j ' + rm + 'm lagi</b>.</p>' +
+    '<p class="note">Terbangkan Awan Pesanmu di Langit Republik Netizenia! Setiap donasi Rp1.000 = 1 Jam awan pesanmu melayang dari kanan ke kiri di atas rumah warga dan dilihat seluruh pengunjung secara live.</p>' +
+    saweriaBtn + sim +
+    '<button class="btn soft" id="kePapanDonatur" type="button" style="width:100%">💛 Lihat Papan Donatur Lengkap</button>', 'awan');
+  const kb = document.getElementById('kePapanDonatur'); if (kb) kb.onclick = openDonorBoard;
+  const sb2 = document.getElementById('simDonBtn');
+  if (sb2) sb2.onclick = () => {
+    const nm = document.getElementById('simDonNama').value.trim(), amt2 = parseInt(document.getElementById('simDonAmt').value, 10), msg2 = document.getElementById('simDonMsg').value.trim();
+    if (!nm || !amt2 || amt2 < 1000) return;
+    donorList.unshift({ donator_name: nm, amount: amt2, message: msg2, created_at: new Date().toISOString() });
+    renderDonorBar(); note('☁️ Awan simulasi lokal ' + nm + ' terbang! (Mode Lokal, hanya di perangkat ini)');
+    closeSheet();
+  };
+}
+function drawWorld(t) {
+  ctx.fillStyle = '#8FCB7A';
+  ctx.fillRect(-1350, -750, 2700, 1650);
+
+  ctx.fillStyle = '#F0B52E'; ctx.beginPath(); ctx.arc(-450, -560, 42, 0, 7); ctx.fill();
+  [[-850,-390,220],[-520,-390,180],[-180,-390,240],[180,-390,190],[520,-390,230],[840,-390,170]].forEach((m, i) => {
+    ctx.fillStyle = i % 2 ? '#3F7D5B' : '#4E8F6B';
+    ctx.beginPath(); ctx.moveTo(m[0] - m[2], m[1]); ctx.lineTo(m[0], m[1] - m[2] * 0.85); ctx.lineTo(m[0] + m[2], m[1]); ctx.fill();
+  });
+
+  const vy0 = cam.y - H / 2 / cam.z - 50, vy1 = cam.y + H / 2 / cam.z + 50;
+  const vx0 = cam.x - W / 2 / cam.z - 50, vx1 = cam.x + W / 2 / cam.z + 50;
+  for (let y = Math.max(-380, Math.floor(vy0 / 54) * 54); y < Math.min(760, vy1); y += 54) {
+    for (let x = Math.max(-1100, Math.floor(vx0 / 64) * 64); x < Math.min(1100, vx1); x += 64) {
+      const r = hs(x * 7 + y * 13);
+      if (r < 0.4) {
+        ctx.fillStyle = r < 0.2 ? '#7DBE6A' : '#9ED687';
+        ctx.beginPath(); ctx.ellipse(x + r * 35, y + hs(x + y) * 25, 9, 4, 0, 0, 7); ctx.fill();
+      }
+    }
+  }
+
+  const road = (x, y, w, h) => {
+    ctx.fillStyle = '#7C7E74'; ctx.fillRect(x, y + 3, w, h);
+    ctx.fillStyle = '#A3A59A'; ctx.fillRect(x, y, w, h);
+  };
+  road(-32, -520, 64, 1200);
+  road(-960, -18, 1920, 36);
+  road(-960, -165, 1920, 26);
+  road(-960, 150, 1920, 28);
+  CLUSTERS.forEach(cl => {
+    road(cl.cx - 190, cl.cy - 12, 380, 24);
+  });
+
+  drawSpecialZones(t);
+
+  [-340, 0, 340].forEach(bx => {
+    const by = riverY(bx);
+    clay(bx - 36, by - 30, 72, 60, 8, '#D7CCC8', 4);
+    ctx.fillStyle = '#8D6E63';
+    ctx.fillRect(bx - 36, by - 30, 6, 60);
+    ctx.fillRect(bx + 30, by - 30, 6, 60);
+  });
+
+  ctx.strokeStyle = '#F4EBD0'; ctx.lineWidth = 2.5; ctx.setLineDash([14, 12]);
+  ctx.beginPath();
+  ctx.moveTo(0, -500); ctx.lineTo(0, 660);
+  ctx.moveTo(-940, 0); ctx.lineTo(940, 0);
+  ctx.stroke(); ctx.setLineDash([]);
+
+  clay(-75, -535, 150, 24, 10, '#F0B52E');
+  ctx.fillStyle = '#1F4D36'; ctx.font = '700 12.5px Fredoka,sans-serif';
+  ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+  ctx.fillText('SELAMAT DATANG', 0, -523);
+
+  for (let i = 0; i < 48; i++) {
+    const ang = (i / 48) * Math.PI * 2;
+    const rad = 960 + (i % 3) * 55;
+    const tx = Math.cos(ang) * rad, ty = Math.sin(ang) * (rad * 0.62);
+    if (tx > vx0 - 40 && tx < vx1 + 40 && ty > vy0 - 40 && ty < vy1 + 40) {
+      ctx.fillStyle = '#6B4A2B'; ctx.fillRect(tx - 3, ty, 6, 14);
+      clay(tx - 15, ty - 22, 30, 30, 15, i % 2 ? '#4FA05A' : '#3F8F4E', 3);
+    }
+  }
+
+  CONFIG.fas.forEach(f => drawFas(f, t));
+
+  for (let i = 0; i < plots.length; i++) {
+    const p = plots[i];
+    if (p.x > vx0 - 50 && p.x < vx1 + 50 && p.y > vy0 - 50 && p.y < vy1 + 50) {
+      drawHouse(p, t);
+    }
+  }
+
+  if (cam.z >= 1.15) {
+    ctx.font = '700 10.5px Nunito,sans-serif'; ctx.textAlign = 'center';
+    for (let i = 0; i < plots.length; i++) {
+      const p = plots[i];
+      if (p.a && p.x > vx0 && p.x < vx1 && p.y > vy0 && p.y < vy1) {
+        const tName = p.a.n.length > 13 ? p.a.n.slice(0, 12) + '…' : p.a.n;
+        const w = ctx.measureText(tName).width + 10;
+        ctx.fillStyle = 'rgba(18,28,18,.94)';
+        rr(p.x - w / 2, p.y + 22, w, 15, 7); ctx.fill();
+        ctx.fillStyle = '#FFFFFF';
+        ctx.fillText(tName, p.x, p.y + 29.5);
+      }
+    }
+  }
+
+  drawDonorClouds(t);
+  cars.forEach(c => drawCar(c, t));
+  carts.forEach(c => drawCart(c));
+  ctx.font = '14px sans-serif'; ctx.textAlign = 'center';
+  ctx.fillText('🐱', cat.x, cat.y);
+
+  for (let i = 0; i < ag.length; i++) {
+    const a = ag[i];
+    if (a.x > vx0 - 30 && a.x < vx1 + 30 && a.y > vy0 - 30 && a.y < vy1 + 30) {
+      drawPerson(a, t);
+    }
+  }
+}
+
+function drawNightAndNames() {
+  const h = hour(), n = (1 - Math.cos((h - 13) * Math.PI / 12)) / 2;
+  const a = blackout ? 0.58 : 0.45 * Math.pow(n, 1.5);
+  NIGHT = n;
+  if (a > 0.01) {
+    ctx.fillStyle = 'rgba(18,28,70,' + a + ')';
+    ctx.fillRect(0, 0, W, H);
+  }
+  if (cam.z < 0.45) return;
+
+  const L = [];
+  for (let i = 0; i < ag.length; i++) {
+    const agi = ag[i];
+    if (agi.dayJoined > viewDay) continue;
+    if (agi.inside && agi !== selA && !/tidur|masak/.test(agi.act)) continue;
+    const sx = (agi.x - cam.x) * cam.z + W / 2;
+    const sy = (agi.y - cam.y) * cam.z + H / 2 - 14 * Math.max(cam.z, 0.8) - 9;
+    if (sx > -60 && sx < W + 60 && sy > 0 && sy < H) {
+      L.push({ a: agi, sx, sy, d: Math.hypot(sx - W / 2, sy - H / 2) });
+    }
+  }
+  L.sort((p, q) => (q.a === selA) - (p.a === selA) || (q.a.p === 'Presiden') - (p.a.p === 'Presiden') || p.d - q.d);
+
+  ctx.textAlign = 'left'; ctx.textBaseline = 'middle'; ctx.font = '700 11px Nunito,sans-serif';
+  const cap = cam.z >= 1.2 ? 95 : cam.z >= 0.8 ? 55 : 32;
+  L.slice(0, cap).forEach(({ a: agi, sx, sy }) => {
+    const ch = Array.from(agi.n);
+    const t = (agi.ig ? '@' : '') + (ch.length > 14 ? ch.slice(0, 13).join('') + '…' : agi.n);
+    const w = ctx.measureText(t).width + 24;
+    ctx.fillStyle = 'rgba(18,28,18,.94)';
+    rr(sx - w / 2, sy - 9, w, 18, 9); ctx.fill();
+    ctx.fillStyle = PERAN[agi.p].c;
+    ctx.beginPath(); ctx.arc(sx - w / 2 + 9, sy, 4, 0, 7); ctx.fill();
+    ctx.fillStyle = '#FFFFFF';
+    ctx.fillText(t, sx - w / 2 + 16, sy + 0.5);
+  });
+
+  let bCount = 0;
+  ctx.textAlign = 'center'; ctx.font = '700 11.5px Nunito,sans-serif';
+  for (let i = 0; i < L.length && bCount < 7; i++) {
+    const { a: agi, sx, sy } = L[i];
+    if (!(agi.sayT > 0 || agi === selA) || !(agi === selA || cam.z >= 0.95)) continue;
+    const t = agi.say || agi.th; if (!t) continue;
+    bCount++;
+    const tx = t.length > 36 ? t.slice(0, 35) + '…' : t;
+    const w = ctx.measureText(tx).width + 16;
+    ctx.fillStyle = 'rgba(18,28,18,.94)'; rr(sx - w / 2, sy - 32, w, 22, 11); ctx.fill();
+    ctx.fillStyle = '#FFFFFF'; ctx.fillText(tx, sx, sy - 21);
+  }
+}
+
+/* ====== TUR KAMERA OTOMATIS & LOOP UTAMA ====== */
+const TOUR_POINTS = [
+  { x: 0, y: 0, z: 0.95, msg: '🏠 Pusat Kota: Rumah Presiden Pak Mulyo, Bendera Netizenia & Tugu Kuda' },
+  { x: -180, y: -255, z: 0.9, msg: '🌊 Sungai Berikan Mas, Bendungan Irigasi & Sawah Pangan Warga' },
+  { x: 245, y: -245, z: 0.95, msg: '⚡ Gardu Induk PLN Kabel Bawah Tanah, Tower WiFi & Barak TNI' },
+  { x: -250, y: -50, z: 0.9, msg: '🏫 Zona Pendidikan, Kosan Ibu Kos & Tempat Ibadah 6 Agama' },
+  { x: 260, y: 150, z: 0.9, msg: '🏥 Rumah Sakit Gratis, Posko Tukang & Ruko UMKM Fory Coffee' },
+  { x: 0, y: 80, z: 0.45, msg: '🇮🇩 Tampilan Udara: 8 Klaster Rumah Warga Menyebar Mengelilingi Presiden' }
+];
+
+let last = 0;
+function frame(ts) {
+  const dt = Math.min(0.05, (ts - last) / 1000 || 0); last = ts;
+  tg += dt * 11;
+  for (let i = 0; i < ag.length; i++) stepA(ag[i], dt);
+  stepWorldEntities(dt);
+
+  if (dirTour) {
+    dirTimer -= dt;
+    if (dirTimer <= 0) {
+      const pt = TOUR_POINTS[dirStep % TOUR_POINTS.length];
+      fly = { x: pt.x, y: pt.y, z: pt.z };
+      note(pt.msg);
+      dirStep++;
+      dirTimer = 5.5;
+    }
+  }
+
+  if (follow) { cam.x += (follow.x - cam.x) * 0.12; cam.y += (follow.y - cam.y) * 0.12; }
+  if (fly) {
+    cam.x += (fly.x - cam.x) * 0.12;
+    cam.y += (fly.y - cam.y) * 0.12;
+    cam.z += (fly.z - cam.z) * 0.12;
+    if (Math.abs(fly.x - cam.x) + Math.abs(fly.y - cam.y) < 2 && Math.abs(fly.z - cam.z) < 0.02) fly = null;
+  }
+  cam.x = Math.max(-1050, Math.min(1050, cam.x));
+  cam.y = Math.max(-560, Math.min(720, cam.y));
+
+  ctx.setTransform(dpr * cam.z, 0, 0, dpr * cam.z, dpr * (W / 2 - cam.x * cam.z), dpr * (H / 2 - cam.y * cam.z));
+  drawWorld(ts / 1000);
+  ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+  drawNightAndNames();
+
+  $('#sub').textContent = 'Hari ' + viewDay + ' • Jam ' + jam() + ' WIB • 👥 ' + Number(CONFIG.stats.followers || 0).toLocaleString('id-ID') + ' Followers';
+  requestAnimationFrame(frame);
+}
+
+function censorText(s) {
+  const BAD = ['anjing','bangsat','babi','kontol','memek','tolol','goblok','asu','jancok','kampret','brengsek','tai','bajingan'];
+  let out = String(s || '');
+  BAD.forEach(w => { out = out.replace(new RegExp('\\b' + w + '\\b', 'gi'), '***'); });
+  return out;
+}
+/* ====== PANEL UI, KEPUASAN RAKYAT, USULAN, KLAIM NAMA & KTP ====== */
+const feed = [];
+function note(t) {
+  feed.push(t); while (feed.length > 3) feed.shift();
+  $('#feed').innerHTML = feed.map(f => '<span>' + esc(f) + '</span>').join('');
+}
+
+const SEED_NAME_SET = new Set([...CONFIG.warga.map(w => w.n), ...Object.values(CONFIG.seed).flat()]);
+
+function updateChips() {
+  const mine = ag.filter(a => !a.sys && a.dayJoined <= viewDay).length;
+  const baru = ag.filter(a => !a.sys && a.dayJoined <= viewDay && !SEED_NAME_SET.has(a.origName)).length;
+  const doneFas = CONFIG.fas.filter(f => f.st === 'jadi' && f.day <= viewDay).length;
+  const sat = citySatisfaction();
+  $('#c1').textContent = '👥 ' + Math.max(CONFIG.stats.rakyat + baru, mine).toLocaleString('id-ID') + ' Rakyat (' + mine + ' di Peta)';
+  $('#c2').textContent = '🏘️ ' + mine + ' Rumah (' + sat.unfinishedHouses + ' Dibangun)';
+  $('#c3').textContent = '🏗️ ' + doneFas + '/' + CONFIG.fas.length + ' Fasilitas';
+  $('#cPuas').textContent = (sat.avg >= 75 ? '😍 ' : '😊 ') + sat.avg + '% Rakyat Puas';
+  $('#cPln').textContent = blackout ? '⚠️ PLN: Padam' : '⚡ PLN & Air: Menyala';
+  const tr = document.getElementById('topRakyat'); if (tr) tr.textContent = '👥 ' + Math.max(CONFIG.stats.rakyat + baru, mine).toLocaleString('id-ID') + ' Rakyat';
+}
+
+const sheet = $('#sheet');
+let lastSheetKey = '';
+function setFocusMode(on, keep) {
+  const el = id => document.getElementById(id);
+  const fab = el('fab'), dock = document.querySelector('.dock'), tab = el('dockTab'), lm = el('leftMenu'), cb = el('leftChatBtn'), nb = el('leftNotifBtn'), box = el('liveChatBox'), feed = el('feed'), toast = el('chatToast');
+  if (!on) {
+    [fab, dock, tab, lm, cb, nb, box, feed, toast].forEach(e => { if (e) e.style.display = ''; });
+    document.body.classList.remove('focus-mode');
+    return;
+  }
+  document.body.classList.add('focus-mode');
+  if (fab) fab.style.display = 'none';
+  if (dock) dock.style.display = 'none';
+  if (tab) tab.style.display = 'none';
+  if (toast) toast.style.display = 'none';
+  if (keep === 'chat') {
+    if (cb) cb.style.display = '';
+    if (nb) nb.style.display = 'none';
+    if (feed) feed.style.display = 'none';
+  } else if (keep === 'notif') {
+    if (nb) nb.style.display = '';
+    if (cb) cb.style.display = 'none';
+    if (box) box.style.display = 'none';
+  } else {
+    if (lm) lm.style.display = 'none';
+    if (box) box.style.display = 'none';
+    if (feed) feed.style.display = 'none';
+  }
+}
+function openSheet(html, m) {
+  const _t = (html.match(/<h3[^>]*>(.*?)<\/h3>/) || [])[1] || '';
+  const _key = (m || '') + '|' + _t.replace(/<[^>]+>/g, '').trim().slice(0, 60);
+  const _inside = sheet.contains(document.activeElement);
+  if (!_inside && sheet.classList.contains('open') && lastSheetKey === _key) { closeSheet(); return; }
+  lastSheetKey = _key;
+  mode = m;
+  document.body.classList.add('sheet-open');
+  document.body.classList.remove('chat-open', 'notif-open');
+  setFocusMode(true, 'sheet');
+  const ci = document.getElementById('leftChatIcon'); if (ci) ci.textContent = '✉️';
+  const ni = document.getElementById('leftNotifIcon'); if (ni) ni.textContent = '🔔';
+  sheet.innerHTML = '<div class="sheet-closebar"><button class="xbig" type="button" id="xxBig">⤢ Perbesar</button><button class="x" type="button" aria-label="Tutup" id="xx">✕ Tutup</button></div>' + html;
+  sheet.classList.remove('full');
+  sheet.classList.add('open');
+  $('#xx').onclick = e => { e.stopPropagation(); e.preventDefault(); closeSheet(); };
+  $('#xxBig').onclick = () => { const f = sheet.classList.toggle('full'); document.getElementById('xxBig').textContent = f ? '⤣ Perkecil' : '⤢ Perbesar'; };
+}
+function closeSheet() {
+  sheet.classList.remove('open');
+  document.body.classList.remove('sheet-open');
+  lastSheetKey = '';
+  setFocusMode(false);
+  mode = ''; pickPlot = null; selA = null; selP = null; follow = null;
+}
+function toggleMenu(menuKey, openFn) {
+  if (sheet.classList.contains('open') && mode === menuKey) {
+    closeSheet();
+  } else {
+    openFn();
+  }
+}
+// Klik area kosong di luar #sheet (bukan tombol/link/kanvas, karena kanvas sudah ditangani tap()) = close
+document.addEventListener('click', e => {
+  if (!sheet.classList.contains('open')) return;
+  if (e.target.closest('#sheet')) return;
+  if (e.target.closest('button')) return;
+  if (e.target.closest('a')) return;
+  if (e.target === document.getElementById('cv')) return;
+  closeSheet();
+});
+const bar = (v, col) => '<div class="bar2"><i style="width:' + Math.round(v * 100) + '%;background:' + (col || 'var(--brand)') + '"></i></div>';
+
+function infoA(a) {
+  const c = PERAN[a.p], sat = calcSatisfaction(a);
+  const homeTxt = typeof a.home === 'number' ? 'Rumah no. ' + (a.home + 1) + ' (' + plots[a.home].clName + ')' : 'Rumah Presiden (Pusat Kota)';
+  const tagClass = sat.score >= 70 ? 'ok' : sat.score >= 50 ? 'warn' : 'bad';
+  openSheet(
+    '<h3>' + (a.ig ? '@' : '') + esc(a.n) + '</h3>' +
+    '<span class="tag">' + c.e + ' ' + a.p + '</span>' +
+    '<span class="tag">' + esc(a.sub) + '</span>' +
+    '<span class="tag ' + tagClass + '">' + sat.emoji + ' ' + sat.label + ' (' + sat.score + '%)</span>' +
+    '<p style="margin:8px 0 4px">Sedang <b>' + esc(a.act) + '</b> di <b>' + esc(locName(a, a.mv ? a.dest : a.loc)) + '</b>.</p>' +
+    '<div class="q">“' + esc(a.th || 'Senang jadi warga Republik Netizenia!') + '”</div>' +
+    '<small>Tingkat Kepuasan Tinggal di Netizenia (' + sat.score + '%)</small>' + bar(sat.score / 100, sat.score >= 65 ? '#2E7D32' : '#E65100') +
+    '<div style="font-size:.8rem;margin-bottom:8px">' + sat.reasons.map(r => '<div>' + esc(r) + '</div>').join('') + '</div>' +
+    '<small>Tingkat Lapar</small>' + bar(a.lapar) +
+    '<p class="note">📍 <b>Tempat Tinggal:</b> ' + esc(homeTxt) + '</p>' +
+    '<div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:12px">' +
+      (typeof a.home === 'number' ? '<button class="btn soft" id="bKeRumah" type="button">🏠 Lihat Rumahnya</button>' : '') +
+      '<button class="btn gold" id="bCetakKtp" type="button">🪪 Cetak KTP Story</button>' +
+      (!a.sys ? '<button class="btn soft" id="bKlaim" type="button">✏️ Klaim @Username</button>' : '') +
+    '</div>',
+    'info'
+  );
+  if ($('#bKeRumah')) $('#bKeRumah').onclick = () => {
+    const p = plots[a.home]; follow = null; selP = p;
+    fly = { x: p.x, y: p.y, z: 1.35 }; infoP(p);
+  };
+  if ($('#bCetakKtp')) $('#bCetakKtp').onclick = () => downloadKTP(a);
+  if ($('#bKlaim')) $('#bKlaim').onclick = () => openClaimModal(a);
+}
+
+function downloadKTP(a) {
+  const kcv = document.createElement('canvas');
+  kcv.width = 720; kcv.height = 440;
+  const kctx = kcv.getContext('2d');
+  kctx.fillStyle = '#FFF1D0'; kctx.fillRect(0, 0, 720, 440);
+  kctx.fillStyle = '#1F4D36'; kctx.fillRect(0, 0, 720, 86);
+  kctx.fillStyle = '#F0B52E'; kctx.fillRect(0, 82, 720, 8);
+  kctx.fillStyle = '#FFF4DA'; kctx.font = '700 28px Fredoka,sans-serif';
+  kctx.fillText('🇮🇩 KARTU TANDA RAKYAT NETIZENIA', 28, 52);
+  kctx.fillStyle = '#20301F'; kctx.font = '700 26px Nunito,sans-serif';
+  kctx.fillText((a.ig ? '@' : '') + a.n, 32, 145);
+  kctx.font = '600 20px Nunito,sans-serif';
+  kctx.fillText('Peran / Profesi : ' + PERAN[a.p].e + ' ' + a.p + ' (' + a.sub + ')', 32, 190);
+  kctx.fillText('Alamat Rumah   : ' + (typeof a.home === 'number' ? 'Kavling No. ' + (a.home + 1) : 'Pusat Pemerintahan'), 32, 230);
+  kctx.fillText('Status Kepuasan: ' + calcSatisfaction(a).label + ' (' + calcSatisfaction(a).score + '%)', 32, 270);
+  kctx.fillText('Pajak Negara   : Rp 0 (Bebas Pajak & Anti Korupsi)', 32, 310);
+  kctx.fillStyle = '#1F4D36'; kctx.font = '700 18px Fredoka,sans-serif';
+  kctx.fillText('Disahkan di Pusat Kota oleh Presiden Pak Mulyo • @republiknetizenia', 32, 395);
+  const link = document.createElement('a');
+  link.download = 'KTP-Netizenia-' + a.n.replace(/[^a-z0-9]/gi, '_') + '.png';
+  link.href = kcv.toDataURL('image/png');
+  link.click();
+  note('🪪 KTP Rakyat ' + a.n + ' berhasil diunduh!');
+}
+
+function openClaimModal(a) {
+  openSheet(
+    '<h3>Klaim Namaku: ' + esc(a.origName) + '</h3>' +
+    '<p class="note">Nama di peta berasal dari nama tampilan komentar Instagram. Masukkan username Instagram aslimu agar tampil sebagai <b>@username</b> dan mudah dicari.</p>' +
+    '<label>Username Instagram Asli<input id="clUser" placeholder="contoh: ressso_11" value="' + esc(a.ig ? a.n : '') + '"></label>' +
+    '<div class="err" id="clErr"></div>' +
+    (sbPendingClaims[a.origName] ? '<p class="note">⏳ Klaim @' + esc(sbPendingClaims[a.origName]) + ' masih menunggu persetujuan Presiden.</p>' : '') +
+    '<div style="display:flex;gap:8px;margin-top:10px">' +
+      '<button class="btn gold" id="bSimpanKlaim" type="button" style="flex:1">✅ Simpan @Username</button>' +
+      '<button class="btn soft" id="bHapusNama" type="button" style="color:var(--bad)">🗑️ Hapus Namaku</button>' +
+    '</div>',
+    'klaim'
+  );
+  $('#bSimpanKlaim').onclick = async () => {
+    const u = $('#clUser').value.trim().replace(/^@/, '');
+    if (!/^[A-Za-z0-9._]{1,30}$/.test(u)) { $('#clErr').textContent = 'Username tidak valid.'; return; }
+    if (sbMode) {
+      /* TAHAP 2: klaim TIDAK lagi langsung berlaku — masuk antrean persetujuan Presiden. */
+      let res = '';
+      try { res = await sbRpc('request_claim', { p_name: a.origName, p_ig: u }); }
+      catch (e) { $('#clErr').textContent = 'Gagal menghubungi Supabase: ' + e.message + ' — klaim belum dikirim.'; return; }
+      if (res === 'taken') { $('#clErr').textContent = 'Username @' + u + ' sudah diklaim warga lain.'; return; }
+      if (res === 'invalid') { $('#clErr').textContent = 'Username tidak valid.'; return; }
+      if (res === 'not_found') { $('#clErr').textContent = 'Nama ini belum ada di Dunia Bersama — daftar dulu lewat tombol Jadi Rakyat.'; return; }
+      if (res === 'duplicate_pending') { $('#clErr').textContent = 'Klaim @' + u + ' sudah dikirim dan masih menunggu persetujuan Presiden.'; return; }
+      if (res !== 'ok') { $('#clErr').textContent = 'Klaim gagal: ' + (res || 'respons tidak dikenal'); return; }
+      sbPendingClaims[a.origName] = u;
+      store.set('ntz_claims_pending_v1', sbPendingClaims);
+      note('📨 Klaim @' + u + ' dikirim, menunggu persetujuan Presiden.');
+      closeSheet();
+      return;
+    }
+    claimsMap[a.origName] = u;
+    store.set('ntz_claims_v3', claimsMap);
+    a.n = u; a.ig = true;
+    if (bc) bc.postMessage({ type: 'claim', orig: a.origName, u });
+    note('✅ Nama ' + a.origName + ' diklaim menjadi @' + u);
+    infoA(a);
+  };
+  $('#bHapusNama').onclick = async () => {
+    let sbRes = '';
+    if (sbMode) {
+      try { sbRes = await sbRpc('opt_out_resident', { p_name: a.origName }); }
+      catch (e) { $('#clErr').textContent = 'Gagal menghubungi Supabase: ' + e.message + ' — nama belum dihapus.'; return; }
+      if (sbRes !== 'ok' && sbRes !== 'not_found') { $('#clErr').textContent = 'Hapus nama gagal: ' + (sbRes || 'respons tidak dikenal'); return; }
+      if (sbRes === 'not_found') note('Nama ini belum ada di database — dihapus dari perangkat ini saja.');
+    }
+    optOutMap[a.origName] = true;
+    store.set('ntz_optout_v3', optOutMap);
+    if (typeof a.home === 'number' && plots[a.home]) plots[a.home].a = null;
+    const idx = ag.indexOf(a); if (idx >= 0) ag.splice(idx, 1);
+    updateChips(); closeSheet();
+    if (!sbMode || sbRes === 'ok') note('Nama berhasil dihapus dari kota.');
+  };
+}
+
+function infoF(f) {
+  const here = ag.filter(a => a.loc === f.id && !a.mv);
+  const stLabel = { jadi: 'Sudah Berdiri', sebagian: 'Sedang Dibangun Tukang', usulan: 'Lahan Usulan Warga' }[f.st];
+  openSheet(
+    '<h3>' + f.e + ' ' + esc(f.n) + '</h3>' +
+    '<span class="tag">' + stLabel + '</span>' +
+    '<p>' + esc(f.k) + '</p>' +
+    (f.st !== 'jadi' ? '<small>Progres Pembangunan (' + Math.round(f.pr * 100) + '%)</small>' + bar(f.pr) : '') +
+    (f.id === 'pln' ? '<div style="margin:10px 0"><button class="btn gold" id="bTogglePln" type="button">' + (blackout ? '⚡ Nyalakan Kembali Gardu PLN' : '🔌 Simulasi Mati Lampu (Uji Teknisi)') + '</button></div>' : '') +
+    (f.st !== 'jadi' ? '<button class="btn soft" id="bBantuBangun" type="button" style="margin-bottom:8px">🔨 Kerahkan Tukang ke Sini (+15%)</button>' : '') +
+    '<p class="note">👥 <b>' + here.length + ' rakyat</b> sedang berada di lokasi ini: ' +
+    (here.slice(0, 8).map(a => esc(a.n) + ' (' + a.p + ')').join(', ') || 'Sedang dalam perjalanan') + '</p>',
+    'info'
+  );
+  if ($('#bTogglePln')) $('#bTogglePln').onclick = () => {
+    blackout = !blackout;
+    updateChips();
+    note(blackout ? '⚠️ Gardu PLN sedang diuji! Teknisi bergegas mengecek kabel.' : '⚡ Listrik bawah tanah PLN kembali menyala normal!');
+    infoF(f);
+  };
+  if ($('#bBantuBangun')) $('#bBantuBangun').onclick = () => {
+    f.pr = Math.min(1, f.pr + 0.15);
+    if (f.pr >= 1) { f.st = 'jadi'; note('🎉 Pembangunan ' + f.n + ' telah selesai 100%!'); }
+    updateChips(); infoF(f);
+  };
+}
+
+function infoP(p) {
+  if (p.a) {
+    const a = p.a;
+    const archName = { batak: 'Rumah Adat Batak', tingkat: 'Rumah 2 Tingkat + Kolam Renang', kayu: 'Rumah Kayu Asri', reguler: 'Rumah Subsidi Netizenia' }[p.arch];
+    openSheet(
+      '<h3>🏠 Rumah No. ' + (p.i + 1) + ' — ' + esc(a.n) + '</h3>' +
+      '<span class="tag">' + esc(archName) + '</span>' +
+      '<span class="tag ' + (p.pr >= 1 ? 'ok' : 'warn') + '">' + (p.pr >= 1 ? '✅ Selesai 100%' : '🔨 Dibangun ' + Math.round(p.pr * 100) + '%') + '</span>' +
+      '<p>Terletak di <b>' + esc(p.clName) + '</b>. Dihuni oleh <b>' + esc(a.n) + '</b> (' + a.p + ' — ' + esc(a.sub) + ').</p>' +
+      (p.pr < 1 ? '<small>Progres Konstruksi Rumah</small>' + bar(p.pr) + '<button class="btn gold" id="bKebutRumah" type="button">🔨 Bantu Tukang Selesaikan Rumah Ini</button>' : '') +
+      '<div style="margin-top:10px"><button class="btn soft" id="bLihatWarga" type="button">👤 Lihat Isi Kepala ' + esc(a.n) + '</button></div>',
+      'info'
+    );
+    if ($('#bKebutRumah')) $('#bKebutRumah').onclick = () => {
+      p.pr = 1; updateChips();
+      note('🎉 Rumah No. ' + (p.i + 1) + ' milik ' + a.n + ' resmi selesai dibangun!');
+      infoP(p);
+    };
+    $('#bLihatWarga').onclick = () => { selA = a; follow = a; infoA(a); };
+    return;
+  }
+  openSheet(
+    '<h3>Kavling Rumah Kosong No. ' + (p.i + 1) + '</h3>' +
+    '<p>Lokasi: <b>' + esc(p.clName) + '</b> (Tipe: ' + esc(p.arch.toUpperCase()) + '). Belum ada penghuninya. Mau jadi rakyat dan tinggal di sini?</p>' +
+    '<button class="btn gold" id="ambil" type="button">➕ Ambil Rumah Ini</button>',
+    'info'
+  );
+  $('#ambil').onclick = () => openDaftar(p.i);
+}
+
+function openSatisfactionSheet(filterTab) {
+  filterTab = filterTab || 'all';
+  const sat = citySatisfaction();
+  const list = ag.filter(a => {
+    const s = calcSatisfaction(a).score;
+    if (filterTab === 'puas') return s >= 65;
+    if (filterTab === 'komplain') return s < 65;
+    if (filterTab === 'nganggur') return a.workStatus === 'nganggur';
+    if (filterTab === 'bangun') return typeof a.home === 'number' && plots[a.home] && plots[a.home].pr < 1;
+    return true;
+  }).slice(0, 35);
+
+  openSheet(
+    '<h3>😊 Indeks Kepuasan & Aktivitas Rakyat</h3>' +
+    '<div class="grid2">' +
+      '<div class="stat-box"><b>' + sat.avg + '%</b><small>Rata-rata Kepuasan Kota</small></div>' +
+      '<div class="stat-box"><b>' + sat.puas + ' / ' + sat.komplain + '</b><small>Warga Puas vs Komplain</small></div>' +
+      '<div class="stat-box"><b>' + sat.unfinishedHouses + ' Rumah</b><small>Sedang Dibangun Tukang</small></div>' +
+      '<div class="stat-box"><b>' + sat.nganggurCount + ' Warga</b><small>Nganggur di Posko</small></div>' +
+    '</div>' +
+    '<div class="tabs">' +
+      '<button type="button" class="' + (filterTab === 'all' ? 'act' : '') + '" data-t="all">Semua (' + ag.length + ')</button>' +
+      '<button type="button" class="' + (filterTab === 'puas' ? 'act' : '') + '" data-t="puas">😍 Puas (' + sat.puas + ')</button>' +
+      '<button type="button" class="' + (filterTab === 'komplain' ? 'act' : '') + '" data-t="komplain">😤 Komplain (' + sat.komplain + ')</button>' +
+      '<button type="button" class="' + (filterTab === 'nganggur' ? 'act' : '') + '" data-t="nganggur">☕ Nganggur (' + sat.nganggurCount + ')</button>' +
+      '<button type="button" class="' + (filterTab === 'bangun' ? 'act' : '') + '" data-t="bangun">🔨 Rumah Dibangun (' + sat.unfinishedHouses + ')</button>' +
+    '</div>' +
+    '<div class="res" id="satList">' +
+      list.map(a => {
+        const st = calcSatisfaction(a);
+        return '<button type="button" data-id="' + a.id + '">' +
+          '<span>' + st.emoji + ' <b>' + esc(a.n) + '</b> <small>(' + esc(a.sub) + ' — ' + esc(a.act) + ')</small></span>' +
+          '<span class="tag ' + (st.score >= 65 ? 'ok' : 'warn') + '">' + st.score + '%</span>' +
+        '</button>';
+      }).join('') +
+    '</div>',
+    (filterTab === 'bangun' ? 'puas_bangun' : filterTab === 'all' ? 'puas_all' : 'puas_' + filterTab)
+  );
+  sheet.querySelectorAll('.tabs button').forEach(b => b.onclick = () => openSatisfactionSheet(b.dataset.t));
+  $('#satList').onclick = e => {
+    const b = e.target.closest('button'); if (!b) return;
+    const a = ag[b.dataset.id]; selA = a; follow = a;
+    fly = { x: a.x, y: a.y, z: 1.25 }; infoA(a);
+  };
+}
+
+function openProposals() {
+  const votes = store.get('ntz_votes_v3', {});
+  const votesFb = store.get('ntz_votes_fb_v3', {});
+  const props = CONFIG.proposals.map(p => {
+    const votedSb = Object.prototype.hasOwnProperty.call(votes, p.id);
+    const voted = votedSb || !!votesFb[p.id];
+    /* Mode Dunia Bersama: total = angka database (sudah termasuk vote sendiri
+       begitu RPC mengembalikannya), jadi penanda lokal tidak ikut dijumlahkan. */
+    const total = p.votes + (sbMode && votedSb ? 0 : (votes[p.id] || 0)) + (votesFb[p.id] || 0);
+    return { ...p, voted, total };
+  }).sort((a, b) => b.total - a.total);
+  openSheet(
+    '<h3>📋 Papan Usulan Komentar Netizen</h3>' +
+    '<p class="note">Komen di Instagram = Usulan. Usulan dengan vote tertinggi langsung dikerjakan oleh David dan para Tukang!</p>' +
+    '<div class="res" id="propList">' +
+      props.map((p, idx) => {
+        const stBadge = p.status === 'done' ? '✅ Sudah Jadi' : p.status === 'building' ? '🔨 Sedang Dibangun' : idx === 0 ? '🏆 Dibangun Besok' : '🗳️ Terbuka';
+        return '<div class="card-item">' +
+          '<div><b>' + esc(p.title) + '</b><br><small>Pengusul: ' + esc(p.proposer) + ' • ' + stBadge + '</small></div>' +
+          '<button class="btn ' + (p.voted ? 'soft' : 'gold') + '" data-pid="' + p.id + '" style="min-height:36px;padding:0 12px">👍 ' + p.total + '</button>' +
+        '</div>';
+      }).join('') +
+    '</div>',
+    'usulan'
+  );
+  $('#propList').onclick = async e => {
+    const b = e.target.closest('button[data-pid]'); if (!b) return;
+    const pid = b.dataset.pid;
+    if (sbMode) {
+      const votedSb = Object.prototype.hasOwnProperty.call(votes, pid);
+      if (votedSb || votesFb[pid]) { note('Kamu sudah vote usulan ini.'); openProposals(); return; }
+      try {
+        const res = await sbRpc('increment_proposal_vote', { p_id: pid, device_id: sbDeviceId });
+        if (typeof res === 'string' && res.indexOf('ok:') === 0) {
+          const p = CONFIG.proposals.find(x => x.id === pid);
+          if (p) p.votes = parseInt(res.slice(3), 10);
+          votes[pid] = 1; store.set('ntz_votes_v3', votes);
+          if (bc) bc.postMessage({ type: 'vote', pid });
+          openProposals(); return;
+        }
+        if (typeof res === 'string' && res.indexOf('already_voted:') === 0) {
+          const p = CONFIG.proposals.find(x => x.id === pid);
+          if (p) p.votes = parseInt(res.slice(14), 10);
+          votes[pid] = 1; store.set('ntz_votes_v3', votes);
+          note('Kamu sudah vote usulan ini.');
+          openProposals(); return;
+        }
+        throw new Error(res || 'respons RPC tidak dikenal');
+      } catch (err) {
+        /* Fallback: vote lokal saja (perilaku lama). Penanda fallback mencegah vote
+           ganda di perangkat ini, karena RPC bisa saja sudah berhasil di server
+           tapi responsnya hilang di jalan. */
+        votesFb[pid] = (votesFb[pid] || 0) + 1;
+        store.set('ntz_votes_fb_v3', votesFb);
+        if (bc) bc.postMessage({ type: 'vote', pid });
+        note('Vote tersimpan lokal saja — Supabase tidak terjangkau (' + err.message + ').');
+        openProposals(); return;
+      }
+    }
+    votes[pid] = (votes[pid] || 0) + 1;
+    store.set('ntz_votes_v3', votes);
+    if (bc) bc.postMessage({ type: 'vote', pid });
+    openProposals();
+  };
+}
+
+
+function openZoneNav() {
+  const zones = [
+    { n: '🏠 Pusat Kota (Rumah Pak Mulyo & Alun-Alun)', x: 0, y: 0, z: 0.9 },
+    { n: '🌊 Sungai Ikan Mas & Bendungan Air (Utara)', x: -180, y: -255, z: 0.85 },
+    { n: '⚡ Gardu Induk PLN, WiFi & Barak TNI (Timur Laut)', x: 310, y: -250, z: 0.85 },
+    { n: '🌾 Sawah Pangan, Kolam Lele & Ternak (Barat Laut)', x: -410, y: -250, z: 0.85 },
+    { n: '🏫 Sekolah, Kosan Ibu Kos & Tempat Ibadah (Barat)', x: -290, y: -10, z: 0.85 },
+    { n: '🏥 RS Gratis, Posko Tukang, Polisi & Bank (Timur)', x: 310, y: -10, z: 0.85 },
+    { n: '🏪 Ruko PaluGada, Fory Coffee & Pabrik (Tenggara)', x: 320, y: 230, z: 0.85 },
+    { n: '🏟️ Tanah Lapang & Stadion Netizenia FC (Barat Daya)', x: -330, y: 230, z: 0.85 },
+    { n: '🏘️ Klaster Perumahan Rakyat Selatan', x: 0, y: 470, z: 0.7 }
+  ];
+  openSheet(
+    '<h3>🧭 Pindah Cepat ke Zona Kota</h3>' +
+    '<div class="res" id="zoneList">' +
+      zones.map((z, i) => '<button type="button" data-i="' + i + '">' + esc(z.n) + '</button>').join('') +
+    '</div>',
+    'zone'
+  );
+  $('#zoneList').onclick = e => {
+    const b = e.target.closest('button'); if (!b) return;
+    const z = zones[b.dataset.i];
+    follow = null; fly = { x: z.x, y: z.y, z: z.z };
+    closeSheet();
+  };
+}
+
+let role = '';
+function openDaftar(h) {
+  if (h != null) pickPlot = h; role = role || 'Warga';
+  openSheet(
+    '<h3>➕ Daftar Jadi Rakyat Netizenia</h3>' +
+    '<label>Username Instagram<input id="u" placeholder="contoh: budi.santoso" autocapitalize="none" autocomplete="off" maxlength="30"></label>' +
+    '<b>Pilih Peran / Profesi di Kota:</b>' +
+    '<div class="roles">' +
+      ['Tukang','Guru','Murid','Pasien','Dokter','Mandor','Arsitek','Menteri','Polisi','Warga'].map(r =>
+        '<button type="button" class="role" aria-pressed="' + (role === r) + '" data-r="' + r + '">' + PERAN[r].e + ' ' + r + '</button>'
+      ).join('') +
+    '</div>' +
+    '<p style="margin:0 0 10px"><b>Kavling Rumah:</b> <span id="rt">' + (pickPlot != null ? 'No. ' + (pickPlot + 1) + ' (' + plots[pickPlot].clName + ')' : 'Otomatis dipilihkan di klaster terdekat') + '</span></p>' +
+    '<div class="err" id="er"></div>' +
+    '<button class="btn gold" id="go" type="button" style="width:100%">Resmikan Jadi Rakyat & Bangun Rumah</button>',
+    'daftar'
+  );
+  sheet.querySelectorAll('.role').forEach(b => b.onclick = () => {
+    role = b.dataset.r;
+    sheet.querySelectorAll('.role').forEach(x => x.setAttribute('aria-pressed', x === b));
+  });
+  $('#go').onclick = async () => {
+    const u = $('#u').value.trim().replace(/^@/, '');
+    if (!/^[A-Za-z0-9._]{1,30}$/.test(u)) { $('#er').textContent = 'Username tidak valid. Gunakan huruf, angka, titik, atau garis bawah.'; return; }
+    const dup = ag.find(a => a.n.toLowerCase() === u.toLowerCase());
+    if (dup) { selA = dup; follow = dup; infoA(dup); return; }
+    const a = addAgent(u, role, pickPlot, false, false);
+    a.me = a.ig = true;
+    const sv = store.get('ntz_w_radial', []);
+    sv.push({ n: u, p: role, h: a.home });
+    store.set('ntz_w_radial', sv);
+    if (bc) bc.postMessage({ type: 'register', n: u, p: role, h: a.home });
+    const d = door(a, 'home');
+    a.x = 0; a.y = -500;
+    a.path = buildRoadPath(0, -500, d.x, d.y, a.ox, a.oy);
+    a.dest = 'home';
+    if (sbMode) {
+      try {
+        /* house_progress = nilai logika bangun lokal saat ini, supaya peta dan
+           database sepakat pada sapuan pertama (bukan 0 buta). */
+        await sbRegisterInsert(u, role, a.home, (typeof a.home === 'number' && plots[a.home]) ? plots[a.home].pr : 0);
+      } catch (e) {
+        /* Agen lokal TETAP dipertahankan; hanya penyimpanan Dunia Bersama yang gagal.
+           Formulir dibuka lagi dengan pesan error persis dari Supabase. */
+        note('⚠️ @' + u + ' tersimpan lokal, tapi gagal masuk Dunia Bersama: ' + e.message);
+        openDaftar();
+        const iu = document.getElementById('u'); if (iu) iu.value = u;
+        const er = document.getElementById('er'); if (er) er.textContent = 'Gagal Supabase: ' + e.message;
+        return;
+      }
+    }
+    updateChips();
+    note('🎉 @' + u + ' resmi menjadi Rakyat Netizenia (' + role + ') di Rumah No. ' + (a.home + 1));
+    selA = a; follow = a; fly = { x: d.x, y: d.y, z: 1.15 };
+    infoA(a);
+  };
+}
+
+function openCari() {
+  openSheet(
+    '<h3>🔍 Cari Rakyat / Klaim Nama Komentar</h3>' +
+    '<input id="q" placeholder="Ketik @username, nama tampilan, atau profesi..." autocomplete="off">' +
+    '<div class="res" id="res"></div>',
+    'cari'
+  );
+  const render = () => {
+    const q = $('#q').value.trim().toLowerCase().replace(/^@/, '');
+    const list = (q ? ag.filter(a => a.n.toLowerCase().includes(q) || a.origName.toLowerCase().includes(q) || a.sub.toLowerCase().includes(q)) : ag.slice(0, 10)).slice(0, 12);
+    $('#res').innerHTML = !list.length ? '<small>Nama belum ditemukan. Kamu bisa langsung daftar lewat tombol Jadi Rakyat!</small>' :
+      list.map(a => '<button type="button" data-i="' + a.id + '"><span>' + PERAN[a.p].e + ' <b>' + (a.ig ? '@' : '') + esc(a.n) + '</b> <small>(' + esc(a.sub) + ')</small></span><span class="tag">Rumah #' + (typeof a.home === 'number' ? a.home + 1 : 'Pusat') + '</span></button>').join('');
+  };
+  $('#q').oninput = render; render();
+  $('#res').onclick = e => {
+    const b = e.target.closest('button'); if (!b) return;
+    const a = ag[b.dataset.i]; selA = a; follow = a;
+    fly = { x: a.x, y: a.y, z: 1.25 }; infoA(a);
+  };
+}
+
+/* ====== TAHAP 2 — Panel Admin (Google OAuth) ======
+   Login admin memakai Google OAuth milik Presiden (BUKAN email+password,
+   dan BUKAN PIN — PIN di halaman bisa dibaca lewat view-source).
+   Panel hanya terbuka bila sesi Auth ada DAN auth.uid() terdaftar di
+   tabel public.admins (dicek lewat RPC is_admin). Tanpa itu, panel tidak
+   terbuka dan tidak ada RPC admin yang bisa dipanggil (semuanya menolak
+   'forbidden' di server). Mode lokal (tanpa kunci / Supabase tak
+   terjangkau) memakai panel lama tanpa auth. */
+async function openAdmin() {
+  if (!sbHasKeys() || !sbMode) { openAdminLocal(); return; }
+  let session = null;
+  try { const r = await sbClient.auth.getSession(); session = r.data.session; } catch (e) {}
+  if (!session) { openAdminLogin(''); return; }
+  let chk = '';
+  try { chk = await sbRpc('is_admin', {}); }
+  catch (e) { openAdminLogin('Gagal memeriksa status presiden: ' + e.message + ' — pastikan migrasi Tahap 2 sudah dijalankan.'); return; }
+  if (chk !== 'true') { openAdminNotAdmin(session); return; }
+  openAdminPanel(session);
+}
+function openAdminLocal() {
+  openSheet(
+    '<h3>⚙️ Panel Admin Kota Radial</h3>' +
+    '<div class="grid2">' +
+      '<button class="btn soft" id="admDoneAll" type="button">✅ Selesaikan Semua Rumah</button>' +
+      '<button class="btn soft" id="admPln" type="button">⚡ Toggle Listrik PLN</button>' +
+      '<button class="btn soft" id="admTour" type="button">🎬 Mulai Tur Kamera</button>' +
+      '<button class="btn soft" id="admReset" type="button">🔄 Reset Klaim Lokal</button>' +
+    '</div>' +
+    '<label style="margin-top:10px">Tambah Warga Massal dari Rekap Komentar (Format: Nama,Peran per baris)<textarea id="csvIn" rows="3" placeholder="budi_netizen,Tukang\nsiti_warga,Dokter"></textarea></label>' +
+    '<button class="btn gold" id="admImport" type="button" style="width:100%;margin-bottom:12px">📥 Impor Warga ke Peta</button>',
+    'admin'
+  );
+  $('#admDoneAll').onclick = () => {
+    plots.forEach(p => p.pr = 1);
+    CONFIG.fas.forEach(f => { f.pr = 1; f.st = 'jadi'; });
+    updateChips(); note('🎉 Seluruh rumah dan fasilitas kota telah diselesaikan 100%!');
+  };
+  $('#admPln').onclick = () => { blackout = !blackout; updateChips(); };
+  $('#admTour').onclick = () => { closeSheet(); $('#bDir').click(); };
+  $('#admReset').onclick = () => { localStorage.clear(); location.reload(); };
+  $('#admImport').onclick = () => {
+    const lines = $('#csvIn').value.split('\n').map(l => l.trim()).filter(Boolean);
+    let count = 0;
+    lines.forEach(l => {
+      const [n, p] = l.split(',').map(s => s.trim());
+      if (n) { addAgent(n, PERAN[p] ? p : 'Warga', null, true, false); count++; }
+    });
+    updateChips(); note('✅ ' + count + ' warga baru berhasil ditambahkan ke kota!');
+  };
+}
+function openAdminLogin(msg) {
+  openSheet(
+    '<h3>⚙️ Panel Admin — Presiden</h3>' +
+    '<p class="note">Panel ini hanya untuk Presiden. Masuk dengan akun Google yang terdaftar sebagai presiden.</p>' +
+    (msg ? '<div class="err">' + esc(msg) + '</div>' : '') +
+    '<div class="err" id="admLoginErr"></div>' +
+    '<button class="btn gold" id="admGoogle" type="button" style="width:100%">🔐 Masuk dengan Google</button>' +
+    '<p class="note">Syarat: provider Google sudah aktif di Supabase Dashboard &gt; Authentication &gt; Providers. Login Google butuh halaman dibuka lewat https (hasil deploy), bukan file lokal.</p>',
+    'adminlogin'
+  );
+  $('#admGoogle').onclick = async () => {
+    try { sessionStorage.setItem('ntz_admin_after_login', '1'); } catch (e) {}
+    const opts = {};
+    if (location.protocol === 'http:' || location.protocol === 'https:') opts.redirectTo = location.origin + location.pathname + location.search;
+    const { error } = await sbClient.auth.signInWithOAuth({ provider: 'google', options: opts });
+    if (error) $('#admLoginErr').textContent = 'Gagal membuka login Google: ' + error.message;
+  };
+}
+function openAdminNotAdmin(session) {
+  const email = session && session.user ? session.user.email : '';
+  openSheet(
+    '<h3>⚙️ Panel Admin — Presiden</h3>' +
+    '<p class="note">Akun <b>' + esc(email) + '</b> belum terdaftar sebagai presiden.</p>' +
+    '<p class="note">Minta pemilik menambahkan email ini ke tabel admins, lalu masuk lagi.</p>' +
+    '<button class="btn soft" id="admLogout2" type="button" style="width:100%">🚪 Keluar</button>',
+    'adminnotadmin'
+  );
+  $('#admLogout2').onclick = async () => { try { await sbClient.auth.signOut(); } catch (e) {} closeSheet(); note('Keluar dari akun presiden.'); };
+}
+function openAdminPanel(session) {
+  const email = session && session.user ? session.user.email : '';
+  const fasOpts = CONFIG.fas.map(f => '<option value="' + f.id + '">' + esc(f.n) + '</option>').join('');
+  openSheet(
+    '<h3>⚙️ Panel Admin Kota Radial</h3>' +
+    '<p class="note">✅ Presiden masuk: <b>' + esc(email) + '</b></p>' +
+    '<button class="btn soft" id="admLogout" type="button" style="width:100%;margin-bottom:12px">🚪 Keluar</button>' +
+    '<div class="grid2">' +
+      '<button class="btn soft" id="admDoneAll" type="button">✅ Selesaikan Semua Rumah</button>' +
+      '<button class="btn soft" id="admPln" type="button">⚡ Toggle Listrik PLN</button>' +
+      '<button class="btn soft" id="admTour" type="button">🎬 Mulai Tur Kamera</button>' +
+      '<button class="btn soft" id="admReset" type="button">🔄 Reset Klaim Lokal</button>' +
+    '</div>' +
+    '<label style="margin-top:10px">Tambah Warga Massal dari Rekap Komentar (Format: Nama,Peran per baris)<textarea id="csvIn" rows="3" placeholder="budi_netizen,Tukang\nsiti_warga,Dokter"></textarea></label>' +
+    '<button class="btn gold" id="admImport" type="button" style="width:100%;margin-bottom:12px">📥 Impor Warga ke Peta (Lokal)</button>' +
+    '<hr>' +
+    '<h3>🌐 Hari & Angka Kota (Dunia Bersama)</h3>' +
+    '<label>Hari / Episode<input id="admHari" type="number" min="1" step="1" value="' + CONFIG.hari + '"></label>' +
+    '<label>Total Rakyat<input id="admRakyat" type="number" min="0" step="1" value="' + CONFIG.stats.rakyat + '"></label>' +
+    '<label>Followers<input id="admFollowers" type="number" min="0" step="1" value="' + CONFIG.stats.followers + '"></label>' +
+    '<div class="err" id="admSetErr"></div>' +
+    '<button class="btn gold" id="admSimpanSet" type="button" style="width:100%;margin-bottom:12px">💾 Simpan Hari & Angka</button>' +
+    '<h3>💛 Link Saweria & Donasi Manual</h3>' +
+    '<label>Link Saweria (saweria.co/...)<input id="admSaweria" placeholder="saweria.co/namalu" value="' + esc(saweriaUrl) + '"></label>' +
+    '<div class="err" id="admSaweriaErr"></div>' +
+    '<button class="btn gold" id="admSimpanSaweria" type="button" style="width:100%;margin-bottom:12px">💾 Simpan Link Saweria</button>' +
+    '<label>Nama donatur<input id="admDonNama" placeholder="nama donatur"></label>' +
+    '<label>Nominal (Rp)<input id="admDonAmt" type="number" min="0" step="1"></label>' +
+    '<label>Pesan (opsional)<input id="admDonMsg" placeholder="pesan donatur"></label>' +
+    '<div class="err" id="admDonErr"></div>' +
+    '<button class="btn gold" id="admSimpanDon" type="button" style="width:100%;margin-bottom:12px">💛 Catat Donasi (muncul otomatis di papan)</button>' +
+    '<p class="note">Donasi manual ini jalan setelah migrasi donasi dijalankan. Kalau tombol gagal, migrasinya belum jalan — donasinya tidak hilang, coba lagi setelah migrasi.</p>' +
+    '<h3>🏗️ Bangunan & Fasilitas</h3>' +
+    '<label>Bangunan<select id="admFas">' + fasOpts + '</select></label>' +
+    '<label>Status<select id="admFasSt"><option value="usulan">usulan</option><option value="sebagian">sebagian</option><option value="jadi">jadi</option></select></label>' +
+    '<label>Progres (%)<input id="admFasPr" type="number" min="0" max="100" step="1" value="100"></label>' +
+    '<div class="err" id="admFasErr"></div>' +
+    '<button class="btn gold" id="admSimpanFas" type="button" style="width:100%;margin-bottom:12px">💾 Simpan Bangunan</button>' +
+    '<h3>🏠 Progres Rumah Warga</h3>' +
+    '<label>Nama warga (nama asli)<input id="admRumahNama" placeholder="contoh: David"></label>' +
+    '<label>Progres rumah (%)<input id="admRumahPr" type="number" min="0" max="100" step="1" value="100"></label>' +
+    '<div class="err" id="admRumahErr"></div>' +
+    '<button class="btn gold" id="admSimpanRumah" type="button" style="width:100%;margin-bottom:12px">💾 Simpan Progres Rumah</button>' +
+    '<h3>📨 Klaim Menunggu Persetujuan</h3>' +
+    '<div id="admKlaimList"><p class="note">Memuat antrean klaim…</p></div>' +
+    '<button class="btn soft" id="admKlaimRefresh" type="button" style="width:100%;margin-bottom:12px">🔄 Muat Ulang Antrean</button>' +
+    '<h3>📥 Impor Nama (Dunia Bersama)</h3>' +
+    '<label>Nama per baris, opsional ",Peran"<textarea id="admSbImportTxt" rows="3" placeholder="budi_netizen,Tukang\nsiti_warga"></textarea></label>' +
+    '<div class="err" id="admSbImportErr"></div>' +
+    '<button class="btn gold" id="admSbImportBtn" type="button" style="width:100%">📥 Impor ke Dunia Bersama</button>',
+    'admin'
+  );
+  $('#admDoneAll').onclick = () => {
+    plots.forEach(p => p.pr = 1);
+    CONFIG.fas.forEach(f => { f.pr = 1; f.st = 'jadi'; });
+    updateChips(); note('🎉 Seluruh rumah dan fasilitas kota telah diselesaikan 100%!');
+  };
+  $('#admPln').onclick = () => { blackout = !blackout; updateChips(); };
+  $('#admTour').onclick = () => { closeSheet(); $('#bDir').click(); };
+  $('#admReset').onclick = () => { localStorage.clear(); location.reload(); };
+  $('#admImport').onclick = () => {
+    const lines = $('#csvIn').value.split('\n').map(l => l.trim()).filter(Boolean);
+    let count = 0;
+    lines.forEach(l => {
+      const [n, p] = l.split(',').map(s => s.trim());
+      if (n) { addAgent(n, PERAN[p] ? p : 'Warga', null, true, false); count++; }
+    });
+    updateChips(); note('✅ ' + count + ' warga baru berhasil ditambahkan ke kota!');
+  };
+  $('#admLogout').onclick = async () => { try { await sbClient.auth.signOut(); } catch (e) {} closeSheet(); note('Keluar dari akun presiden.'); };
+  $('#admSimpanSet').onclick = async () => {
+    const hari = parseInt($('#admHari').value, 10), rakyat = parseInt($('#admRakyat').value, 10), fol = parseInt($('#admFollowers').value, 10);
+    if (![hari, rakyat, fol].every(v => Number.isFinite(v) && v >= 0) || hari < 1) { $('#admSetErr').textContent = 'Angka tidak valid (hari minimal 1).'; return; }
+    try {
+      const keys = [['hari', hari], ['stats_rakyat', rakyat], ['followers', fol]];
+      for (const kv of keys) {
+        const r = await sbRpc('admin_set_setting', { p_key: kv[0], p_value: kv[1] });
+        if (r !== 'ok') throw new Error(kv[0] + ': ' + (r || 'gagal'));
+      }
+      sbApplySettingsRow('hari', hari); sbApplySettingsRow('stats_rakyat', rakyat); sbApplySettingsRow('followers', fol);
+      updateChips();
+      note('✅ Hari & angka kota disimpan ke Dunia Bersama.');
+    } catch (e) { $('#admSetErr').textContent = 'Gagal menyimpan: ' + e.message; }
+  };
+  $('#admSimpanSaweria').onclick = async () => {
+    let v = $('#admSaweria').value.trim();
+    if (!v) { $('#admSaweriaErr').textContent = 'Link Saweria kosong. Isi saweria.co/... dulu.'; return; }
+    if (!/^https?:\/\//i.test(v)) v = 'https://' + v;
+    try { const r = await sbRpc('admin_set_setting', { p_key: 'saweria_url', p_value: v }); if (r !== 'ok') throw new Error(r || 'gagal'); sbApplySettingsRow('saweria_url', v); note('✅ Link Saweria disimpan. Tombol donasi sekarang membuka Saweria.'); } catch (e) { $('#admSaweriaErr').textContent = 'Gagal menyimpan link: ' + e.message + ' (migrasi donasi belum jalan?)'; }
+  };
+  $('#admSimpanDon').onclick = async () => {
+    const nm = $('#admDonNama').value.trim(), amt = parseInt($('#admDonAmt').value, 10), msg = $('#admDonMsg').value.trim();
+    if (!nm || !Number.isFinite(amt) || amt < 0) { $('#admDonErr').textContent = 'Nama dan nominal tidak valid.'; return; }
+    try { const r = await sbRpc('admin_add_donation', { p_name: nm, p_amount: amt, p_message: msg }); if (r !== 'ok') throw new Error(r || 'gagal'); if (typeof sbLoadDonations === 'function') sbLoadDonations(); note('✅ Donasi ' + nm + ' dicatat — namanya otomatis muncul di papan donatur.'); } catch (e) { $('#admDonErr').textContent = 'Gagal mencatat donasi: ' + e.message + ' (migrasi donasi belum jalan?)'; }
+  };
+  $('#admSimpanFas').onclick = async () => {
+    const id = $('#admFas').value, st = $('#admFasSt').value, pr = parseFloat($('#admFasPr').value);
+    const f = FAS[id];
+    if (!f || ['usulan', 'sebagian', 'jadi'].indexOf(st) < 0 || !Number.isFinite(pr) || pr < 0 || pr > 100) { $('#admFasErr').textContent = 'Bangunan / status / progres tidak valid.'; return; }
+    try {
+      const r = await sbRpc('admin_set_building', { p_id: id, p_status: st, p_progress: pr / 100, p_type: f.n });
+      if (r !== 'ok') throw new Error(r || 'gagal');
+      f.st = st; f.pr = pr / 100; updateChips();
+      note('✅ Bangunan ' + f.n + ' disimpan (' + st + ', ' + pr + '%).');
+    } catch (e) { $('#admFasErr').textContent = 'Gagal menyimpan bangunan: ' + e.message; }
+  };
+  $('#admSimpanRumah').onclick = async () => {
+    const nm = $('#admRumahNama').value.trim(), pr = parseFloat($('#admRumahPr').value);
+    if (!nm || !Number.isFinite(pr) || pr < 0 || pr > 100) { $('#admRumahErr').textContent = 'Nama / progres tidak valid.'; return; }
+    try {
+      const r = await sbRpc('admin_set_house_progress', { p_name: nm, p_progress: pr / 100 });
+      if (r === 'not_found') { $('#admRumahErr').textContent = 'Nama tidak ditemukan di Dunia Bersama.'; return; }
+      if (r !== 'ok') throw new Error(r || 'gagal');
+      const a = sbFindAgentByName(nm);
+      if (a && typeof a.home === 'number' && plots[a.home]) plots[a.home].pr = pr / 100;
+      updateChips();
+      note('✅ Progres rumah ' + nm + ' disimpan (' + pr + '%).');
+    } catch (e) { $('#admRumahErr').textContent = 'Gagal menyimpan progres rumah: ' + e.message; }
+  };
+  const renderClaims = async () => {
+    const box = $('#admKlaimList'); if (!box) return;
+    try {
+      const { data, error } = await sbClient.from('claim_requests').select('*').eq('status', 'pending').order('created_at', { ascending: true });
+      if (error) throw new Error(error.message);
+      if (!data || !data.length) { box.innerHTML = '<p class="note">Tidak ada klaim menunggu.</p>'; return; }
+      box.innerHTML = data.map(r =>
+        '<div style="display:flex;gap:8px;align-items:center;margin-bottom:8px"><span style="flex:1">' + esc(r.display_name) + ' → @' + esc(r.ig_username) + '</span>' +
+        '<button class="btn soft" type="button" data-appr="' + r.id + '">✅ Setujui</button>' +
+        '<button class="btn soft" type="button" data-rej="' + r.id + '">❌ Tolak</button></div>'
+      ).join('');
+      box.querySelectorAll('[data-appr]').forEach(b => b.onclick = async () => {
+        try {
+          const r = await sbRpc('admin_approve_claim', { p_request_id: parseInt(b.dataset.appr, 10) });
+          if (r === 'taken') note('⚠️ @ tersebut sudah diklaim warga lain — permintaan dibiarkan menunggu.');
+          else if (r !== 'ok') note('Gagal menyetujui klaim: ' + (r || 'gagal'));
+          else note('✅ Klaim disetujui.');
+        } catch (e) { note('Gagal menyetujui klaim: ' + e.message); }
+        renderClaims();
+      });
+      box.querySelectorAll('[data-rej]').forEach(b => b.onclick = async () => {
+        try {
+          const r = await sbRpc('admin_reject_claim', { p_request_id: parseInt(b.dataset.rej, 10) });
+          if (r !== 'ok') note('Gagal menolak klaim: ' + (r || 'gagal')); else note('Klaim ditolak.');
+        } catch (e) { note('Gagal menolak klaim: ' + e.message); }
+        renderClaims();
+      });
+    } catch (e) { box.innerHTML = '<p class="note">Gagal memuat antrean: ' + esc(e.message) + '</p>'; }
+  };
+  renderClaims();
+  $('#admKlaimRefresh').onclick = renderClaims;
+  if (!sbClaimsChannel) {
+    sbClaimsChannel = sbClient.channel('netizenia-admin-claims')
+      .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'claim_requests' }, () => { if (mode === 'admin') renderClaims(); })
+      .on('postgres_changes', { event: 'UPDATE', schema: 'public', table: 'claim_requests' }, () => { if (mode === 'admin') renderClaims(); })
+      .subscribe();
+  }
+  $('#admSbImportBtn').onclick = async () => {
+    const rows = $('#admSbImportTxt').value.split('\n').map(l => l.trim()).filter(Boolean).map(l => {
+      const i = l.indexOf(',');
+      return i < 0 ? { display_name: l, role: 'Warga' } : { display_name: l.slice(0, i).trim(), role: l.slice(i + 1).trim() || 'Warga' };
+    }).filter(r => r.display_name);
+    if (!rows.length) { $('#admSbImportErr').textContent = 'Tidak ada nama untuk diimpor.'; return; }
+    try {
+      const r = await sbRpc('admin_import_residents', { p_rows: rows });
+      note('📥 Impor selesai: ' + r);
+    } catch (e) { $('#admSbImportErr').textContent = 'Gagal mengimpor: ' + e.message; }
+  };
+}
+
+/* ====== INTERAKSI SENTUH, PAN, ZOOM & KLIK ENTITAS ====== */
+const ptrs = new Map(); let moved = 0, multi = false, p0 = 0;
+const zoomBy = f => { cam.z = Math.min(2.4, Math.max(0.28, cam.z * f)); fly = null; };
+
+cv.addEventListener('pointerdown', e => {
+  cv.setPointerCapture(e.pointerId);
+  ptrs.set(e.pointerId, { x: e.clientX, y: e.clientY });
+  if (ptrs.size === 1) { moved = 0; multi = false; }
+  else { multi = true; const [a, b] = [...ptrs.values()]; p0 = Math.hypot(a.x - b.x, a.y - b.y); }
+});
+cv.addEventListener('pointermove', e => {
+  const p = ptrs.get(e.pointerId); if (!p) return;
+  const dx = e.clientX - p.x, dy = e.clientY - p.y;
+  p.x = e.clientX; p.y = e.clientY; moved += Math.abs(dx) + Math.abs(dy);
+  if (ptrs.size === 1 && moved > 6) {
+    cam.x -= dx / cam.z; cam.y -= dy / cam.z;
+    follow = null; fly = null; dirTour = false;
+  } else if (ptrs.size === 2) {
+    const [a, b] = [...ptrs.values()], d = Math.hypot(a.x - b.x, a.y - b.y);
+    if (p0) zoomBy(d / p0); p0 = d;
+  }
+});
+const up = e => {
+  const was = ptrs.size; ptrs.delete(e.pointerId);
+  if (was === 1 && moved < 8 && !multi && e.type === 'pointerup') tap(e.clientX, e.clientY);
+};
+cv.addEventListener('pointerup', up); cv.addEventListener('pointercancel', up);
+cv.addEventListener('wheel', e => { e.preventDefault(); zoomBy(e.deltaY < 0 ? 1.12 : 0.89); }, { passive: false });
+
+function tap(sx, sy) {
+  const wx = (sx - W / 2) / cam.z + cam.x, wy = (sy - H / 2) / cam.z + cam.y;
+  const cloud = donorCloudHit.find(c => Math.abs(c.x - wx) < 90 && Math.abs(c.y - wy) < 55);
+  if (cloud) { openDonorCloudPopup(cloud.d, cloud.hours, cloud.remainMs); return; }
+  if (Math.hypot(cat.x - wx, cat.y - wy) < 20) {
+    note('🐱 Meong! Ini ' + cat.name + ' yang suka ikut rapat di Rumah Pak Mulyo.');
+    return;
+  }
+  const hitCar = cars.find(c => Math.abs(c.x - wx) < 24 && Math.abs(c.y - wy) < 14);
+  if (hitCar) {
+    note('🚗 ' + hitCar.n + ' sedang melintas di jalan raya.');
+    return;
+  }
+  let best = null, bd = 1e9;
+  ag.forEach(a => {
+    if (a.dayJoined > viewDay) return;
+    const d = Math.hypot(a.x - wx, a.y - 6 - wy);
+    if (d < bd) { bd = d; best = a; }
+  });
+  if (best && bd < (15 / cam.z + 8)) { selA = best; selP = null; follow = best; return infoA(best); }
+  const f = CONFIG.fas.find(f => f.day <= viewDay && Math.abs(f.x - wx) < f.w / 2 + 6 && Math.abs(f.y - wy) < f.h / 2 + 6);
+  if (f) { selP = f; selA = null; follow = null; return infoF(f); }
+  const p = plots.find(p => Math.abs(p.x - wx) < 28 && Math.abs(p.y - 6 - wy) < 28);
+  if (p) {
+    follow = null;
+    if (mode === 'daftar' && !p.a) { pickPlot = p.i; $('#rt').textContent = 'No. ' + (p.i + 1) + ' (' + p.clName + ')'; return; }
+    selP = p; return infoP(p);
+  }
+  if (mode) closeSheet();
+}
+
+/* ====== TOMBOL DOCK & HEADER ====== */
+$('#bDaftar').onclick = () => toggleMenu('daftar', () => openDaftar());
+$('#bUsul').onclick = () => toggleMenu('usulan', openProposals);
+$('#bPuas').onclick = () => toggleMenu('puas_all', () => openSatisfactionSheet('all'));
+$('#cPuas').onclick = () => toggleMenu('puas_all', () => openSatisfactionSheet('all'));
+$('#c1').onclick = () => toggleMenu('cari', openCari);
+$('#c2').onclick = () => toggleMenu('puas_bangun', () => openSatisfactionSheet('bangun'));
+$('#c3').onclick = () => toggleMenu('zone', openZoneNav);
+$('#cPln').onclick = () => toggleMenu('pln', () => { selP = FAS.pln; fly = { x: FAS.pln.x, y: FAS.pln.y, z: 1.05 }; infoF(FAS.pln); });
+$('#bZone').onclick = () => toggleMenu('zone', openZoneNav);
+$('#bCari').onclick = () => toggleMenu('cari', openCari);
+$('#bIn').onclick = () => zoomBy(1.28);
+$('#bOut').onclick = () => zoomBy(0.78);
+$('#bAdmin').onclick = () => toggleMenu('admin', openAdmin);
+/* Tombol Teks: sembunyikan/tampilkan teks layar (judul, chip, banner, feed) supaya peta tidak ketutupan di HP. Bar bawah + gir admin tetap tampil agar bisa dikembalikan. Pilihan disimpan lokal. */
+function applyTeksBtn(){ const b = document.getElementById('bTeks'); if (b) b.textContent = document.body.classList.contains('text-hidden') ? '👁️' : '🙈'; }
+(function(){ try { if (localStorage.getItem('ntz_teks_hidden') === '1') document.body.classList.add('text-hidden'); } catch (e) {} applyTeksBtn(); })();
+$('#bTeks').onclick = () => { const hidden = document.body.classList.toggle('text-hidden'); try { localStorage.setItem('ntz_teks_hidden', hidden ? '1' : '0'); } catch (e) {} applyTeksBtn(); };
+/* Panel atas tarik-ciut: ketuk atau tarik handle untuk menciutkan panel atas jadi sebaris (peta meluas) atau melebarkan lagi. Default: ciut di layar sempit (HP), lebar di layar besar; pilihan diingat. */
+function applyTopHandle(){
+  const h = document.getElementById('topHandle');
+  if (h) h.textContent = document.body.classList.contains('top-collapsed') ? '▼ Lihat panel' : '▲ Sembunyikan';
+}
+function setTopCollapsed(c){
+  document.body.classList.toggle('top-collapsed', c);
+  try { localStorage.setItem('ntz_top_collapsed', c ? '1' : '0'); } catch (e) {}
+  applyTopHandle();
+}
+(function(){
+  let saved = null;
+  try { saved = localStorage.getItem('ntz_top_collapsed'); } catch (e) {}
+  setTopCollapsed(saved === null ? window.innerWidth <= 700 : saved === '1');
+  const h = document.getElementById('topHandle');
+  if (!h) return;
+  let sy = null, justDragged = false;
+  h.onclick = () => { if (justDragged) { justDragged = false; return; } setTopCollapsed(!document.body.classList.contains('top-collapsed')); };
+  h.addEventListener('pointerdown', e => { sy = e.clientY; });
+  h.addEventListener('pointermove', e => {
+    if (sy === null) return;
+    const dy = e.clientY - sy;
+    if (Math.abs(dy) > 24) { justDragged = true; setTopCollapsed(dy < 0); sy = null; }
+  });
+  h.addEventListener('pointerup', () => { sy = null; });
+  h.addEventListener('pointercancel', () => { sy = null; });
+})();
+/* PAPAN DONATUR: bar highlight + papan daftar + ucapan terima kasih dari seluruh rakyat saat donasi baru masuk (realtime). Link Saweria dibaca dari settings 'saweria_url' (string) — tanpa itu tombol donasi menampilkan catatan. */
+let saweriaUrl = '';
+let donorList = [], sbDonorChannel = null;
+function fmtRp(n){ return 'Rp' + Number(n || 0).toLocaleString('id-ID'); }
+function fmtTgl(ts){ try { return new Date(ts).toLocaleDateString('id-ID', { day: 'numeric', month: 'short', year: 'numeric' }); } catch (e) { return ''; } }
+function renderDonorBar(){
+  const el = document.getElementById('donorBarTxt');
+  if (!el) return;
+  if (!donorList.length) { el.textContent = '💛 Donatur: belum ada'; renderDonorTicker(); return; }
+  const d = donorList[0];
+  el.textContent = '💛 Donatur terbaru: ' + d.donator_name + ' — ' + fmtRp(d.amount) + (d.message ? ' — “' + d.message + '”' : '');
+  renderDonorTicker();
+}
+function onDonationNew(row){
+  if (!row) return;
+  donorList.unshift(row); donorList.length = Math.min(donorList.length, 50);
+  renderDonorBar();
+  noteLive('🎉 Terima kasih, ' + row.donator_name + '! Seluruh rakyat Netizenia mengucapkan terima kasih atas donasi ' + fmtRp(row.amount) + (row.message ? ' — “' + row.message + '”' : ''));
+  if (mode === 'donatur') openDonorBoard();
+}
+async function sbLoadDonations(){
+  if (!sbClient) return;
+  try {
+    const { data, error } = await sbClient.from('donations').select('*').order('created_at', { ascending: false }).limit(50);
+    if (!error && data) donorList = data;
+  } catch (e) { /* abaikan: tabel belum ada = papan kosong */ }
+  renderDonorBar();
+  try {
+    if (!sbDonorChannel) {
+      sbDonorChannel = sbClient.channel('netizenia-donations')
+        .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'donations' }, p => onDonationNew(p.new))
+        .subscribe();
+    }
+  } catch (e) { /* abaikan */ }
+}
+function openDonorBoard(){
+  let list = donorList.map(d =>
+    '<div class="donor-item"><b>💛 ' + esc(d.donator_name) + '</b> <span class="tag ok">Donatur</span><br>' +
+    '<b>' + fmtRp(d.amount) + '</b> • ' + fmtTgl(d.created_at) +
+    (d.message ? '<div class="q">“' + esc(d.message) + '”</div>' : '') + '</div>').join('');
+  if (!list) list = '<p class="note">Belum ada donasi. Jadilah donatur pertama lewat Saweria!</p>';
+  const saweriaBtn = saweriaUrl
+    ? '<a class="btn gold" href="' + esc(saweriaUrl) + '" target="_blank" rel="noopener" style="width:100%;text-decoration:none;margin-bottom:12px">💸 Donasi via Saweria</a>'
+    : '<p class="note" style="margin-bottom:12px">Link Saweria belum dipasang — presiden belum kirim link saweria.co/... . Begitu link dipasang lewat Panel Admin (tanpa upload ulang), tombol ini langsung membuka Saweria, dan nama donatur yang berhasil donasi otomatis muncul di papan ini.</p>';
+  openSheet('<h3>💛 Papan Donatur</h3>' + saweriaBtn + '<div class="res">' + list + '</div>', 'donatur');
+}
+$('#bDonatur').onclick = () => toggleMenu('donatur', () => { const cs = activeDonorClouds(); if (cs.length) { const d = cs[0]; const hrs = Math.max(1, Math.floor((Number(d.amount) || 0) / 1000)); openDonorCloudPopup(d, hrs, Math.max(0, (new Date(d.created_at).getTime() + hrs * 3600 * 1000) - Date.now())); } else openDonorBoard(); });
+$('#donorBarBtn').onclick = () => toggleMenu('donatur', openDonorBoard);
+renderDonorBar();
+
+/* TICKER DONATUR + WILAYAH + PKL + KEAMANAN + KABUL SEMUA (build 1 Nov siang).
+Judul, bar donatur, ticker, strip wilayah, strip PKL dan strip keamanan ada di .top-fixed,
+jadi tetap tampil saat panel diciutkan. Yang disembunyikan handle hanya .top-collapsible:
+tombol Zona/Tur, chip Dunia Aktif/Rakyat/Rumah/Fasilitas/Puas/PLN, dan banner. */
+function renderDonorTicker(){
+  const track = document.getElementById('donorTickerTrack');
+  if (!track) return;
+  const tick = document.getElementById('donorTicker');
+  if (!donorList.length) { if (tick) tick.style.display = 'none'; return; }
+  if (tick) tick.style.display = '';
+  const run = donorList.map(d => '💛 ' + d.donator_name + ' — ' + fmtRp(d.amount)).join('   •   ') + '   •   ';
+  track.textContent = run + run; track.style.animation = '';
+}
+function openGovBoard(){
+  openSheet('<h3>🏛️ Wilayah &amp; Pemerintahan</h3>' +
+    '<div class="res">' +
+    '<div class="donor-item"><b>🏙️ Kota: Netizenia</b><br>Pusat Kota Radial, sudah ada di peta. Ini kota pusatnya, bukan nama desa atau kabupaten.</div>' +
+    '<div class="donor-item"><b>🗺️ Kabupaten: Belum dinamai</b><br>Belum ada nama kabupaten yang ditetapkan presiden. Usul nama lewat komen, presiden yang tetapkan.</div>' +
+    '<div class="donor-item"><b>🏡 Desa: Belum dinamai</b><br>Belum ada nama desa yang ditetapkan. Usulan yang masuk baru jenisnya: desa produksi (pertanian, peternakan, perkebunan) dan rumah bidan desa, bukan namanya.</div>' +
+    '<div class="donor-item"><b>👤 Bupati: Lowong</b><br>Pelamar dari komen: Erwin Saputra, mas A, dewa, Aan Putra, H O L A, ALVINAS SAHDEWO (minta daerahnya bupatinya pakai namanya), Sfyn Thok (mau jadi kades dulu, lalu bupati).</div>' +
+    '<div class="donor-item"><b>🏙️ Walikota: Lowong</b><br>Pelamar dari komen: ombar___27.</div>' +
+    '<div class="donor-item"><b>🏡 Kepala Desa: Lowong</b><br>Pelamar dari komen: Fazril, Sfyn Thok.</div>' +
+    '</div><p class="note">Daftar di atas adalah lamaran dari komen, bukan penetapan. Satu kursi tidak bisa diisi semua pelamar sekaligus, presiden yang pilih.</p>', 'pemerintahan');
+}
+function openPklBoard(){
+  openSheet('<h3>☕ PKL &amp; Gerobak Kopi</h3>' +
+    '<div class="res">' +
+    '<div class="donor-item"><b>☕ Fory Coffee — Gerobak Kopi Dorong</b><br>Cita-cita dari komennya 31 Okt: menjadi penjual kopi pertama terbesar di negara ini. Jawaban presiden di komen yang sama: dibuatkan yang didorong. Lokasi: Ruko UMKM &amp; Kopi / Pasar, tenggara peta. Pelanggan pertama yang mendaftar: Rapita Said. Alasan warga butuh kopi: tukang yang ngantuk terus (komentar For Rest).</div>' +
+    '<div class="donor-item"><b>🛒 Ruko PaluGada — Alfie Rizkiyansyah</b><br>Usaha bernama PaluGada, di Ruko UMKM &amp; Kopi.</div>' +
+    '<div class="donor-item"><b>🏪 Warung Madura 24 Jam, Martabak Perintis, Barber</b><br>Semua tercatat di fasilitas Ruko UMKM &amp; Kopi yang sama.</div>' +
+    '<div class="donor-item"><b>🛒 Pedagang UMKM Pasar</b><br>Pedagang pasar lain bekerja di Pasar Tradisional / Ruko, tenggara peta.</div>' +
+    '<div class="donor-item"><b>🍛 Warteg (s) — mangkal pinggir jalan</b><br>Dari komen: mau jadi tukang warteg buat pada makan. Warungnya mangkal di pinggir jalan, di Zona PKL.</div>' +
+    '<div class="donor-item"><b>🐟 Pecel Lele (Pelajar Cupang) — mangkal pinggir jalan</b><br>Dari komen: jadi peternak lele, nanti juga jualan pecel lele. Di peta dia ternak di Zona Pangan, warung pecel lelenya mangkal di Zona PKL.</div>' +
+    '<div class="donor-item"><b>🛒 PKL Jhoon — dorong</b><br>Dari komen: pekerjaan saya pedagang kaki lima. Gerobaknya jalan dorong di jalan utara-selatan, dan dia juga jadi warga di Zona PKL.</div>' +
+    '<div class="donor-item"><b>🍜 Pedagang baru dari komen</b><br>Seblak Prasmanan (Nhidea Dzaffira), Mie Ayam (Z 41 N), Miso Pak Ziss (apa aja), Nasi Padang (Raffi), Gorengan (Bengki Gustiawan), Angkringan (Rangga), Ayam Bakar, Koki Istana (Maru), Koki Kantin Tukang (Nadhy Badhol), dan pedagang UMKM lainnya — semuanya berdiri di lapaknya masing-masing di Pasar / Zona PKL, bukan cuma nama di papan.</div>' +
+    '</div><p class="note">Ini BUKAN cuma di papan: Zona PKL Pinggir Jalan sudah ada di peta (selatan pusat kota), gerobak kopi Fory dan PKL Jhoon jalan dorong di jalan, warteg dan pecel lele mangkal di pinggir jalan. Harga, menu, dan jam buka belum ditetapkan di komen, jadi tidak dikarang di sini.</p>', 'pkl');
+}
+function openAmanBoard(){
+  openSheet('<h3>🚓 Keamanan &amp; Penjara</h3>' +
+    '<div class="res">' +
+    '<div class="donor-item"><b>🚓 Kantor Polisi &amp; Damkar — Sebagian (60%)</b><br>Markas PRN &amp; Pemadam Kebakaran. Personel yang tercatat: Kapolri Bintang, Ilham Harahap, Fanji Giovanski, Damkar dullll, bang ris, dan polisi lain dari komen.</div>' +
+    '<div class="donor-item"><b>🪖 Barak TNI Kaki Gunung — Sebagian (50%)</b><br>Markas Pertahanan &amp; Paspampres di pegunungan. Personel yang tercatat: Jenderal esjeeee, Hasby Shohibul Risky, Yeremia Malaru.</div>' +
+    '<div class="donor-item"><b>🔒 Penjara Netizenia — Sebagian (50%), selatan pusat kota</b><br>Fasilitas baru di peta. Ada tahanan peran di dalamnya, lihat daftar di bawah.</div>' +
+    '<div class="donor-item"><b>🔒 Penjahat & tahanan peran (daftar sendiri di komen)</b><br>YR, the bung (perampok), Jull (maling), soekamto, M Bachrull Ulum, aby. Mereka yang minta peran jahat, bukan warga yang dituduh tanpa komen. Di peta mereka punya siklus: mengendap → mencuri → dikejar polisi (sirine 🚨, lari cepat) → tertangkap → dikawal ke Penjara → mendekam 45 detik di balik jeruji → bebas dan istirahat di rumah.</div>' +
+    '<div class="donor-item"><b>⚖️ Aturan anti-korupsi</b><br>Usulan cahayamalam yang dikabulkan: pejabat dites kejujuran dan ketulusan dulu sebelum dipilih, tidak ada korupsi di segala instansi. Yang daftar jadi koruptor di komen (Abdurahèém Jr, DEBY, bix) tidak diberi jabatan korup; di kota ini korupsi ditindak, bukan diberi kursi.</div>' +
+    '</div><p class="note">Yang TIDAK dikabulkan harfiah: hukuman mati, penggal, kebiri, dan tembak mati untuk koruptor yang diminta beberapa komen. Di kota ini hukumannya penjara, bukan eksekusi.</p>', 'keamanan');
+}
+function openKabulBoard(){
+  openSheet('<h3>✅ Kabul Semua — Rekap 1.961 Komen</h3>' +
+    '<p class="note">Dibaca ulang dari 3 file komen: Hari 1 (757), Hari 2 (723), Terbaru (486), total 1.961 teks unik termasuk balasan. Kabul di sini artinya ACC presiden dan dicatat resmi, lalu dibangun bertahap sesuai antrean tukang. Bukan berarti semua gedung langsung jadi hari ini.</p>' +
+    '<div class="res">' +
+    '<div class="donor-item"><b>🏠 Bangunan yang di-ACC</b><br>Rumah (139 sebutan), sekolah (48), rumah sakit (26), jalan (24), tempat ibadah, pasar dan Ruko, kantor polisi, barak TNI, penjara baru, bank, pabrik, bendungan, sawah, lapangan, dan istana sebagai usulan yang di-ACC antreannya.</div>' +
+    '<div class="donor-item"><b>🧑‍💼 Semua lamaran dicatat</b><br>Tukang (101 sebutan), guru (88), menteri (49), dokter (43), polisi (31), gubernur (17), bupati (8), walikota, kepala desa, arsitek, mandor, murid, dan pedagang. Satu kursi tidak bisa diisi semua pelamar, presiden yang pilih, sisanya staf dan calon.</div>' +
+    '<div class="donor-item"><b>🌾 Bentrok sawit vs hutan — dipisah</b><br>Kebun pangan kota tetap bebas sawit. Sawit tidak dibuka massal. Pelamar sawit dialihkan ke penghijauan dan kebun pangan, hutan dan gunung dilindungi.</div>' +
+    '<div class="donor-item"><b>🍛 MBG dan kopdes — antre, bukan ditolak</b><br>MBG (22 sebutan, pro dan kontra) dan kopdes (38 sebutan) dicatat sebagai program antrean, bukan dibangun mendadak hari ini. Di episode, keduanya tetap antrean utang janji sampai presiden putuskan jadwalnya.</div>' +
+    '<div class="donor-item"><b>🇮🇩 Nama negara tetap Netizenia</b><br>Usulan Konoha, WNI, indmio, dan Razenja dicatat, tapi tidak menggantikan nama negara.</div>' +
+    '<div class="donor-item"><b>💰 Uang joke tidak dikabulkan harfiah</b><br>Subsidi Rp1 juta per minggu, mata uang dollar tanpa pajak, dan sejenisnya tidak dikabulkan harfiah. Pajak tetap 5 persen sesuai keputusan presiden sebelumnya.</div>' +
+    '<div class="donor-item"><b>⚖️ Hukuman berat tidak dikabulkan harfiah</b><br>Hukuman mati, penggal, kebiri, dan tembak mati diganti penjara dan tes kejujuran.</div>' +
+    '</div><p class="note">Kalau ada usulan yang menurut lu belum masuk daftar ini, sebutkan komennya, gua tambahkan ke sheet ini tanpa mengubah yang sudah dikabulkan.</p>', 'kabul');
+}
+$('#cGov').onclick = () => toggleMenu('pemerintahan', openGovBoard);
+$('#cPkl').onclick = () => toggleMenu('pkl', openPklBoard);
+$('#cAman').onclick = () => toggleMenu('keamanan', openAmanBoard);
+$('#cKabul').onclick = () => toggleMenu('kabul', openKabulBoard);
+renderDonorTicker();
+
+/* Tombol sembunyi di judul (atas) + sembunyi bar donatur + geser menu bawah ke kiri. Semua pilihan diingat per perangkat. */
+$('#topCollapseBtn').onclick = () => setTopCollapsed(true);
+function setDonorHidden(h){
+  document.body.classList.toggle('donor-hidden', h);
+  try { localStorage.setItem('ntz_donor_hidden', h ? '1' : '0'); } catch (e) {}
+  const bar = document.getElementById('donorBar'), mini = document.getElementById('donorBarMini');
+  if (bar) bar.style.display = h ? 'none' : '';
+  if (mini) mini.style.display = h ? '' : 'none';
+}
+$('#donorBarHide').onclick = () => setDonorHidden(true);
+$('#donorBarMini').onclick = () => setDonorHidden(false);
+(function(){ try { if (localStorage.getItem('ntz_donor_hidden') === '1') setDonorHidden(true); } catch (e) {} })();
+function setDockHidden(h){
+  document.body.classList.toggle('dock-hidden', h);
+  try { localStorage.setItem('ntz_dock_hidden', h ? '1' : '0'); } catch (e) {}
+  const tab = document.getElementById('dockTab');
+  if (tab) tab.style.display = h ? '' : 'none';
+}
+$('#dockHide').onclick = () => setDockHidden(true);
+$('#dockTab').onclick = () => setDockHidden(false);
+(function(){ try { if (localStorage.getItem('ntz_dock_hidden') === '1') setDockHidden(true); } catch (e) {} })();
+/* LIVE CHAT POJOK KIRI BAWAH: hanya 6 terbaru, baru dari bawah, lama tenggelam. */
+let liveChatEntries = [];
+function pushLiveChat(kind, user, text) {
+  liveChatEntries.push({ kind, user, text, ts: Date.now() });
+  liveChatEntries = liveChatEntries.slice(-6);
+  renderLiveChat();
+}
+function renderLiveChat() {
+  const el = document.getElementById('liveChatStream');
+  if (!el) return;
+  el.innerHTML = liveChatEntries.length ? liveChatEntries.map(m => m.kind === 'sys'
+    ? '<div class="live-msg sys">✨ ' + esc(m.text) + '</div>'
+    : '<div class="live-msg"><b>' + esc(m.user) + '</b> ' + esc(censorText(m.text)) + '</div>').join('')
+    : '<div class="live-msg sys">Belum ada chat. Sapa rakyat dulu!</div>';
+}
+function noteLive(t) { note(t); pushLiveChat('sys', '', t); bumpNotifBadge(); }
+async function sendLiveChat() {
+  const nmEl = document.getElementById('liveChatName'), txEl = document.getElementById('liveChatText');
+  if (!nmEl || !txEl) return;
+  const u = nmEl.value.trim(), t = censorText(txEl.value.trim());
+  if (!u || !t) return;
+  try { localStorage.setItem('ntz_chat_name', u); } catch (e) {}
+  if (!sbClient) { pushLiveChat('chat', u, t); txEl.value = ''; note('Mode Lokal: pesan live chat hanya tampil di perangkat ini.'); return; }
+  try {
+    const res = await sbRpc('send_chat_message', { p_username: u, p_text: t });
+    if (res === 'ok') { pushLiveChat('chat', u, t); txEl.value = ''; }
+    else if (res === 'slow_down') { note('Live chat: terlalu cepat — tunggu sebentar lalu kirim lagi.'); }
+    else if (res === 'invalid_user') { note('Live chat: username harus 1–30 karakter.'); }
+    else if (res === 'invalid_text') { note('Live chat: pesan harus 1–200 karakter.'); }
+    else { note('Live chat: pesan gagal dikirim.'); }
+  } catch (e) { note('Live chat gagal: ' + e.message); }
+}
+let chatUnreadMenu = 0, notifUnreadMenu = 0;
+function setBadge(id, n) { const el = document.getElementById(id); if (!el) return; el.textContent = n > 9 ? '9+' : String(n); el.classList.toggle('show', n > 0); }
+function bumpChatBadge() { if (document.body.classList.contains('chat-open')) return; chatUnreadMenu++; setBadge('chatMenuBadge', chatUnreadMenu); }
+function bumpNotifBadge() { if (document.body.classList.contains('notif-open')) return; notifUnreadMenu++; setBadge('notifMenuBadge', notifUnreadMenu); }
+function toggleChatMenu() {
+  if (document.body.classList.contains('sheet-open')) closeSheet();
+  const opening = !document.body.classList.contains('chat-open');
+  document.body.classList.toggle('chat-open', opening);
+  document.body.classList.remove('notif-open');
+  setFocusMode(opening, 'chat');
+  if (!opening) setFocusMode(false);
+  const ic = document.getElementById('leftChatIcon'); if (ic) ic.textContent = opening ? '✕' : '✉️';
+  const ni = document.getElementById('leftNotifIcon'); if (ni) ni.textContent = '🔔';
+  if (opening) { chatUnreadMenu = 0; setBadge('chatMenuBadge', 0); }
+}
+function toggleNotifMenu() {
+  if (document.body.classList.contains('sheet-open')) closeSheet();
+  const opening = !document.body.classList.contains('notif-open');
+  document.body.classList.toggle('notif-open', opening);
+  document.body.classList.remove('chat-open');
+  setFocusMode(opening, 'notif');
+  if (!opening) setFocusMode(false);
+  const ic = document.getElementById('leftNotifIcon'); if (ic) ic.textContent = opening ? '✕' : '🔔';
+  const ci = document.getElementById('leftChatIcon'); if (ci) ci.textContent = '✉️';
+  if (opening) { notifUnreadMenu = 0; setBadge('notifMenuBadge', 0); }
+}
+(function initLiveChatBox() {
+  document.body.classList.remove('livechat-hidden');
+  const _cb = document.getElementById('leftChatBtn');
+  if (_cb) _cb.onclick = toggleChatMenu;
+  const _nb = document.getElementById('leftNotifBtn');
+  if (_nb) _nb.onclick = toggleNotifMenu;
+  const minBtn = document.getElementById('liveChatMin');
+  if (minBtn) { minBtn.textContent = '✕'; minBtn.onclick = () => { document.body.classList.remove('chat-open'); const ci = document.getElementById('leftChatIcon'); if (ci) ci.textContent = '✉️'; setFocusMode(false); }; }
+  const box = document.getElementById('liveChatBox');
+  if (box) box.addEventListener('click', e => {
+    if (e.target.closest('button') || e.target.tagName === 'INPUT') return;
+    const tx2 = document.getElementById('liveChatText');
+    if (tx2 && document.activeElement !== tx2) { tx2.focus(); setTimeout(() => { try { tx2.scrollIntoView({ block: 'center' }); } catch (err) {} }, 120); }
+  });
+  const sendBtn = document.getElementById('liveChatSend');
+  if (sendBtn) sendBtn.onclick = sendLiveChat;
+  const tx = document.getElementById('liveChatText');
+  if (tx) tx.addEventListener('keydown', e => { if (e.key === 'Enter') sendLiveChat(); });
+  const nm = document.getElementById('liveChatName');
+  if (nm) { try { nm.value = localStorage.getItem('ntz_chat_name') || ''; } catch (e) {} }
+  ['liveChatName','liveChatText'].forEach(id => {
+    const el = document.getElementById(id);
+    if (!el) return;
+    el.addEventListener('focus', () => document.body.classList.add('livechat-focus'));
+    el.addEventListener('blur', () => document.body.classList.remove('livechat-focus'));
+  });
+  renderLiveChat();
+})();
+/* PESAN RAKYAT: obrolan publik sementara — hanya 30 pesan terbaru yang tampil; yang tenggelam harus chat ulang. Notifikasi TIDAK di kiri: badge di tombol + toast tengah bawah. */
+let chatList = [], sbChatChannel = null, chatUnread = 0, chatToastTimer = null;
+function renderChatList(){
+  const el = document.getElementById('chatList');
+  if (!el) return;
+  el.innerHTML = chatList.length ? chatList.map(m => '<div class="chat-item"><b>' + esc(m.username) + '</b> <small style="opacity:.7">' + fmtTgl(m.created_at) + '</small><br>' + esc(censorText(m.text)) + '</div>').join('') : '<p class="note">Belum ada pesan. Jadilah yang pertama menyapa rakyat!</p>';
+}
+function setChatBadge(){
+  const b = document.getElementById('chatBadge');
+  if (!b) return;
+  b.textContent = chatUnread;
+  b.style.display = chatUnread > 0 ? '' : 'none';
+}
+function showChatToast(m){
+  const t = document.getElementById('chatToast');
+  if (!t) return;
+  t.textContent = '💬 ' + m.username + ': ' + m.text;
+  t.classList.add('show');
+  clearTimeout(chatToastTimer);
+  chatToastTimer = setTimeout(() => t.classList.remove('show'), 4000);
+}
+function onChatNew(row){
+  if (!row) return;
+  chatList.unshift(row); chatList.length = Math.min(chatList.length, 30);
+  const lastLive = liveChatEntries[liveChatEntries.length - 1];
+  if (!(lastLive && lastLive.user === row.username && lastLive.text === row.text && Date.now() - lastLive.ts < 5000)) pushLiveChat('chat', row.username, row.text);
+  if (mode === 'chat') { renderChatList(); }
+  else if (!document.body.classList.contains('chat-open')) { chatUnread++; setChatBadge(); bumpChatBadge(); }
+}
+async function sbLoadChat(){
+  if (!sbClient) return;
+  try {
+    const { data, error } = await sbClient.from('chat_messages').select('*').order('created_at', { ascending: false }).limit(30);
+    if (!error && data) chatList = data;
+  } catch (e) { /* abaikan: tabel belum ada = obrolan kosong */ }
+  renderChatList();
+  liveChatEntries = chatList.slice(0, 6).reverse().map(m => ({ kind: 'chat', user: m.username, text: m.text, ts: new Date(m.created_at).getTime() || Date.now() }));
+  renderLiveChat();
+  try {
+    if (!sbChatChannel) {
+      sbChatChannel = sbClient.channel('netizenia-chat')
+        .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'chat_messages' }, p => onChatNew(p.new))
+        .subscribe();
+    }
+  } catch (e) { /* abaikan */ }
+}
+function openChatBoard(){
+  chatUnread = 0; setChatBadge();
+  openSheet('<h3>💬 Pesan Rakyat</h3>' +
+    '<p class="note">Obrolan publik sementara — hanya 30 pesan terbaru yang tampil. Yang tenggelam, chat ulang supaya muncul lagi.</p>' +
+    '<div id="chatList" class="res"></div>' +
+    '<label>Username<input id="chatName" placeholder="nama kamu" maxlength="30"></label>' +
+    '<label>Pesan<input id="chatText" placeholder="tulis pesan untuk semua rakyat…" maxlength="200"></label>' +
+    '<div class="err" id="chatErr"></div>' +
+    '<button class="btn gold" id="chatSend" type="button" style="width:100%">💬 Kirim Pesan</button>', 'chat');
+  try { const nm0 = document.getElementById('chatName'); if (nm0) nm0.value = localStorage.getItem('ntz_chat_name') || ''; } catch (e) {}
+  renderChatList();
+  const send = async () => {
+    const nm = document.getElementById('chatName');
+    const tx = document.getElementById('chatText');
+    const er = document.getElementById('chatErr');
+    if (!nm || !tx) return;
+    const u = nm.value.trim(), t = censorText(tx.value.trim());
+    if (!u || !t) { if (er) er.textContent = 'Isi username dan pesan dulu.'; return; }
+    if (er) er.textContent = '';
+    try {
+      const res = await sbRpc('send_chat_message', { p_username: u, p_text: t });
+      if (res === 'ok') {
+        try { localStorage.setItem('ntz_chat_name', u); } catch (e) {}
+        tx.value = '';
+        sbLoadChat();
+      } else if (res === 'slow_down') { if (er) er.textContent = 'Terlalu cepat — tunggu sebentar lalu kirim lagi.'; }
+      else if (res === 'invalid_user') { if (er) er.textContent = 'Username harus 1–30 karakter.'; }
+      else if (res === 'invalid_text') { if (er) er.textContent = 'Pesan harus 1–200 karakter.'; }
+      else { if (er) er.textContent = 'Pesan gagal dikirim. Periksa username (maks 30 karakter) dan pesan (maks 200 karakter).'; }
+    } catch (e) { if (er) er.textContent = 'Pesan gagal dikirim: ' + e.message; }
+  };
+  document.getElementById('chatSend').onclick = send;
+  document.getElementById('chatText').addEventListener('keydown', e => { if (e.key === 'Enter') send(); });
+}
+$('#bChat').onclick = () => toggleChatMenu();
+
+$('#bDay').onclick = () => {
+  viewDay = viewDay >= 3 ? 1 : viewDay + 1;
+  $('#epTag').textContent = 'HARI ' + viewDay;
+  const epTitles = {
+    1: '📢 HARI 1: Rakyatnya nol. Yang berkuasa satu (Pak Mulyo di Pusat Kota).',
+    2: '📢 HARI 2: Rumah warga, RS gratis, Sungai & Gardu PLN mulai berdiri.',
+    3: '📢 HARI 3: Pelamar menteri banyak, tukang lembur bangun rumah & fasilitas!'
+  };
+  $('#bannerTxt').textContent = epTitles[viewDay] || ('📢 HARI ' + viewDay + ': Kota terus dibangun rakyat!');
+  updateChips();
+};
+
+/* FAB kanan bawah: tombol teknis (+, −, 📸, 🙈, 🎬) dipindah dari dock/top ke kolom vertikal kecil. */
+(function setupFab() {
+  const fab = document.createElement('div'); fab.id = 'fab'; document.body.appendChild(fab);
+  ['bFoto','bIn','bOut','bTeks','bDir'].forEach(id => { const el = document.getElementById(id); if (el) fab.appendChild(el); });
+  const bd = document.getElementById('bDir'); if (bd) bd.textContent = '🎬';
+  const topPill = document.querySelector('.top-fixed .pill');
+  const chip = document.getElementById('sbChip');
+  if (topPill && chip) { chip.style.display = 'inline-block'; chip.style.marginLeft = '6px'; topPill.appendChild(chip); }
+  const topRakyat = document.createElement('span'); topRakyat.id = 'topRakyat'; topRakyat.className = 'tag'; topRakyat.style.marginLeft = '6px';
+  if (topPill) topPill.appendChild(topRakyat);
+  topRakyat.style.cursor = 'pointer'; topRakyat.onclick = () => toggleMenu('cari', openCari);
+})();
+$('#bDir').onclick = () => {
+  dirTour = !dirTour;
+  if (dirTour) {
+    dirStep = 0; dirTimer = 0.1;
+    document.body.classList.add('photo-mode');
+  } else {
+    document.body.classList.remove('photo-mode');
+  }
+};
+
+$('#bFoto').onclick = () => {
+  document.body.classList.add('photo-mode');
+  setTimeout(() => {
+    try {
+      const a = document.createElement('a');
+      a.download = 'Republik-Netizenia-Hari-' + viewDay + '.png';
+      a.href = cv.toDataURL('image/png');
+      a.click();
+    } catch (e) {}
+  }, 300);
+};
+
+$('#exitPhoto').onclick = () => {
+  dirTour = false;
+  document.body.classList.remove('photo-mode');
+};
+
+if (bc) {
+  bc.onmessage = e => {
+    const d = e.data;
+    if (d.type === 'register') {
+      addAgent(d.n, d.p, d.h, true, false);
+      updateChips();
+      note('🌐 Rakyat baru bergabung secara live: @' + d.n + ' (' + d.p + ')');
+    } else if (d.type === 'claim') {
+      const target = ag.find(a => a.origName === d.orig);
+      if (target) { target.n = d.u; target.ig = true; }
+    }
+  };
+}
+
+/* ====== INISIALISASI KOTA RADIAL & DEEP LINK ====== */
+function checkDeepLink() {
+  const hash = decodeURIComponent(location.hash.replace(/^#/, '')).trim().toLowerCase();
+  if (!hash) return;
+  const q = hash.replace(/^rumah-/, '').replace(/^@/, '');
+  const target = ag.find(a => a.n.toLowerCase().includes(q) || a.origName.toLowerCase().includes(q));
+  if (target) {
+    selA = target; follow = target;
+    fly = { x: target.x, y: target.y, z: 1.3 };
+    infoA(target);
+  }
+}
+
+/* TAHAP 1 SUPABASE — boot kota: sinkron snapshot dulu (bila kunci ada), baru sebar benih warga.
+   Tanpa kunci / bila Supabase tidak terjangkau, snap = null dan kota jalan lokal persis seperti biasa. */
+async function boot() {
+  let snap = null;
+  if (sbHasKeys()) {
+    try { snap = await sbInit(); } catch (e) { snap = null; }
+  }
+  if (snap) {
+    /* (a) Klaim & opt-out dari database -> peta lokal sesi ini. */
+    snap.residents.forEach(r => {
+      if (r.opt_out) optOutMap[r.display_name] = true;
+      else if (r.claimed && r.ig_username) claimsMap[r.display_name] = r.ig_username;
+    });
+    /* (d) Bangunan dari database menimpa CONFIG.fas (status & progres). */
+    snap.buildings.forEach(b => {
+      const f = FAS[b.id];
+      if (f) {
+        if (['usulan', 'sebagian', 'jadi'].indexOf(b.status) >= 0) f.st = b.status;
+        if (typeof b.progress === 'number') f.pr = Math.max(0, Math.min(1, b.progress));
+      }
+    });
+    /* (e) Usulan dari database menimpa (vote/status) atau menambah papan usulan. */
+    snap.proposals.forEach(pr => {
+      const ex = CONFIG.proposals.find(p => p.id === pr.id);
+      if (ex) { ex.votes = pr.votes; ex.status = pr.status; }
+      else CONFIG.proposals.push({ id: pr.id, title: pr.title, proposer: pr.proposer || 'Warga', votes: pr.votes || 0, status: pr.status || 'open', day: pr.build_day || 3 });
+    });
+  }
+  const SEEDS = CONFIG.warga.concat(Object.entries(CONFIG.seed).flatMap(([p, l]) => l.map(n => ({ n, p }))));
+  const savedLocal = store.get('ntz_w_radial', []);
+  const overlayByLower = {};
+  if (snap) snap.residents.forEach(r => { overlayByLower[String(r.display_name).toLowerCase()] = r; });
+  const seenLower = new Set(['pak mulyo']);
+  let maxDbPlot = -1;
+  if (snap) snap.residents.forEach(r => { if (Number.isInteger(r.plot_id) && r.plot_id > maxDbPlot) maxDbPlot = r.plot_id; });
+  ensurePlots(Math.ceil(Math.max(CONFIG.kapasitas, SEEDS.length + savedLocal.length + 24, maxDbPlot + 1) / 24) * 24);
+
+  addAgent('Pak Mulyo', 'Presiden', null, true, true);
+  SEEDS.forEach((w, i) => {
+    const ov = overlayByLower[String(w.n).toLowerCase()];
+    seenLower.add(String(w.n).toLowerCase());
+    if (ov && ov.opt_out) { optOutMap[w.n] = true; return; }
+    if (ov && ov.claimed && ov.ig_username) claimsMap[w.n] = ov.ig_username;
+    const role = ov && PERAN[ov.role] ? ov.role : w.p;
+    const plot = ov && Number.isInteger(ov.plot_id) && ov.plot_id >= 0 ? ov.plot_id : (w.h != null ? w.h : i);
+    const a = addAgent(w.n, role, plot, true, false);
+    /* Benih: progres rumah dari database hanya dipakai bila < 1. Nilai default
+       1.0 di database TIDAK boleh memalsukan rumah benih yang masih dibangun. */
+    if (a && ov && typeof ov.house_progress === 'number' && ov.house_progress >= 0 && ov.house_progress < 1 && typeof a.home === 'number' && plots[a.home]) {
+      plots[a.home].pr = ov.house_progress;
+    }
+  });
+  savedLocal.forEach(w => {
+    seenLower.add(String(w.n).toLowerCase());
+    const a = addAgent(w.n, w.p, w.h, true, false);
+    if (a) a.me = a.ig = true;
+  });
+  /* (b) Warga database yang belum ada di benih / lokal -> agen tambahan. */
+  if (snap) snap.residents.forEach(r => {
+    const low = String(r.display_name).toLowerCase();
+    if (seenLower.has(low) || r.opt_out) return;
+    seenLower.add(low);
+    const role = PERAN[r.role] ? r.role : 'Warga';
+    const a = addAgent(r.display_name, role, Number.isInteger(r.plot_id) ? r.plot_id : null, true, false);
+    if (a && typeof a.home === 'number' && plots[a.home] && typeof r.house_progress === 'number' && r.house_progress >= 0 && r.house_progress <= 1) {
+      plots[a.home].pr = r.house_progress;
+    }
+  });
+
+  addEventListener('hashchange', checkDeepLink);
+  setTimeout(checkDeepLink, 300);
+
+  updateChips();
+  note('Selamat datang di Republik Netizenia! Presiden di tengah kota, ketuk warga atau bangunan untuk melihat aktivitasnya.');
+  if (sbMode) sbSubscribe();
+  if (sbMode) sbLoadSettings();
+  if (sbMode) sbLoadDonations();
+  if (sbMode) sbLoadChat();
+  /* TAHAP 2: kembali dari login Google — bersihkan token dari URL, lalu
+     buka panel admin bila tombol admin yang memicu login tadi. */
+  try {
+    if (sbMode && location.hash.indexOf('access_token') >= 0) history.replaceState(null, '', location.pathname + location.search);
+    if (sbMode && sessionStorage.getItem('ntz_admin_after_login') === '1') {
+      sessionStorage.removeItem('ntz_admin_after_login');
+      sbClient.auth.getSession().then(r => { if (r.data.session) openAdmin(); }).catch(() => {});
+    }
+  } catch (e) {}
+  requestAnimationFrame(frame);
+}
+boot();
+</script>
+</body>
+</html>
