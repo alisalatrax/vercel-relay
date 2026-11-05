@@ -991,6 +991,13 @@ function mapAuth(err){
   if (/signups not allowed|signup.*disabled/i.test(m)) return 'Pendaftaran sedang ditutup di server.';
   return m;
 }
+// Tombol Google hanya tampil bila provider Google aktif di Supabase (pengaturan publik GoTrue).
+let googleOn = null;
+async function loadAuthSettings(){
+  try { const r = await fetch(CFG.url + '/auth/v1/settings', { headers: { apikey: CFG.key } }); const d = await r.json(); googleOn = !!(d && d.external && d.external.google); }
+  catch (_) { googleOn = null; }
+  if (modalKind === 'login') renderModal();
+}
 async function loginGoogle(){
   if (!sb) return toast('Pustaka Supabase gagal dimuat.', 'bad');
   const { error } = await sb.auth.signInWithOAuth({ provider: 'google', options: { redirectTo: location.origin + location.pathname } });
@@ -1401,7 +1408,7 @@ function renderModal(){
   const M = $('#modal');
   if (modalKind === 'login'){
     M.innerHTML = `<div class="mcard" role="dialog" aria-label="Masuk"><button class="x" data-act="close-modal" aria-label="Tutup">${svg('x')}</button>${FLAG}<h1>Masuk ke Republik Netizenia</h1><p class="note">Punya rumah, kerja, dan ikut voting bangunan kota bersama warga lain.</p>
-      <button class="gbtn" data-act="google">${GOOGLE}Masuk dengan Google</button><div class="or">atau pakai username</div>
+      ${googleOn === false ? '' : `<button class="gbtn" data-act="google">${GOOGLE}Masuk dengan Google</button><div class="or">atau pakai username</div>`}
       <div class="tabs"><button class="tab" data-lmode="masuk" aria-pressed="${loginMode === 'masuk'}">Masuk</button><button class="tab" data-lmode="daftar" aria-pressed="${loginMode === 'daftar'}">Daftar baru</button></div>
       <form id="loginForm" class="list" autocomplete="on"><div class="field"><label for="lu">Username</label><input id="lu" name="username" autocomplete="username" inputmode="text" autocapitalize="none" spellcheck="false" maxlength="20" placeholder="mis. budi_santoso" required></div>
       <div class="field"><label for="lp">Kata sandi</label><input id="lp" name="password" type="password" autocomplete="${loginMode === 'daftar' ? 'new-password' : 'current-password'}" minlength="8" placeholder="minimal 8 karakter" required></div>
@@ -1545,7 +1552,7 @@ document.addEventListener('visibilitychange', () => { if (!document.hidden && S.
   requestAnimationFrame(frame);
   if (!sb) enterPreview('Pustaka Supabase gagal dimuat.');
   else {
-    initAuth();
+    initAuth(); loadAuthSettings();
     const ok = await loadSnapshot();
     if (ok){ await Promise.all([loadNpcs(), loadDistricts(['pusat'])]); ensureVisibleDistricts(); }
   }
