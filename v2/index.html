@@ -991,6 +991,13 @@ function mapAuth(err){
   if (/signups not allowed|signup.*disabled/i.test(m)) return 'Pendaftaran sedang ditutup di server.';
   return m;
 }
+// Tombol Google hanya tampil bila provider Google aktif di Supabase (pengaturan publik GoTrue).
+let googleOn = null;
+async function loadAuthSettings(){
+  try { const r = await fetch(CFG.url + '/auth/v1/settings', { headers: { apikey: CFG.key } }); const d = await r.json(); googleOn = !!(d && d.external && d.external.google); }
+  catch (_) { googleOn = null; }
+  if (modalKind === 'login') renderModal();
+}
 async function loginGoogle(){
   if (!sb) return toast('Pustaka Supabase gagal dimuat.', 'bad');
   const { error } = await sb.auth.signInWithOAuth({ provider: 'google', options: { redirectTo: location.origin + location.pathname } });
@@ -1084,8 +1091,37 @@ const ICON = {
 };
 const svg = (k, sz) => `<svg viewBox="0 0 24 24"${sz ? ` width="${sz}" height="${sz}"` : ''}>${ICON[k]}</svg>`;
 const DOCK = [['bangun','Bangun'],['kerja','Kerja'],['voting','Voting'],['kota','Kota'],['chat','Chat']];
-const SHEET_COLOR = { bangun:'#2F8F5B', kerja:'#8A5A3C', voting:'#3E6FB0', kota:'#D9483B', chat:'#7A5AA6', info:'#E2A21F', profil:'#1F8AA8', npc:'#79B94F', distrik:'#5C8C4A' };
+const SHEET_COLOR = { warga:'#3E6FB0', bangun:'#2F8F5B', kerja:'#8A5A3C', voting:'#3E6FB0', kota:'#D9483B', chat:'#7A5AA6', info:'#E2A21F', profil:'#1F8AA8', npc:'#79B94F', distrik:'#5C8C4A' };
 let sheetKind = null, sheetArg = null, sheetTab = null, dockSel = null, modalKind = null;
+/* ---------- tahap 4: kerja, profesi, laporan, misi ---------- */
+const PROF_ACT = {
+  Warga:['bakti','Kerja bakti','Bersihkan lingkungan: kepuasan kota naik 4 jam. +8 NC.'],
+  Arsitek:['rancang','Rancang ulang usulan','Pilih usulan di bawah: biayanya turun 10%. +20 NC dari kas.'],
+  Guru:['ajar','Mengajar','Pilih murid di daftar Warga: dia +15 XP, kamu +25 NC. Butuh sekolah yang sudah jadi.'],
+  Murid:['belajar','Belajar di sekolah','+15 XP dan 5 NC uang saku. Butuh sekolah yang sudah jadi.'],
+  Dokter:['obati','Obati pasien','Pilih warga sakit di daftar Warga. +30 NC dari kas. Butuh rumah sakit yang sudah jadi.'],
+  Polisi:['tangkap','Tangkap tersangka','Hanya warga yang dilapor minimal 2 akun lain. +30 NC. Butuh kantor polisi dan penjara yang sudah jadi.'],
+  Pedagang:['jualan','Jualan keliling','Untung ikut jumlah daya tampung kota.'],
+  Petani:['panen','Panen','22 NC per sawah milikmu, atau 10 NC bantu tetangga.'],
+  Pengusaha:['promosi','Promosi usaha','Pendapatan usahamu +50% selama 2 jam.'],
+  Penjahat:['beraksi','Beraksi','Dapat 20–44 NC, tapi bisa ketahuan saksi dan dilaporkan.'],
+  Menteri:['rapat','Rapat negara','Kepuasan kota naik 6 jam. +25 NC dari kas.'],
+  Tukang:['bantu','Bantu bangun','Pilih proyek di bawah: +16% progres, upah 25 NC.'],
+  Mandor:['bantu','Awasi proyek','Pilih proyek di bawah: +11% progres, upah 30 NC.'],
+};
+const cdLeft = k => { const r = S.me?.cooldowns?.[k]; return r ? Math.max(0, Date.parse(r) - now()) : 0; };
+const jailed = () => !!(S.me?.jail_until && Date.parse(S.me.jail_until) > now());
+const hasType = (...types) => [...S.buildings.values()].some(b => b.stage === 'jadi' && types.includes(b.type));
+const bname = b => b ? (b.label || catOf(b.type).n) : '';
+const freeSlots = b => Math.max(0, (catOf(b.type).jobs || 0) - (b.workers || 0));
+function cdBtn(act, label, key, extra, cls){ const l = cdLeft(key); return `<button class="btn ${cls || 'gold'}" data-act="${act}"${extra || ''} ${l || jailed() ? 'disabled' : ''}>${l ? esc(label) + ' · lagi ' + fmtLeft(l) : esc(label)}</button>`; }
+let citT = null;
+async function loadCitizens(){
+  const a = sheetArg || {}; a.loading = true;
+  try { a.list = await rpc('get_citizens', { p_query: a.q || '', p_filter: a.f || 'semua', p_limit: 60 }); a.err = null; }
+  catch (e) { a.err = e.message; a.list = []; }
+  a.loading = false; if (sheetKind === 'warga') renderSheet();
+}
 
 /* ---------- HUD ---------- */
 function myVoteCount(){
@@ -1112,7 +1148,7 @@ function renderHud(){
   const s = S.snap, st = s?.stats || {};
   const happy = st.happy ?? 0, hc = happy >= 60 ? '#2F8F5B' : happy >= 40 ? '#E2A21F' : '#D9483B';
   $('#stats').innerHTML = s ? `
-    <button class="pill" data-open="kota"><span class="pi" style="background:#3E6FB0">${svg('people')}</span><span><small>Penduduk</small><b class="num">${fmt(st.pop || 0)}</b></span></button>
+    <button class="pill" data-open="kota"><span class="pi" style="background:#3E6FB0">${svg('people')}</span><span><small>Penduduk</small><b class="num">${fmt((st.npcs || 0) + (st.players || 0))}</b></span></button>
     <button class="pill" data-open="kota"><span class="pi" style="background:#E2A21F">${svg('coin')}</span><span><small>Kas negara</small><b class="num">${fmt(s.kas)}</b></span></button>
     <button class="pill" data-open="kota"><span class="pi" style="background:${hc}">${svg('smile')}</span><span><small>Kepuasan</small><b class="num" style="color:${hc}">${happy}%</b></span></button>` : '';
   const ban = $('#banner');
@@ -1127,7 +1163,13 @@ function nextStep(){
   if (!registered()) return { t: 'Buat tokohmu dulu', a: 'register', i: 'user' };
   const me = S.me;
   if (me.profession !== 'Presiden' && !me.free_house_used) return { t: 'Ambil rumah gratismu', a: 'free-house', i: 'home' };
+  if (jailed()) return { t: 'Ditahan sampai ' + fmtWib(me.jail_until), a: 'open-kerja', i: 'lock' };
   const nv = myVoteCount(); if (nv) return { t: nv + ' usulan menunggu suaramu', a: 'open-voting', i: 'voting' };
+  if (me.profession !== 'Presiden'){
+    if (me.job && !cdLeft('shift')) return { t: 'Shift siap di ' + me.job.name, a: 'open-kerja', i: 'kerja' };
+    const ms = me.missions || [], done = ms.filter(m => m.done).length;
+    if (ms.length && done < ms.length) return { t: 'Misi hari ini ' + done + '/' + ms.length, a: 'open-kerja', i: 'kerja' };
+  }
   const mine = [...S.buildings.values()].find(b => b.owner_id === me.id && b.stage === 'bangun' && progressOf(b) < 1);
   if (mine){ const p = progressOf(mine), left = (1 - p) * Number(mine.build_hours) * 3600000; return { t: (mine.label || catOf(mine.type).n) + ' jadi ' + fmtLeft(left) + ' lagi', a: 'goto:' + mine.id, i: 'bangun' }; }
   return null;
@@ -1136,7 +1178,7 @@ function renderNext(){ const n = nextStep(), el = $('#next'); if (!n || sheetKin
 function renderDock(){
   if (place){ $('#dock').hidden = true; return; } $('#dock').hidden = false;
   const nv = myVoteCount();
-  $('#dock').innerHTML = DOCK.map(([k, l]) => `<button type="button" data-dock="${k}" aria-pressed="${dockSel === k}"><span class="di">${svg(k)}</span>${l}${k === 'voting' && nv ? `<span class="badge">${nv}</span>` : ''}</button>`).join('');
+  $('#dock').innerHTML = DOCK.map(([k, l]) => `<button type="button" data-dock="${k}" aria-pressed="${dockSel === k}"><span class="di">${svg(k)}</span>${l}${k === 'voting' && nv ? `<span class="badge">${nv}</span>` : ''}${k === 'kerja' && registered() && S.me.job && !cdLeft('shift') && !jailed() ? '<span class="badge">!</span>' : ''}</button>`).join('');
 }
 let tickerIdx = 0;
 function rotateTicker(){
@@ -1229,7 +1271,14 @@ const SHEETS = {
     }
     h += `<dl class="kv"><dt>Pemilik</dt><dd>${esc(owner)}</dd><dt>Distrik</dt><dd>${esc(DIST_NAME[b.d] || '')}</dd><dt>Ukuran</dt><dd>${b.w}×${b.h} kavling</dd>${ct.res ? `<dt>Daya tampung</dt><dd>${ct.res} jiwa</dd>` : ''}${ct.jobs ? `<dt>Pekerja</dt><dd>${(b.workers || 0) + (b.npc_staff || 0)} / ${ct.jobs}</dd>` : ''}${ct.jobs && b.stage === 'jadi' ? `<dt>Gaji per shift</dt><dd>${nc(b.wage || 30)}</dd>` : ''}</dl>`;
     const res = b.extra?.residents; if (res && res.length) h += `<div class="lab">Penghuni</div><p class="note">${res.map(esc).join(', ')}</p>`;
-    if (ct.jobs && b.stage === 'jadi') h += `<p class="note">Melamar kerja di sini hadir di Tahap 4.</p>`;
+    if (ct.jobs && b.stage === 'jadi' && registered()){
+      const myJob = S.me.job && S.me.job.building_id === b.id, free = freeSlots(b);
+      if (myJob) h += `<div class="row">${cdBtn('shift', 'Masuk kerja', 'shift')}<button class="btn" data-act="quit">Berhenti</button></div>`;
+      else if (mine || (b.owner_kind === 'negara' && isAdmin())) h += manageHTML(b);
+      else if (!isPres()){ const bad = ct.jobProf && S.me.profession !== ct.jobProf ? 'Khusus ' + ct.jobProf : !b.job_open ? 'Lowongan ditutup' : !free ? 'Lowongan penuh' : '';
+        h += `<button class="btn gold wide" data-act="apply" data-id="${b.id}" ${bad || jailed() ? 'disabled' : ''}>${bad ? esc(bad) : 'Lamar kerja · ' + nc(b.wage || 30) + '/shift · ' + free + ' kursi'}</button>`; }
+    }
+    if (b.type === 'rs' && b.stage === 'jadi' && registered() && S.me.health < 100) h += `<button class="btn" data-act="treat">Berobat di sini (20 NC)</button>`;
     h += `<div class="row"><button class="btn" data-act="goto" data-id="${b.id}">Lihat dari dekat</button>${mine && b.stage !== 'sketsa' && !b.protected ? `<button class="btn red" data-act="demolish" data-id="${b.id}">Bongkar</button>` : ''}</div>`;
     return [esc(b.label || ct.n), h, esc(owner), 'info'];
   },
@@ -1252,15 +1301,68 @@ const SHEETS = {
   },
   kota(){
     const s = S.snap || {}, st = s.stats || {}, cov = st.cov || {}; const bar = (l, v) => `<span>${l}</span><span class="meter"><i style="width:${Math.round((v || 0) * 100)}%"></i></span><span class="p">${Math.round((v || 0) * 100)}%</span>`;
-    let h = `<div class="row" style="gap:10px;flex-wrap:nowrap">${[['Penduduk', fmt(st.pop || 0), '#3E6FB0'], ['Warga aktif', fmt(st.players || 0), '#2F8F5B'], ['Kas', fmt(s.kas || 0), '#E2A21F']].map(([l, v, c]) => `<div style="flex:1;background:var(--panel2);border-radius:14px;padding:10px 12px"><small class="note">${l}</small><div class="big num" style="color:${c}">${v}</div></div>`).join('')}</div>`;
-    h += `<div class="lab">Layanan untuk rumah warga</div><div class="bars">${bar('Pendidikan', cov.sekolah)}${bar('Kesehatan', cov.rs)}${bar('Keamanan', cov.polisi)}${bar('Taman', cov.taman)}${bar('Lapangan kerja', cov.kerja)}</div><p class="note">Rumah terlayani bila ada fasilitas dalam jarak 9 kavling. Pajak ${s.tax ?? 10}%; di atas 10% menurunkan kepuasan.</p>`;
+    let h = `<div class="row" style="gap:10px;flex-wrap:nowrap">${[['Penduduk', fmt((st.npcs || 0) + (st.players || 0)), '#3E6FB0'], ['Pemain', fmt(st.players || 0), '#2F8F5B'], ['Kas', fmt(s.kas || 0), '#E2A21F']].map(([l, v, c]) => `<div style="flex:1;background:var(--panel2);border-radius:14px;padding:10px 12px"><small class="note">${l}</small><div class="big num" style="color:${c}">${v}</div></div>`).join('')}</div>`;
+    h += `<div class="lab">Layanan untuk rumah warga</div><div class="bars">${bar('Pendidikan', cov.sekolah)}${bar('Kesehatan', cov.rs)}${bar('Keamanan', cov.polisi)}${bar('Taman', cov.taman)}${bar('Lapangan kerja', cov.kerja)}</div><dl class="kv"><dt>Warga dari komen</dt><dd>${fmt(st.npcs || 0)}</dd><dt>Pemain terdaftar</dt><dd>${fmt(st.players || 0)}</dd><dt>Daya tampung rumah</dt><dd>${fmt(st.pop || 0)} jiwa</dd><dt>Rumah berdiri</dt><dd>${fmt(st.houses || 0)}</dd></dl><p class="note">Daya tampung rumah dipakai untuk menghitung ramainya dagang. Rumah terlayani bila ada fasilitas dalam jarak 9 kavling. Pajak ${s.tax ?? 10}%; di atas 10% menurunkan kepuasan.</p>`;
     h += `<div class="lab">Distrik</div><div class="list">${(s.districts || []).map(d => `<div class="item"><div class="grow"><b>${esc(d.name)}</b></div><span class="tagc ${d.open ? 'green' : ''}">${d.open ? 'Terbuka' : 'Hutan · ' + nc(d.cost)}</span></div>`).join('')}</div>`;
     if ((s.announcements || []).length) h += `<div class="lab">Pengumuman presiden</div><div class="list">${s.announcements.map(a => `<div class="item"><div class="grow"><b style="white-space:normal">📢 ${esc(a.text)}</b><small>${fmtAgo(a.at)}</small></div></div>`).join('')}</div>`;
     h += `<div class="lab">Kabar kota</div><div class="list">${(s.news || []).slice(0, 12).map(n => `<div class="item"><div class="grow"><b style="white-space:normal;font-weight:800">${n.kind === 'kutipan' && n.actor ? esc(n.actor) + ': “' + esc(n.text) + '”' : esc(n.text)}</b>${n.at ? `<small>${fmtAgo(n.at)}</small>` : ''}</div></div>`).join('') || '<div class="empty">Belum ada kabar.</div>'}</div>`;
     h += `<div class="row"><button class="btn" data-act="profil">${registered() ? 'Profil & ganti profesi' : 'Masuk / Daftar'}</button></div>`;
     return ['Kota', h, 'Republik Netizenia', 'kota'];
   },
-  kerja(){ return ['Kerja', `<div class="empty">Pekerjaan, aksi profesi, laporan, dan misi harian hadir di Tahap 4.</div>${registered() ? `<dl class="kv"><dt>Profesi</dt><dd>${esc(S.me.profession)}</dd><dt>Energi</dt><dd>${S.me.energy}/100</dd><dt>Koin dari aksi hari ini</dt><dd>${fmt(S.me.earned_today || 0)} / ${fmt(S.me.daily_cap || 300)} NC</dd></dl>` : ''}`, 'Segera hadir', 'kerja']; },
+  kerja(){
+    if (!registered()) return ['Kerja', `<div class="empty">Masuk dulu untuk bekerja, menjalankan profesi, dan mengambil misi harian.</div><button class="btn gold wide" data-act="login">Masuk / Daftar</button>`, 'Pekerjaan dan profesi', 'kerja'];
+    const me = S.me, pa = PROF_ACT[me.profession]; let h = '';
+    if (jailed()) h += `<div class="prog" style="background:#FDE7E4"><b>Kamu sedang ditahan</b><span class="note">Bebas ${fmtWib(me.jail_until)} (${fmtLeft(Date.parse(me.jail_until) - now())} lagi). Selama ditahan kamu tidak bisa bekerja, beraksi, atau memberi suara.</span></div>`;
+    h += `<dl class="kv"><dt>Profesi</dt><dd>${esc(me.profession)}</dd><dt>Energi</dt><dd><span class="ebar" style="width:70px;vertical-align:middle"><i style="width:${me.energy}%"></i></span> ${me.energy}/100</dd><dt>Kesehatan</dt><dd>${me.health}/100</dd><dt>Koin dari aksi hari ini</dt><dd>${fmt(me.earned_today || 0)} / ${fmt(me.daily_cap || 300)} NC</dd>${me.reports_on_me ? `<dt>Dilaporkan</dt><dd style="color:var(--red)">${me.reports_on_me} akun</dd>` : ''}</dl>`;
+    if (me.profession === 'Presiden') h += `<p class="note">Presiden tidak bekerja dan tidak mengambil misi. Pantau warga dan tahanan lewat daftar Warga.</p><button class="btn" data-act="open-warga" data-f="lapor">Daftar warga dilaporkan</button>`;
+    else {
+      h += `<div class="lab">Pekerjaanmu</div>`;
+      if (me.job){ h += `<div class="prog"><div class="spread"><b>${esc(me.job.name)}</b><span class="note">${esc(me.job.owner)}</span></div><span class="note">Gaji ${nc(me.job.wage)} per shift (4 jam, energi 20). ${me.job.state ? 'Gaji negara dibayar kas bertahap tiap jam.' : 'Dibayar pemilik saat shift, dipotong pajak.'}</span></div>
+          <div class="row">${cdBtn('shift', 'Masuk kerja', 'shift')}<button class="btn" data-act="goto" data-id="${me.job.building_id}">Lihat</button><button class="btn red" data-act="quit">Berhenti</button></div>`; }
+      else h += `<p class="note">Belum bekerja. Lamar lowongan di bawah, atau kerja serabutan 12 NC tiap 2 jam (energi 15).</p><div class="row">${cdBtn('odd', 'Kerja serabutan · +12 NC', 'serabutan')}</div>`;
+      if (pa){ h += `<div class="lab">Aksi profesi · ${esc(me.profession)}</div><p class="note">${esc(pa[2])} Jeda 1 jam, energi 10.</p>`;
+        const [k, label] = pa;
+        if (k === 'bantu'){ const sites = [...S.buildings.values()].filter(b => b.stage === 'bangun' && progressOf(b) < 1).sort((a, b) => progressOf(b) - progressOf(a)).slice(0, 12);
+          h += sites.length ? `<div class="list">${sites.map(b => `<div class="item"><div class="grow"><b>${esc(bname(b))}</b><small>${Math.floor(progressOf(b) * 100)}% · ${b.owner_kind === 'negara' ? 'negara' : esc(b.owner || 'warga')}</small></div><div class="acts"><button class="btn sm" data-act="goto" data-id="${b.id}">Lihat</button>${cdBtn('help', 'Bantu', 'bantu', ` data-id="${b.id}"`, 'sm gold')}</div></div>`).join('')}</div>` : '<div class="empty">Tidak ada proyek yang sedang dibangun di distrik yang dimuat.</div>'; }
+        else if (k === 'rancang'){ const ps = (S.snap?.proposals || []).filter(p => p.status === 'voting' && !p.discount);
+          h += ps.length ? `<div class="list">${ps.map(p => `<div class="item"><div class="grow"><b>${esc(p.name)}</b><small>${nc(p.cost)} → ${nc(Math.round(p.cost * .9))}</small></div>${cdBtn('rancang', 'Rancang', 'aksi', ` data-id="${p.id}"`, 'sm gold')}</div>`).join('')}</div>` : '<div class="empty">Tidak ada usulan yang bisa dirancang ulang.</div>'; }
+        else if (k === 'ajar' || k === 'obati' || k === 'tangkap'){ h += `<div class="row"><button class="btn gold" data-act="open-warga" data-f="${k === 'obati' ? 'sakit' : k === 'tangkap' ? 'lapor' : 'semua'}">${esc(label)}: pilih warga</button></div>${cdLeft('aksi') ? `<p class="note">Aksi berikutnya ${fmtLeft(cdLeft('aksi'))} lagi.</p>` : ''}`; }
+        else h += `<div class="row">${cdBtn('pact', label, 'aksi', ` data-k="${k}"`)}</div>`;
+      }
+      if (me.health < 100) h += `<div class="row"><button class="btn" data-act="treat">Berobat di RS · 20 NC</button></div>`;
+      const ms = me.missions || [];
+      if (ms.length) h += `<div class="lab">Misi hari ini · +40 NC tiap misi</div><div class="steps">${ms.map((m, i) => `<div class="step${m.done ? ' done' : ''}"><span class="sn">${m.done ? '✓' : i + 1}</span><span class="grow"><b>${esc(m.label)}</b><small>${m.done ? 'Selesai' : 'Belum'}</small></span></div>`).join('')}</div><p class="note">Misi berganti tiap tengah malam WIB. Hadiah misi ikut dihitung dalam batas harian 300 NC.</p>`;
+    }
+    const mineBiz = [...S.buildings.values()].filter(b => b.owner_id === me.id && catOf(b.type).jobs && b.stage === 'jadi');
+    if (mineBiz.length) h += `<div class="lab">Usaha milikmu</div><div class="list">${mineBiz.map(b => `<div class="item" style="flex-direction:column;align-items:stretch"><div class="spread" style="display:flex;justify-content:space-between"><b>${esc(bname(b))}</b><span class="note">${b.workers || 0}/${catOf(b.type).jobs} pekerja</span></div>${manageHTML(b)}</div>`).join('')}</div>`;
+    if (me.profession !== 'Presiden'){
+      const vac = [...S.buildings.values()].filter(b => b.stage === 'jadi' && catOf(b.type).jobs && b.job_open !== false && freeSlots(b) > 0 && b.owner_id !== me.id && (!me.job || me.job.building_id !== b.id))
+        .sort((a, b) => (b.wage || 30) - (a.wage || 30)).slice(0, 20);
+      h += `<div class="lab">Lowongan kerja (${vac.length})</div><div class="list">${vac.length ? vac.map(b => { const jp = catOf(b.type).jobProf, ok = !jp || jp === me.profession;
+        return `<div class="item"><div class="grow"><b>${esc(bname(b))}${jp ? `<span class="tagc blue">${jp}</span>` : ''}</b><small>${b.owner_kind === 'negara' ? 'Negara' : esc(b.owner || 'warga')} · ${nc(b.wage || 30)}/shift · ${freeSlots(b)} kursi</small></div><div class="acts"><button class="btn sm" data-act="goto" data-id="${b.id}">Lihat</button><button class="btn sm gold" data-act="apply" data-id="${b.id}" ${ok && !jailed() ? '' : 'disabled'}>Lamar</button></div></div>`; }).join('') : '<div class="empty">Belum ada lowongan di distrik yang dimuat.</div>'}</div>`;
+    }
+    h += `<div class="row"><button class="btn" data-act="open-warga" data-f="semua">Daftar warga</button></div>`;
+    return ['Kerja', h, esc(me.profession) + ' · ' + COIN.replace('class="coin"', 'class="coin" style="vertical-align:-2px"') + ' ' + fmt(me.coins), 'kerja'];
+  },
+  warga(a){
+    a = a || (sheetArg = { f: 'semua', q: '' }); if (!a.list && !a.loading && !a.err) { loadCitizens(); }
+    const me = S.me, f = a.f || 'semua';
+    let h = `<div class="field"><input id="wq" placeholder="Cari nama atau profesi" value="${esc(a.q || '')}" autocomplete="off"></div><div class="tabs">${[['semua','Semua'],['sakit','Sedang sakit'],['lapor','Dilaporkan']].map(([k, l]) => `<button class="tab" data-wtab="${k}" aria-pressed="${f === k}">${l}</button>`).join('')}</div>`;
+    if (!registered()) return ['Warga', h + `<div class="empty">Masuk dulu untuk melihat daftar warga.</div>`, '', 'people'];
+    const pk = PROF_ACT[me.profession]?.[0]; const cdA = cdLeft('aksi');
+    if (pk === 'obati' || pk === 'tangkap' || pk === 'ajar') h += `<p class="note">${pk === 'obati' ? 'Ketuk Obati pada warga yang sakit.' : pk === 'tangkap' ? 'Tangkap hanya bisa untuk warga yang dilapor minimal 2 akun selain kamu.' : 'Ketuk Ajar pada warga yang ingin kamu ajar.'}${cdA ? ' Aksi berikutnya ' + fmtLeft(cdA) + ' lagi.' : ''}</p>`;
+    if (a.loading && !a.list) return ['Warga', h + '<div class="empty">Memuat warga…</div>', 'Cari dan bantu warga lain', 'people'];
+    if (a.err) return ['Warga', h + `<div class="empty">${esc(a.err)}</div>`, '', 'people'];
+    const rows = (a.list || []).map(x => { const acts = [], npc = x.kind === 'npc', tgt = npc ? ` data-n="${x.id}"` : ` data-u="${x.id}"`, dis = cdA || jailed() ? 'disabled' : '';
+      if (pk === 'obati' && x.sick) acts.push(`<button class="btn sm gold" data-act="pact-t" data-k="obati"${tgt} ${dis}>Obati</button>`);
+      if (pk === 'ajar') acts.push(`<button class="btn sm" data-act="pact-t" data-k="ajar"${tgt} ${dis}>Ajar</button>`);
+      if (!npc && pk === 'tangkap' && x.reports >= 2 && !x.jailed) acts.push(`<button class="btn sm gold" data-act="pact-t" data-k="tangkap"${tgt} ${dis}>Tangkap</button>`);
+      if (!npc && !isPres() && !x.i_reported && x.prof !== 'Presiden') acts.push(`<button class="btn sm red" data-act="report" data-u="${x.id}" ${jailed() ? 'disabled' : ''}>Lapor</button>`);
+      if (!npc && isAdmin()){ if (x.jailed) acts.push(`<button class="btn sm dark" data-act="release" data-u="${x.id}">Bebaskan</button>`); if (x.prof === 'Menteri') acts.push(`<button class="btn sm" data-act="minister" data-u="${x.id}" data-on="0">Copot Menteri</button>`); else if (x.prof !== 'Presiden') acts.push(`<button class="btn sm" data-act="minister" data-u="${x.id}" data-on="1">Angkat Menteri</button>`); }
+      return `<div class="item"><span class="av" style="width:34px;height:34px;font-size:12px;background:${esc(x.color || profColor(x.prof))}">${esc(initials(x.name))}</span><div class="grow"><b>${esc(x.name)}</b><small>${esc(x.prof)}${npc ? ' · warga komen' : x.job ? ' · kerja di ' + esc(x.job) : ''}${x.sick ? ' <span class="tagc red">sakit</span>' : ''}${x.reports ? ` <span class="tagc red">${x.reports} laporan</span>` : ''}${x.jailed ? ' <span class="tagc">ditahan</span>' : ''}${x.i_reported ? ' <span class="tagc">sudah kamu lapor</span>' : ''}</small></div><div class="acts">${acts.join('')}</div></div>`; });
+    h += `<div class="list">${rows.length ? rows.join('') : '<div class="empty">Tidak ada warga yang cocok.</div>'}</div><p class="note">Laporan dari akun berbeda menumpuk; polisi bisa menangkap setelah 2 akun lain melapor. Maksimal 5 laporan per hari.</p>`;
+    return ['Warga', h, f === 'sakit' ? 'Warga yang sedang sakit' : f === 'lapor' ? 'Warga yang dilaporkan' : 'Cari dan bantu warga lain', 'people'];
+  },
   chat(){ const c = S.snap?.chat || []; return ['Pesan rakyat', `<p class="note">Kirim pesan hadir di Tahap 5 (nama otomatis dari akunmu).</p><div class="list">${c.length ? c.slice().reverse().map(m => `<div class="item"><span class="av" style="width:32px;height:32px;background:${profColor(m.prof)}">${esc(initials(m.name))}</span><div class="grow"><b>${esc(m.name)}</b><small style="white-space:normal;color:var(--ink);font-size:13px">${esc(m.text)}</small></div></div>`).join('') : '<div class="empty">Belum ada pesan.</div>'}</div>`, '30 pesan terbaru', 'chat']; },
   profil(){
     if (!registered()) return ['Profil', `<div class="empty">Masuk dulu untuk punya tokoh.</div><button class="btn gold wide" data-act="login">Masuk / Daftar</button>`, '', 'user'];
@@ -1289,6 +1391,13 @@ const SHEETS = {
   },
 };
 
+function manageHTML(b){
+  const w = b.wage || 30;
+  return `<div class="prog"><div class="spread"><b>Kelola lowongan</b><span class="note">${b.workers || 0}/${catOf(b.type).jobs} pekerja</span></div>
+    <div class="row" style="flex-wrap:nowrap"><button class="btn sm" data-act="wage" data-id="${b.id}" data-w="${Math.max(10, w - 5)}" ${w <= 10 ? 'disabled' : ''} aria-label="Turunkan gaji">−5</button><span style="flex:1;text-align:center"><b class="num">${nc(w)}</b><small class="note" style="display:block">gaji per shift</small></span><button class="btn sm" data-act="wage" data-id="${b.id}" data-w="${Math.min(80, w + 5)}" ${w >= 80 ? 'disabled' : ''} aria-label="Naikkan gaji">+5</button></div>
+    <button class="btn sm" data-act="jobopen" data-id="${b.id}" data-v="${b.job_open === false ? 1 : 0}">${b.job_open === false ? 'Buka lowongan' : 'Tutup lowongan'}</button></div>`;
+}
+
 /* ---------- modal: masuk, buat tokoh, sambutan ---------- */
 let loginMode = 'masuk', draft = { prof: 'Warga', color: COLORS[0], name: '' };
 const GOOGLE = '<svg viewBox="0 0 24 24"><path fill="#4285F4" d="M23.5 12.3c0-.8-.1-1.6-.2-2.3H12v4.4h6.5a5.6 5.6 0 01-2.4 3.6v3h3.9c2.2-2.1 3.5-5.1 3.5-8.7z"/><path fill="#34A853" d="M12 24c3.2 0 6-1.1 8-2.9l-3.9-3c-1.1.7-2.5 1.2-4.1 1.2-3.1 0-5.8-2.1-6.7-5H1.3v3.1A12 12 0 0012 24z"/><path fill="#FBBC05" d="M5.3 14.3a7.2 7.2 0 010-4.6V6.6H1.3a12 12 0 000 10.8z"/><path fill="#EA4335" d="M12 4.8c1.8 0 3.3.6 4.6 1.8l3.4-3.4A12 12 0 001.3 6.6l4 3.1c.9-2.9 3.6-4.9 6.7-4.9z"/></svg>';
@@ -1299,7 +1408,7 @@ function renderModal(){
   const M = $('#modal');
   if (modalKind === 'login'){
     M.innerHTML = `<div class="mcard" role="dialog" aria-label="Masuk"><button class="x" data-act="close-modal" aria-label="Tutup">${svg('x')}</button>${FLAG}<h1>Masuk ke Republik Netizenia</h1><p class="note">Punya rumah, kerja, dan ikut voting bangunan kota bersama warga lain.</p>
-      <button class="gbtn" data-act="google">${GOOGLE}Masuk dengan Google</button><div class="or">atau pakai username</div>
+      ${googleOn === false ? '' : `<button class="gbtn" data-act="google">${GOOGLE}Masuk dengan Google</button><div class="or">atau pakai username</div>`}
       <div class="tabs"><button class="tab" data-lmode="masuk" aria-pressed="${loginMode === 'masuk'}">Masuk</button><button class="tab" data-lmode="daftar" aria-pressed="${loginMode === 'daftar'}">Daftar baru</button></div>
       <form id="loginForm" class="list" autocomplete="on"><div class="field"><label for="lu">Username</label><input id="lu" name="username" autocomplete="username" inputmode="text" autocapitalize="none" spellcheck="false" maxlength="20" placeholder="mis. budi_santoso" required></div>
       <div class="field"><label for="lp">Kata sandi</label><input id="lp" name="password" type="password" autocomplete="${loginMode === 'daftar' ? 'new-password' : 'current-password'}" minlength="8" placeholder="minimal 8 karakter" required></div>
@@ -1315,7 +1424,7 @@ function renderModal(){
       <span class="hint" id="rhint"></span><button class="btn gold wide" data-act="register">Masuk ke negara</button></div>`; return;
   }
   if (modalKind === 'welcome'){
-    const steps = [['Ambil rumah gratis', 'Menu Bangun → Rumah Kecil, lalu ketuk kavling hijau.'], ['Beri suara', 'Menu Voting: setuju atau tolak usulan bangunan umum.'], ['Cari kerja', 'Lamar lowongan dan dapat gaji (segera hadir).']];
+    const steps = [['Ambil rumah gratis', 'Menu Bangun → Rumah Kecil, lalu ketuk kavling hijau.'], ['Beri suara', 'Menu Voting: setuju atau tolak usulan bangunan umum.'], ['Cari kerja', 'Menu Kerja: lamar lowongan, jalankan aksi profesi, dan selesaikan misi harian.']];
     M.innerHTML = `<div class="mcard" role="dialog" aria-label="Sambutan">${FLAG}<h1>Selamat datang, ${esc(S.me?.name || 'warga')}!</h1><p class="note">Kamu dapat modal 400 NC. Tiga langkah pertama:</p><div class="steps">${steps.map((s, k) => `<div class="step"><span class="sn">${k + 1}</span><span class="grow"><b>${s[0]}</b><small>${s[1]}</small></span></div>`).join('')}</div><button class="btn gold wide" data-act="start">Mulai: ambil rumah gratis</button></div>`;
   }
 }
@@ -1368,6 +1477,7 @@ document.addEventListener('click', async e => {
   if (el.dataset.open){ openSheet(el.dataset.open); return; }
   if (el.dataset.tab){ sheetTab = el.dataset.tab; renderSheet(); return; }
   if (el.dataset.place){ if (el.getAttribute('aria-disabled') === 'true'){ toast(ruleErr(el.dataset.place) || 'Belum bisa.', 'bad'); return; } startPlace(el.dataset.place, el.dataset.at ? el.dataset.at.split(',').map(Number) : null); return; }
+  if (el.dataset.wtab){ sheetArg = { ...(sheetArg || {}), f: el.dataset.wtab, list: null, err: null }; renderSheet(); return; }
   if (el.dataset.lmode){ loginMode = el.dataset.lmode; renderModal(); return; }
   if (el.dataset.dp){ draft.prof = el.dataset.dp; draft.name = $('#rn')?.value || draft.name; renderModal(); return; }
   if (el.dataset.dc){ draft.color = el.dataset.dc; draft.name = $('#rn')?.value || draft.name; renderModal(); return; }
@@ -1406,6 +1516,21 @@ document.addEventListener('click', async e => {
     case 'pres-approve': await busy(() => act('pres_approve', { p_id: id })); break;
     case 'pres-veto': if (el.dataset.sure){ await busy(() => act('pres_veto', { p_id: id })); closeSheet(); } else { el.dataset.sure = '1'; el.textContent = 'Yakin veto? Ketuk lagi'; } break;
     case 'pres-dist': await busy(() => act('pres_open_district', { p_district: el.dataset.d }, { refresh: false })); await loadSnapshot(); break;
+    case 'open-kerja': openSheet('kerja'); break;
+    case 'open-warga': openSheet('warga', { f: el.dataset.f || 'semua', q: '' }); break;
+    case 'shift': await busy(() => act('do_shift', {}, { ...pos, refresh: false })); break;
+    case 'odd': await busy(() => act('odd_job', {}, { ...pos, refresh: false })); break;
+    case 'quit': if (el.dataset.sure){ await busy(() => act('quit_job', {})); } else { el.dataset.sure = '1'; el.textContent = 'Yakin berhenti? Ketuk lagi'; } break;
+    case 'apply': await busy(() => act('apply_job', { p_building_id: id }, { ...pos })); break;
+    case 'pact': await busy(() => act('prof_action', { p_kind: el.dataset.k }, { ...pos, refresh: false })); loadSnapshot(); break;
+    case 'rancang': await busy(() => act('prof_action', { p_kind: 'rancang', p_target_id: id }, { ...pos, refresh: false })); await loadSnapshot(); renderSheet(); break;
+    case 'pact-t': await busy(() => act('prof_action', { p_kind: el.dataset.k, p_target: el.dataset.u || null, p_target_id: el.dataset.n ? Number(el.dataset.n) : null }, { ...pos, refresh: false })); if (sheetKind === 'warga') loadCitizens(); break;
+    case 'report': if (el.dataset.sure){ await busy(() => act('report_citizen', { p_target: el.dataset.u }, { refresh: false })); if (sheetKind === 'warga') loadCitizens(); } else { el.dataset.sure = '1'; el.textContent = 'Yakin lapor? Ketuk lagi'; } break;
+    case 'treat': await busy(() => act('seek_treatment', {}, { ...pos, refresh: false })); break;
+    case 'wage': await busy(() => act('set_wage', { p_building_id: id, p_wage: Number(el.dataset.w) })); break;
+    case 'jobopen': await busy(() => act('set_job_open', { p_building_id: id, p_open: el.dataset.v === '1' })); break;
+    case 'minister': await busy(() => act('pres_set_minister', { p_user: el.dataset.u, p_on: el.dataset.on === '1' }, { refresh: false })); if (sheetKind === 'warga') loadCitizens(); break;
+    case 'release': await busy(() => act('pres_release', { p_user: el.dataset.u }, { refresh: false })); if (sheetKind === 'warga') loadCitizens(); break;
     default: if (a.startsWith('goto:')){ const b = S.buildings.get(Number(a.slice(5))); if (b){ const [x, z] = centerOf(b); flyTo(x, z, 55); openInfo(b.id); } }
   }
 });
@@ -1416,7 +1541,7 @@ document.addEventListener('submit', async e => {
   catch (err) { hint.textContent = err.message; hint.className = 'hint bad'; }
   finally { btn.classList.remove('busy'); }
 });
-document.addEventListener('input', e => { if (e.target.id === 'rn') draft.name = e.target.value; if (e.target.id === 'lu' && loginMode === 'daftar'){ const v = e.target.value.trim().toLowerCase(); const ok = /^[a-z0-9_.]{3,20}$/.test(v); $('#lhint').textContent = v ? (ok ? 'Format username oke.' : 'Huruf kecil, angka, titik, atau garis bawah (3–20).') : ''; $('#lhint').className = 'hint ' + (v ? (ok ? 'ok' : 'bad') : ''); } });
+document.addEventListener('input', e => { if (e.target.id === 'wq' && sheetKind === 'warga'){ sheetArg.q = e.target.value; clearTimeout(citT); citT = setTimeout(loadCitizens, 350); } if (e.target.id === 'rn') draft.name = e.target.value; if (e.target.id === 'lu' && loginMode === 'daftar'){ const v = e.target.value.trim().toLowerCase(); const ok = /^[a-z0-9_.]{3,20}$/.test(v); $('#lhint').textContent = v ? (ok ? 'Format username oke.' : 'Huruf kecil, angka, titik, atau garis bawah (3–20).') : ''; $('#lhint').className = 'hint ' + (v ? (ok ? 'ok' : 'bad') : ''); } });
 document.addEventListener('visibilitychange', () => { if (!document.hidden && S.snap && !S.preview) poll(); });
 
 /* =====================================================================
@@ -1427,13 +1552,13 @@ document.addEventListener('visibilitychange', () => { if (!document.hidden && S.
   requestAnimationFrame(frame);
   if (!sb) enterPreview('Pustaka Supabase gagal dimuat.');
   else {
-    initAuth();
+    initAuth(); loadAuthSettings();
     const ok = await loadSnapshot();
     if (ok){ await Promise.all([loadNpcs(), loadDistricts(['pusat'])]); ensureVisibleDistricts(); }
   }
   rotateTicker();
   const bt = $('#boot'); bt.classList.add('gone'); setTimeout(() => bt.remove(), 600);
-  setInterval(poll, 60000); setInterval(rotateTicker, 5000); setInterval(() => { if (!document.hidden) renderNext(); }, 30000);
+  setInterval(poll, 60000); setInterval(rotateTicker, 5000); setInterval(() => { if (document.hidden) return; renderNext(); renderDock(); if (sheetKind === 'kerja') renderSheet(); }, 30000);
 })();
 </script>
 </body>
