@@ -690,10 +690,10 @@ const MAP = N * T, LHALF = MAP / 2;
 // kavling: rumput rapi; berwarna saat mode bangun
 const lotList = [], lotIndex = new Map();
 for (let j = 0; j < N; j++) for (let i = 0; i < N; i++) if (isLot(i, j)){ lotIndex.set(j * N + i, lotList.length); lotList.push([i, j]); }
-const lotMesh = new THREE.InstancedMesh(new THREE.BoxGeometry(T * .94, .14, T * .94), toonMat({ color: 0xffffff }), lotList.length);
+const lotMesh = new THREE.InstancedMesh(new THREE.BoxGeometry(T, .1, T), toonMat({ color: 0xffffff }), lotList.length);
 lotMesh.receiveShadow = true; scene.add(lotMesh);
-{ lotList.forEach(([i, j], k) => { _m4.makeTranslation(wx(i), .3, wx(j)); lotMesh.setMatrixAt(k, _m4); lotMesh.setColorAt(k, lin('#9DCB7D')); }); }
-const LOTC = { lawn: ['#A6CC78','#9CC46E','#B0D383'].map(lin), forest: lin('#5C8C4A'), free: lin('#B8F07E'), bad: lin('#E8907E'), mine: lin('#FFE08A') };
+{ lotList.forEach(([i, j], k) => { _m4.makeTranslation(wx(i), .28, wx(j)); lotMesh.setMatrixAt(k, _m4); lotMesh.setColorAt(k, lin('#9DCB7D')); }); }
+const LOTC = { lawn: ['#A6CC78','#A3C975','#A9CE7B'].map(lin), forest: lin('#6A9452'), free: lin('#C3EE8A'), bad: lin('#E8907E'), mine: lin('#FFE08A') };
 
 /* ---------- pohon (3 jenis) ---------- */
 const TREE_GEOS = (() => {
@@ -1135,7 +1135,7 @@ function rebuildOcc(){ S.occ = new Map(); for (const b of S.buildings.values()) 
 function paintLots(){
   const mineSet = new Set(); if (S.me) for (const b of S.buildings.values()) if (b.owner_id === S.me.id) for (let a = 0; a < b.w; a++) for (let c = 0; c < b.h; c++) mineSet.add((b.j + c) * N + b.i + a);
   lotList.forEach(([i, j], k) => { const d = districtOf(i, j), key = j * N + i; let col;
-    if (!openSet.has(d)) col = LOTC.forest; else if (place && !S.occ.has(key)) col = LOTC.free; else if (mineSet.has(key)) col = LOTC.mine; else col = LOTC.lawn[(i * 7 + j * 3) % 3];
+    if (!openSet.has(d)) col = LOTC.forest; else if (place && !S.occ.has(key)) col = (i + j) % 2 ? LOTC.free : LOTC.lawn[2]; else if (mineSet.has(key)) col = LOTC.mine; else col = LOTC.lawn[(i * 7 + j * 3) % 3];
     lotMesh.setColorAt(k, col); });
   lotMesh.instanceColor.needsUpdate = true;
 }
