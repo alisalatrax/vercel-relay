@@ -535,9 +535,9 @@ renderer.toneMappingExposure = 1.16;
 renderer.shadowMap.enabled = !LOW;
 renderer.shadowMap.type = THREE.PCFSoftShadowMap;
 const scene = new THREE.Scene();
-scene.fog = new THREE.Fog(0xcde7f0, 320, 980);
+scene.fog = new THREE.Fog(0xcde7f0, 260, 820);
 const camera = new THREE.PerspectiveCamera(42, 1, 1, 2400);
-const lin = (() => { const cache = new Map(); return hex => { let c = cache.get(hex); if (!c){ c = new THREE.Color(hex).convertSRGBToLinear(); cache.set(hex, c); } return c; }; })();
+const lin = (() => { const cache = new Map(); return hex => { let c = cache.get(hex); if (!c){ c = new THREE.Color(hex); const l = c.r * .3 + c.g * .59 + c.b * .11; c.lerp(new THREE.Color(l, l, l), .14).convertSRGBToLinear(); cache.set(hex, c); } return c; }; })();
 
 const hemi = new THREE.HemisphereLight(0xf2f8ff, 0x6f8f55, .8); scene.add(hemi);
 const sun = new THREE.DirectionalLight(0xfff1d6, 1); sun.castShadow = !LOW;
@@ -560,7 +560,7 @@ const BASE = (() => {
 const _m4 = new THREE.Matrix4(), _q = new THREE.Quaternion(), _v3 = new THREE.Vector3(), _s3 = new THREE.Vector3(), _nm = new THREE.Matrix3(), _e = new THREE.Euler(), _t = new THREE.Vector3(), _n = new THREE.Vector3();
 function merge(parts, ao){
   let count = 0; for (const p of parts) count += BASE[p.g].attributes.position.count;
-  const pos = new Float32Array(count * 3), nor = new Float32Array(count * 3), col = new Float32Array(count * 3); let o = 0;
+  const pos = new Float32Array(count * 3), nor = new Float32Array(count * 3), col = new Float32Array(count * 3), onr = new Float32Array(count * 3); let o = 0;
   for (const p of parts){
     const g = BASE[p.g], gp = g.attributes.position.array, gn = g.attributes.normal.array, n = g.attributes.position.count;
     _e.set(0, p.ry || 0, 0); _q.setFromEuler(_e); _m4.compose(_v3.set(p.p[0], p.p[1], p.p[2]), _q, _s3.set(p.s[0], p.s[1], p.s[2])); _nm.getNormalMatrix(_m4);
@@ -573,13 +573,29 @@ function merge(parts, ao){
     }
     o += n;
   }
+  // normal halus (rata-rata titik yang berimpit) khusus untuk kulit garis tepi, supaya sudut tidak bolong
+  const acc = new Map();
+  for (let k = 0; k < count; k++){ const key = (pos[k*3] * 97).toFixed(2) + ',' + (pos[k*3+1] * 97).toFixed(2) + ',' + (pos[k*3+2] * 97).toFixed(2); let a = acc.get(key); if (!a){ a = [0, 0, 0]; acc.set(key, a); } a[0] += nor[k*3]; a[1] += nor[k*3+1]; a[2] += nor[k*3+2]; }
+  for (let k = 0; k < count; k++){ const key = (pos[k*3] * 97).toFixed(2) + ',' + (pos[k*3+1] * 97).toFixed(2) + ',' + (pos[k*3+2] * 97).toFixed(2); const a = acc.get(key); const l = Math.hypot(a[0], a[1], a[2]) || 1; onr[k*3] = a[0] / l; onr[k*3+1] = a[1] / l; onr[k*3+2] = a[2] / l; }
   const geo = new THREE.BufferGeometry();
-  geo.setAttribute('position', new THREE.BufferAttribute(pos, 3)); geo.setAttribute('normal', new THREE.BufferAttribute(nor, 3)); geo.setAttribute('color', new THREE.BufferAttribute(col, 3));
+  geo.setAttribute('position', new THREE.BufferAttribute(pos, 3)); geo.setAttribute('normal', new THREE.BufferAttribute(nor, 3)); geo.setAttribute('color', new THREE.BufferAttribute(col, 3)); geo.setAttribute('onormal', new THREE.BufferAttribute(onr, 3));
   geo.computeBoundingSphere(); return geo;
 }
-const VMAT = new THREE.MeshLambertMaterial({ vertexColors: true });
-const VMAT_I = new THREE.MeshLambertMaterial({ vertexColors: true }); // khusus InstancedMesh (r128 tidak boleh berbagi material dengan Mesh biasa)
+/* Gaya "ilustrasi tinta": cel-shading 4 tingkat + kulit garis tepi gelap (inverted hull) */
+const TOON_GRAD = (() => { const d = new Uint8Array([105, 150, 205, 255]); const t = new THREE.DataTexture(d, 4, 1, THREE.LuminanceFormat); t.minFilter = t.magFilter = THREE.NearestFilter; t.generateMipmaps = false; t.needsUpdate = true; return t; })();
+const toonMat = (opts) => new THREE.MeshToonMaterial(Object.assign({ gradientMap: TOON_GRAD }, opts || {}));
+const VMAT = toonMat({ vertexColors: true });
+const VMAT_I = toonMat({ vertexColors: true }); // khusus InstancedMesh (r128 tidak boleh berbagi material dengan Mesh biasa)
 const GLOWMAT = new THREE.MeshBasicMaterial({ vertexColors: true, toneMapped: false });
+const INK = lin('#3B2A1E');
+function inkMat(thick){ const m = new THREE.MeshBasicMaterial({ color: INK, side: THREE.BackSide, toneMapped: false }); m.userData.thick = thick || .07;
+  m.onBeforeCompile = sh => { sh.vertexShader = 'attribute vec3 onormal;\n' + sh.vertexShader.replace('#include <begin_vertex>', '#include <begin_vertex>\n#ifdef USE_INSTANCING\n transformed += onormal * ' + m.userData.thick.toFixed(3) + ';\n#else\n transformed += onormal * ' + m.userData.thick.toFixed(3) + ';\n#endif'); }; return m; }
+const INKMAT = inkMat(.07), INKMAT_I = inkMat(.07), INKMAT_BIG = inkMat(.12);
+// kulit garis tepi untuk Mesh biasa (berbagi geometri)
+function withInk(mesh, mat){ const o = new THREE.Mesh(mesh.geometry, mat || INKMAT); o.position.copy(mesh.position); o.rotation.copy(mesh.rotation); o.scale.copy(mesh.scale); mesh.add(o); o.position.set(0, 0, 0); o.rotation.set(0, 0, 0); o.scale.set(1, 1, 1); return mesh; }
+// kulit garis tepi untuk InstancedMesh (berbagi matriks instance)
+function inkInstanced(im, mat){ const o = new THREE.InstancedMesh(im.geometry, mat || INKMAT_I, im.instanceMatrix.count); o.instanceMatrix = im.instanceMatrix; o.count = im.count; o.frustumCulled = im.frustumCulled; im.userData.ink = o; im.add(o); return o; }
+function syncInk(im){ if (im.userData.ink){ im.userData.ink.count = im.count; } }
 const GEO_CACHE = new Map();
 function modelGeo(type, color, wall){
   const key = type + '|' + color + '|' + wall; let g = GEO_CACHE.get(key); if (g) return g;
@@ -605,9 +621,9 @@ const SKYKEYS = [
   [0,   '#0A1430','#1D2C52','#9DB4FF',.16,.24,1, 1],
   [4.6, '#0E1A3B','#27365F','#9DB4FF',.16,.26,1, .9],
   [5.6, '#36579C','#F2A56B','#FFB070',.55,.52,.7,.2],
-  [7,   '#5AA6E8','#CFE8F2','#FFE5BE',.95,.78,0, 0],
-  [12,  '#4A9BE0','#DCEBEE','#FFF0CF',1.15,.85,0, 0],
-  [16.3,'#4F97DA','#F2DDB2','#FFD9A0',1.0,.78,0, 0],
+  [7,   '#7FB6E0','#E6EFEA','#FFE5BE',.95,.82,0, 0],
+  [12,  '#79AEDD','#E9EEE6','#FFF0CF',1.1,.9,0, 0],
+  [16.3,'#86A9D2','#F4E1BF','#FFD9A0',1.0,.82,0, 0],
   [17.8,'#3B4F90','#F58A5C','#FF8A50',.6,.55,.45,0],
   [19,  '#16224A','#4A3D6D','#8FA3FF',.2,.3,1, .6],
   [24,  '#0A1430','#1D2C52','#9DB4FF',.16,.24,1, 1],
@@ -651,30 +667,30 @@ const MAP = N * T, LHALF = MAP / 2;
     c[k*3] = col.r; c[k*3+1] = col.g; c[k*3+2] = col.b;
   }
   g.setAttribute('color', new THREE.BufferAttribute(c, 3));
-  const m = new THREE.Mesh(g, new THREE.MeshLambertMaterial({ vertexColors: true })); m.position.y = -.05; m.receiveShadow = true; scene.add(m);
+  const m = new THREE.Mesh(g, toonMat({ vertexColors: true })); m.position.y = -.05; m.receiveShadow = true; scene.add(m);
   // jalan aspal + trotoar per blok (digabung jadi sedikit draw call)
   P = [];
   for (let k = 0; k <= 8; k++){ const q = wx(k * BK); box(MAP, .1, 3.6, 0, 0, q, '#56524F'); box(3.6, .1, MAP, q, .005, 0, '#56524F'); }
   box(3.6, .1, 60, 0, 0, -LHALF - 30, '#56524F');
   for (let bx = 0; bx < 8; bx++) for (let by = 0; by < 8; by++){ const cx = wx(bx * BK + 2.5), cz = wx(by * BK + 2.5); box(4 * T + 2.4, .28, 4 * T + 2.4, cx, 0, cz, '#E4DDCB'); box(4 * T + .6, .3, 4 * T + .6, cx, 0, cz, '#D3CBB6'); }
-  const roads = new THREE.Mesh(merge(P, false), new THREE.MeshLambertMaterial({ vertexColors: true })); roads.receiveShadow = true; scene.add(roads);
+  const roads = new THREE.Mesh(merge(P, false), toonMat({ vertexColors: true })); roads.receiveShadow = true; scene.add(roads);
   // marka jalan & zebra cross
   const dashes = [], zebra = [];
   for (let k = 0; k <= 8; k++){ const q = wx(k * BK); for (let s = -LHALF + 3; s < LHALF - 3; s += 5){ if (Math.abs(((s / T) + HALF) % BK) < .7 || Math.abs(((s / T) + HALF) % BK) > BK - .7) continue; dashes.push([s, q, 0], [q, s, 1]); } }
   for (let a = 0; a <= 8; a++) for (let b = 0; b <= 8; b++){ const x = wx(a * BK), z = wx(b * BK); for (let s = -1.2; s <= 1.21; s += .6){ zebra.push([x + s, z - 2.9, 1], [x + s, z + 2.9, 1], [x - 2.9, z + s, 0], [x + 2.9, z + s, 0]); } }
-  const inst = (geo, color, list, y) => { const im = new THREE.InstancedMesh(geo, new THREE.MeshLambertMaterial({ color: lin(color) }), list.length); const yq = new THREE.Quaternion().setFromAxisAngle(new THREE.Vector3(0,1,0), Math.PI/2), q0 = new THREE.Quaternion();
+  const inst = (geo, color, list, y) => { const im = new THREE.InstancedMesh(geo, toonMat({ color: lin(color) }), list.length); const yq = new THREE.Quaternion().setFromAxisAngle(new THREE.Vector3(0,1,0), Math.PI/2), q0 = new THREE.Quaternion();
     list.forEach((d, k) => { _m4.compose(_v3.set(d[0], y, d[1]), d[2] ? yq : q0, _s3.set(1,1,1)); im.setMatrixAt(k, _m4); }); im.receiveShadow = true; scene.add(im); };
   inst(new THREE.BoxGeometry(2, .04, .22), '#F4D35E', dashes, .12);
   inst(new THREE.BoxGeometry(1.5, .04, .32), '#F3F1EA', zebra, .121);
   // jembatan di utara
   P = []; box(5.2, .6, 34, 0, .2, -LHALF - 29, '#B9B3A6'); for (const s of [-1, 1]){ box(.3, 1, 34, s * 2.5, .8, -LHALF - 29, '#8E8778'); for (let z = -12; z <= 46; z += 4) box(.4, 1.2, .4, s * 2.5, .6, -LHALF - 12 - z * .5, '#8E8778'); }
-  const br = new THREE.Mesh(merge(P, true), VMAT); br.castShadow = true; br.receiveShadow = true; scene.add(br);
+  const br = withInk(new THREE.Mesh(merge(P, true), VMAT)); br.castShadow = true; br.receiveShadow = true; scene.add(br);
 })();
 
 // kavling: rumput rapi; berwarna saat mode bangun
 const lotList = [], lotIndex = new Map();
 for (let j = 0; j < N; j++) for (let i = 0; i < N; i++) if (isLot(i, j)){ lotIndex.set(j * N + i, lotList.length); lotList.push([i, j]); }
-const lotMesh = new THREE.InstancedMesh(new THREE.BoxGeometry(T * .94, .14, T * .94), new THREE.MeshLambertMaterial({ color: 0xffffff }), lotList.length);
+const lotMesh = new THREE.InstancedMesh(new THREE.BoxGeometry(T * .94, .14, T * .94), toonMat({ color: 0xffffff }), lotList.length);
 lotMesh.receiveShadow = true; scene.add(lotMesh);
 { lotList.forEach(([i, j], k) => { _m4.makeTranslation(wx(i), .3, wx(j)); lotMesh.setMatrixAt(k, _m4); lotMesh.setColorAt(k, lin('#9DCB7D')); }); }
 const LOTC = { lawn: ['#A6CC78','#9CC46E','#B0D383'].map(lin), forest: lin('#5C8C4A'), free: lin('#B8F07E'), bad: lin('#E8907E'), mine: lin('#FFE08A') };
@@ -687,7 +703,7 @@ const TREE_GEOS = (() => {
   return { round, pine, palm };
 })();
 const MAXT = LOW ? 900 : 1500;
-const treeMeshes = Object.fromEntries(Object.entries(TREE_GEOS).map(([k, g]) => { const m = new THREE.InstancedMesh(g, VMAT_I, MAXT); m.instanceColor = new THREE.InstancedBufferAttribute(new Float32Array(MAXT * 3).fill(1), 3); m.castShadow = !LOW; m.count = 0; scene.add(m); return [k, m]; }));
+const treeMeshes = Object.fromEntries(Object.entries(TREE_GEOS).map(([k, g]) => { const m = new THREE.InstancedMesh(g, VMAT_I, MAXT); m.instanceColor = new THREE.InstancedBufferAttribute(new Float32Array(MAXT * 3).fill(1), 3); m.castShadow = !LOW; m.count = 0; inkInstanced(m); scene.add(m); return [k, m]; }));
 function paintTrees(open){
   const r = rng(99), spots = { round: [], pine: [], palm: [] };
   const add = (x, z, s, kind) => { kind = kind || (r() < .5 ? 'round' : r() < .6 ? 'pine' : 'palm'); if (spots[kind].length < MAXT) spots[kind].push([x, z, s, r() * 6.28]); };
@@ -699,21 +715,21 @@ function paintTrees(open){
   // hutan di luar kota
   for (let k = 0; k < (LOW ? 260 : 480); k++){ const a = r() * Math.PI * 2, d = LHALF + 16 + Math.pow(r(), .7) * 230; const x = Math.cos(a) * d, z = Math.sin(a) * d; if (z < -LHALF - 10 && z > -LHALF - 48) continue; if (Math.abs(x) < 6 && z < 0) continue; add(x, z, .9 + r() * 1.1); }
   for (const [kind, list] of Object.entries(spots)){ const m = treeMeshes[kind]; list.forEach((t, k) => { _q.setFromAxisAngle(_v3.set(0,1,0), t[3]); _m4.compose(_v3.set(t[0], .3, t[1]), _q, _s3.set(t[2], t[2], t[2])); m.setMatrixAt(k, _m4); m.setColorAt(k, _ca.setRGB(.85 + r() * .25, .85 + r() * .25, .85 + r() * .2)); });
-    m.count = list.length; m.instanceMatrix.needsUpdate = true; if (m.instanceColor) m.instanceColor.needsUpdate = true; }
+    m.count = list.length; syncInk(m); m.instanceMatrix.needsUpdate = true; if (m.instanceColor) m.instanceColor.needsUpdate = true; }
 }
 
 /* ---------- sungai, bukit, gunung, awan ---------- */
 const riverGeo = new THREE.PlaneGeometry(1300, 22, LOW ? 40 : 140, 4); riverGeo.rotateX(-Math.PI / 2);
-const river = new THREE.Mesh(riverGeo, new THREE.MeshPhongMaterial({ color: lin('#3BA6D6'), specular: 0xffffff, shininess: 90, transparent: true, opacity: .92 }));
+const river = new THREE.Mesh(riverGeo, new THREE.MeshPhongMaterial({ color: lin('#5FB2D3'), specular: 0xffffff, shininess: 60, transparent: true, opacity: .9 }));
 river.position.set(0, .05, -LHALF - 29); river.receiveShadow = true; scene.add(river);
 const riverBase = riverGeo.attributes.position.array.slice();
 (function hills(){
   P = []; const r = rng(7);
   for (let k = 0; k < 30; k++){ const a = k / 30 * Math.PI * 2, d = 330 + r() * 90, s = 40 + r() * 55; cone(s, s * .7, Math.cos(a) * d, -2, Math.sin(a) * d, r() < .5 ? '#6FA35E' : '#7DB066'); }
   for (let k = 0; k < 14; k++){ const a = k / 14 * Math.PI * 2 + .2, d = 650 + r() * 120, s = 110 + r() * 90; cone(s, s * 1.05, Math.cos(a) * d, -4, Math.sin(a) * d, '#6E8FA8'); cone(s * .3, s * .3, Math.cos(a) * d, s * .74, Math.sin(a) * d, '#8FAABD'); }
-  const m = new THREE.Mesh(merge(P, false), VMAT); scene.add(m);
+  const m = withInk(new THREE.Mesh(merge(P, false), VMAT), INKMAT_BIG); scene.add(m);
 })();
-const CLOUD_MAT = new THREE.MeshLambertMaterial({ color: 0xffffff, emissive: lin('#3A4A5C'), emissiveIntensity: .35 });
+const CLOUD_MAT = toonMat({ color: 0xffffff, emissive: lin('#3A4A5C'), emissiveIntensity: .35 });
 const clouds = (() => { P = []; sph(9, 0, 0, 0, '#FFFFFF', 6); sph(7, 8, 1, 2, '#FFFFFF', 5); sph(6.5, -8, -.5, -1, '#FFFFFF', 4.5); sph(5, 3, 3, -4, '#FFFFFF', 4);
   const m = new THREE.InstancedMesh(merge(P, false), CLOUD_MAT, 16); const r = rng(11); m.userData.list = [];
   for (let k = 0; k < 16; k++) m.userData.list.push({ x: (r() - .5) * 1100, y: 150 + r() * 70, z: (r() - .5) * 1100, s: .8 + r() * 1.4, sp: 1.5 + r() * 2 });
@@ -734,7 +750,7 @@ function stepDonorClouds(dt){ for (const c of donorClouds){ c.a += dt * .03; c.m
 /* ---------- lampu jalan ---------- */
 const lampSpots = []; for (let a = 0; a <= 8; a++) for (let b = 0; b <= 8; b++) lampSpots.push([wx(a * BK) + 2.6, wx(b * BK) + 2.6]);
 P = []; cyl(.1, 4.6, 0, 0, 0, '#4A5056'); box(1.3, .14, .2, -.55, 4.5, 0, '#4A5056');
-const lampPoles = new THREE.InstancedMesh(merge(P, true), VMAT_I, lampSpots.length);
+const lampPoles = new THREE.InstancedMesh(merge(P, true), VMAT_I, lampSpots.length); inkInstanced(lampPoles);
 const LAMP_HEAD = new THREE.MeshBasicMaterial({ color: 0xffffff, toneMapped: false });
 const lampHeads = new THREE.InstancedMesh(new THREE.BoxGeometry(.6, .16, .34), LAMP_HEAD, lampSpots.length);
 const glowTex = (() => { const c = document.createElement('canvas'); c.width = c.height = 64; const x = c.getContext('2d'); const g = x.createRadialGradient(32,32,0,32,32,32); g.addColorStop(0,'rgba(255,225,150,1)'); g.addColorStop(.35,'rgba(255,200,110,.45)'); g.addColorStop(1,'rgba(255,190,90,0)'); x.fillStyle = g; x.fillRect(0,0,64,64); return new THREE.CanvasTexture(c); })();
@@ -773,13 +789,13 @@ function makeVisual(b){
     v.pick = g;
   } else {
     const geo = modelGeo(b.type, ownerColor(b), wallOf(b)); const inner = new THREE.Group(); if (b.w !== ct.w) inner.rotation.y = Math.PI / 2;
-    const body = new THREE.Mesh(geo.body, VMAT); body.castShadow = !LOW; body.receiveShadow = true; inner.add(body);
+    const body = withInk(new THREE.Mesh(geo.body, VMAT)); body.castShadow = !LOW; body.receiveShadow = true; inner.add(body);
     if (geo.glow){ const gl = new THREE.Mesh(geo.glow, GLOWMAT); inner.add(gl); }
     root.add(inner); v.inner = inner; v.pick = body;
     if (b.stage === 'bangun' && progressOf(b) < 1){
       const sc = new THREE.LineSegments(new THREE.EdgesGeometry(new THREE.BoxGeometry(fx * .92, 8, fz * .92, 3, 4, 3)), scafMat); sc.position.y = 4; sc.userData.own = true; root.add(sc); v.scaf = sc;
-      const cr = new THREE.Mesh(craneGeo, VMAT); cr.position.set(-fx * .46, 0, -fz * .46); cr.castShadow = !LOW; root.add(cr);
-      const jib = new THREE.Mesh(jibGeo, VMAT); jib.position.set(-fx * .46, 17.5, -fz * .46); jib.rotation.y = hashStr(b.id) % 6; root.add(jib); v.jib = jib; cranes.push(jib);
+      const cr = withInk(new THREE.Mesh(craneGeo, VMAT)); cr.position.set(-fx * .46, 0, -fz * .46); cr.castShadow = !LOW; root.add(cr);
+      const jib = withInk(new THREE.Mesh(jibGeo, VMAT)); jib.position.set(-fx * .46, 17.5, -fz * .46); jib.rotation.y = hashStr(b.id) % 6; root.add(jib); v.jib = jib; cranes.push(jib);
       v.building = true; applyProgress(v);
     }
   }
@@ -812,21 +828,31 @@ function stepSparks(dt){ for (let k = sparks.length - 1; k >= 0; k--){ const s =
 const selMesh = new THREE.LineSegments(new THREE.EdgesGeometry(new THREE.BoxGeometry(1, 1, 1)), new THREE.LineBasicMaterial({ color: lin('#F2B531') })); selMesh.visible = false; scene.add(selMesh);
 function showSel(i, j, w, h){ selMesh.visible = true; selMesh.scale.set(w * T - .5, 1.4, h * T - .5); selMesh.position.set(wx(i) + (w - 1) * T / 2, 1, wx(j) + (h - 1) * T / 2); }
 const placeGhost = new THREE.Mesh(new THREE.BoxGeometry(1, 1, 1), new THREE.MeshLambertMaterial({ color: lin('#2F8F5B'), transparent: true, opacity: .35, depthWrite: false })); placeGhost.visible = false; scene.add(placeGhost);
-const PREVIEW_MAT = new THREE.MeshLambertMaterial({ vertexColors: true, transparent: true, opacity: .82 });
+const PREVIEW_MAT = toonMat({ vertexColors: true, transparent: true, opacity: .82 });
 let placePreview = null;
 
 /* ---------- warga & kendaraan ---------- */
 const WALKERS = LOW ? 50 : MOBILE ? 90 : 140, CARS = LOW ? 8 : 16, ANGKOT = LOW ? 3 : 6, OJEK = LOW ? 4 : 9;
-const walkerBody = new THREE.InstancedMesh(new THREE.CylinderGeometry(.42, .5, 1.7, 8), new THREE.MeshLambertMaterial({ color: 0xffffff }), WALKERS);
-const headGeo = (() => { P = []; sph(.42, 0, 0, 0, '#E3B28A'); sph(.45, 0, .14, -.04, '#2E2A28', .3); return merge(P, false); })();
-const walkerHead = new THREE.InstancedMesh(headGeo, VMAT_I, WALKERS);
-for (let k = 0; k < WALKERS; k++) walkerHead.setColorAt(k, new THREE.Color(1, 1, 1));
+/* NPC beranggota badan (kepala, badan, 2 lengan, 2 kaki) sebagai 6 InstancedMesh; badan diwarnai per profesi */
+const NPC_S = .72;   // skala NPC relatif tokoh pemain
+const NPC_GEO = (() => {
+  const skin = '#E8B890', pants = '#3B4752', shoe = '#2A2320';
+  const limb = (w, h, d, c, c2) => { P = []; box(w, h, d, 0, -h, 0, c); if (c2) box(w + .04, .4, d + .04, 0, -h * 2 + .2, 0, c2); const g = merge(P, true); g.translate(0, .8, 0); return g; };
+  P = []; box(1.5, 1.7, .85, 0, 0, 0, '#FFFFFF'); box(1.54, .22, .87, 0, 1.48, 0, '#FAF3E8'); const torso = merge(P, true);
+  P = []; box(1.15, 1.15, 1.15, 0, 0, 0, skin); box(.18, .22, .06, -.26, .62, .58, '#2A2320'); box(.18, .22, .06, .26, .62, .58, '#2A2320'); box(.42, .08, .06, 0, .36, .58, '#9B4A3A'); box(1.2, .36, 1.2, 0, .95, 0, '#2E2A28'); const head = merge(P, true);
+  return { torso, head, armL: limb(.55, .8, .55, skin), armR: limb(.55, .8, .55, skin), legL: limb(.62, .82, .62, pants, shoe), legR: limb(.62, .82, .62, pants, shoe) };
+})();
+const NPC_OFF = { torso: [0, 1.65, 0], head: [0, 3.35, 0], armL: [-1.05, 3.2, 0], armR: [1.05, 3.2, 0], legL: [-.4, 1.68, 0], legR: [.4, 1.68, 0] };
+const npcParts = Object.fromEntries(Object.entries(NPC_GEO).map(([k, g]) => { const m = new THREE.InstancedMesh(g, VMAT_I, WALKERS); m.instanceColor = new THREE.InstancedBufferAttribute(new Float32Array(WALKERS * 3).fill(1), 3); m.castShadow = !LOW; m.frustumCulled = false; inkInstanced(m); scene.add(m); return [k, m]; }));
+const walkerBody = npcParts.torso, walkerHead = npcParts.head;
+// topi warna acak di kepala? tidak: kepala memakai warna kulit; badan memakai warna profesi (instanceColor)
+for (const k of ['head', 'armL', 'armR', 'legL', 'legR']) for (let i = 0; i < WALKERS; i++) npcParts[k].setColorAt(i, new THREE.Color(1, 1, 1));
 const carGeo = (() => { P = []; box(2.1, .9, 4.2, 0, .45, 0, '#FFFFFF'); box(1.85, .8, 2.2, 0, 1.3, -.2, '#CFE3EE'); for (const a of [-1, 1]) for (const b of [-1.3, 1.3]) cyl(.42, .3, a * 1.05, .02, b, '#222'); return merge(P, false); })();
 const angkotGeo = (() => { P = []; box(2.2, 2, 4.8, 0, .4, 0, '#FFFFFF'); box(2.24, .6, 3.6, 0, 1.4, -.3, '#CFE3EE'); box(2.26, .25, 4.82, 0, .9, 0, '#F4F4EE'); for (const a of [-1, 1]) for (const b of [-1.5, 1.5]) cyl(.42, .3, a * 1.1, .02, b, '#222'); return merge(P, false); })();
 const ojekGeo = (() => { P = []; box(.5, .7, 2, 0, .5, 0, '#2B2F33'); cyl(.38, .2, 0, .02, .75, '#222'); cyl(.38, .2, 0, .02, -.75, '#222'); box(.7, 1.1, .6, 0, 1.2, -.1, '#3FA84B'); sph(.36, 0, 2.15, -.1, '#3FA84B'); return merge(P, false); })();
-const vehMat = new THREE.MeshLambertMaterial({ vertexColors: true });
+const vehMat = toonMat({ vertexColors: true });
 const carMesh = new THREE.InstancedMesh(carGeo, vehMat, CARS), angkotMesh = new THREE.InstancedMesh(angkotGeo, vehMat, ANGKOT), ojekMesh = new THREE.InstancedMesh(ojekGeo, vehMat, OJEK);
-for (const m of [walkerBody, walkerHead, carMesh, angkotMesh, ojekMesh]){ m.castShadow = !LOW; m.frustumCulled = false; scene.add(m); }
+for (const m of [carMesh, angkotMesh, ojekMesh]){ m.castShadow = !LOW; m.frustumCulled = false; inkInstanced(m); scene.add(m); }
 const movers = []; let openSet = new Set(['pusat']);
 function nodeOK(a, b){ for (const [dx, dy] of [[0,0],[-1,0],[0,-1],[-1,-1]]){ const bx = a + dx, by = b + dy; if (bx < 0 || by < 0 || bx > 7 || by > 7) continue; if (openSet.has(districtOf(bx * BK + 1, by * BK + 1))) return true; } return false; }
 function initMovers(){
@@ -844,7 +870,7 @@ function initMovers(){
   }
   for (const m of [walkerBody, carMesh, angkotMesh, ojekMesh]) if (m.instanceColor) m.instanceColor.needsUpdate = true;
 }
-const UP = new THREE.Vector3(0, 1, 0);
+const UP = new THREE.Vector3(0, 1, 0), _base = new THREE.Matrix4(), _part = new THREE.Matrix4(), _q2 = new THREE.Quaternion(), _one = new THREE.Vector3(1, 1, 1);
 function stepMovers(dt){
   const seg = BK * T, nowS = performance.now() / 1000;
   for (const o of movers){
@@ -853,10 +879,14 @@ function stepMovers(dt){
     const x0 = wx(o.a * BK), z0 = wx(o.b * BK), x1 = wx(o.ta * BK), z1 = wx(o.tb * BK), dx = x1 - x0, dz = z1 - z0, len = Math.hypot(dx, dz) || 1;
     const off = o.kind === 'w' ? 2.45 * o.side : .95 * o.side, nx = -dz / len * off, nz = dx / len * off;
     o.x = x0 + dx * o.t + nx; o.z = z0 + dz * o.t + nz; _q.setFromAxisAngle(UP, Math.atan2(dx, dz));
-    if (o.kind === 'w'){ const bob = Math.abs(Math.sin((nowS + o.ph) * 7)) * .12; _m4.compose(_v3.set(o.x, 1.25 + bob, o.z), _q, _s3.set(1,1,1)); walkerBody.setMatrixAt(o.idx, _m4); _m4.compose(_v3.set(o.x, 2.5 + bob, o.z), _q, _s3.set(1,1,1)); walkerHead.setMatrixAt(o.idx, _m4); }
+    if (o.kind === 'w'){ const ph = (nowS + o.ph) * 7.5, sw = Math.sin(ph) * .62, bob = Math.abs(Math.sin(ph)) * .08;
+      _base.compose(_v3.set(o.x, .3 + bob, o.z), _q, _s3.set(NPC_S, NPC_S, NPC_S));
+      for (const k in NPC_OFF){ const of = NPC_OFF[k]; const rx = k === 'armL' ? -sw : k === 'armR' ? sw : k === 'legL' ? sw : k === 'legR' ? -sw : 0;
+        _e.set(rx, 0, k === 'armL' ? .08 : k === 'armR' ? -.08 : 0); _q2.setFromEuler(_e); _part.compose(_v3.set(of[0], of[1], of[2]), _q2, _one); _m4.multiplyMatrices(_base, _part); npcParts[k].setMatrixAt(o.idx, _m4); } }
     else { const mesh = o.kind === 'car' ? carMesh : o.kind === 'angkot' ? angkotMesh : ojekMesh; _m4.compose(_v3.set(o.x, .42, o.z), _q, _s3.set(1,1,1)); mesh.setMatrixAt(o.idx, _m4); }
   }
-  walkerBody.instanceMatrix.needsUpdate = walkerHead.instanceMatrix.needsUpdate = carMesh.instanceMatrix.needsUpdate = angkotMesh.instanceMatrix.needsUpdate = ojekMesh.instanceMatrix.needsUpdate = true;
+  for (const k in npcParts) npcParts[k].instanceMatrix.needsUpdate = true;
+  carMesh.instanceMatrix.needsUpdate = angkotMesh.instanceMatrix.needsUpdate = ojekMesh.instanceMatrix.needsUpdate = true;
 }
 
 /* ---------- kamera & kontrol ---------- */
@@ -935,14 +965,14 @@ function partGeo(fn){ P = []; fn(); return merge(P, true); }
 function buildRig(prof, color){
   const pc = profColor(prof), skin = '#E8B890', pants = '#3B4752', shoe = '#2A2320';
   const rig = new THREE.Group(); const body = new THREE.Group(); rig.add(body);
-  const mk = (g, x, y, z) => { const m = new THREE.Mesh(g, VMAT); m.castShadow = !LOW; m.position.set(x, y, z); body.add(m); return m; };
+  const mk = (g, x, y, z) => { const m = withInk(new THREE.Mesh(g, VMAT)); m.castShadow = !LOW; m.position.set(x, y, z); body.add(m); return m; };
   const torso = mk(partGeo(() => { box(1.5, 1.7, .85, 0, 0, 0, pc); box(1.54, .22, .87, 0, 1.48, 0, '#FFFFFF'); box(.5, .5, .06, 0, .9, .44, '#FFF2D6'); box(.3, .26, .07, 0, 1.02, .45, color); }), 0, 1.65, 0);
   const head = mk(partGeo(() => { box(1.15, 1.15, 1.15, 0, 0, 0, skin); box(.18, .22, .06, -.26, .62, .58, '#2A2320'); box(.18, .22, .06, .26, .62, .58, '#2A2320'); box(.42, .08, .06, 0, .36, .58, '#9B4A3A'); box(1.2, .36, 1.2, 0, .95, 0, '#2E2A28'); cyl(.66, .32, 0, 1.18, 0, color); box(1.0, .1, .7, 0, 1.2, .45, color); }), 0, 3.35, 0);
   const limb = (w, h, d, c, c2) => partGeo(() => { box(w, h, d, 0, -h, 0, c); if (c2) box(w + .04, .4, d + .04, 0, -h * 2 + .2, 0, c2); });
   const armL = mk(limb(.55, .8, .55, pc, skin), -1.05, 3.2, 0), armR = mk(limb(.55, .8, .55, pc, skin), 1.05, 3.2, 0);
   const legL = mk(limb(.62, .82, .62, pants, shoe), -.4, 1.68, 0), legR = mk(limb(.62, .82, .62, pants, shoe), .4, 1.68, 0);
   for (const m of [armL, armR, legL, legR]) m.geometry.translate(0, .8, 0);   // engsel di ujung atas
-  rig.userData = { body, torso, head, armL, armR, legL, legR }; return rig;
+  rig.scale.setScalar(.9); rig.userData = { body, torso, head, armL, armR, legL, legR }; return rig;
 }
 function walkBlocked(x, z){
   const i = Math.round(x / T + HALF), j = Math.round(z / T + HALF);
@@ -1019,7 +1049,7 @@ function applyHemat(auto){
   if (hematOn) return; hematOn = true;
   renderer.setPixelRatio(1); renderer.shadowMap.enabled = false; sun.castShadow = false;
   scene.traverse(o => { if (o.material){ (Array.isArray(o.material) ? o.material : [o.material]).forEach(m => m.needsUpdate = true); } });
-  walkerBody.count = walkerHead.count = Math.floor(WALKERS / 2); carMesh.count = Math.floor(CARS / 2);
+  for (const k in npcParts){ npcParts[k].count = Math.floor(WALKERS / 2); syncInk(npcParts[k]); } carMesh.count = Math.floor(CARS / 2); syncInk(carMesh);
   resize(); if (auto){ store.set('nz_hemat', true); toast('Mode hemat dinyalakan otomatis supaya kota tetap lancar. Bisa diubah di menu Kota.'); }
 }
 function measurePerf(dt, t){ if (perf.done || document.hidden || t < perf.start) return; perf.n++; perf.sum += dt; if (perf.n >= 150){ perf.done = true; const fps = perf.n / perf.sum; if (fps < 26) applyHemat(true); } }
