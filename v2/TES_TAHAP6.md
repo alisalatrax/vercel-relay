@@ -4,7 +4,11 @@ Tahap ini hanya mengubah `v2/index.html`. Tidak ada perubahan SQL.
 
 ## Yang baru
 
-- **Jalan-jalan dengan tokohmu** (tombol orang berjalan di kanan). HP: joystick kiri bawah. Laptop: W/A/S/D atau panah, Q/E memutar kamera, Escape keluar. Geser layar untuk memutar kamera. Tokoh memakai warna profesi dan warna topi pilihanmu, tidak bisa menembus bangunan (taman, lapangan, alun-alun, pasar, PKL, dan sawah bisa dilewati), dan tombol "Lihat …" muncul saat dekat bangunan.
+- **Mode tokoh ala Roblox** (tombol orang berjalan di kanan). Tokoh kotak-kotak dengan kepala, badan, lengan, dan kaki yang bergerak: ayunan saat jalan, condong saat lari, kaki terlipat saat lompat, napas saat diam. Kamera orang ketiga mengikuti dari belakang; geser layar untuk memutar.
+  - **HP:** joystick kiri bawah; kanan bawah ada tombol 💬 chat, 😀 emote (👋 lambai, 🕺 joget, 🪑 duduk, 🙌 hore), 🏃 lari (toggle), ⬆ lompat (besar). Tombol "Lihat …" muncul saat dekat bangunan. "Selesai" di kanan atas.
+  - **Laptop:** W/A/S/D jalan, Shift lari, Spasi lompat, 1–4 emote, Q/E putar kamera, Escape keluar.
+  - Pesan chat yang kamu kirim muncul sebagai **gelembung** di atas kepala tokoh selama 6 detik. Tokoh tidak menembus bangunan; taman, lapangan, alun-alun, pasar, PKL, dan sawah bisa dilewati.
+- **Tampilan hangat:** kertas krem, kayu cokelat, terakota genteng, hijau daun, emas; motif batik kawung di kepala panel; dock bergaya kayu; dunia 3D sedikit lebih hangat.
 - **Mode hemat otomatis:** bila HP di bawah ±26 fps dalam beberapa detik pertama, bayangan dimatikan, resolusi diturunkan, dan pejalan kaki dikurangi. Pilihan ini diingat di perangkat. Bisa diubah manual di menu Kota → Grafik.
 - **Cache warga** 10 menit di perangkat: kunjungan berikutnya tidak memuat ulang 1.205 nama warga.
 
@@ -22,7 +26,9 @@ Tahap ini hanya mengubah `v2/index.html`. Tidak ada perubahan SQL.
 | # | Langkah | Hasil yang benar |
 |---|---|---|
 | 1 | Masuk sebagai warga → tombol orang berjalan | Tokohmu muncul di depan rumahmu (atau pusat kota bila belum punya rumah), menu bawah tersembunyi. |
-| 2 | HP: geser joystick. Laptop: tahan W | Tokoh berjalan, kamera mengikuti. |
+| 2 | HP: geser joystick. Laptop: tahan W | Tokoh berjalan dengan tangan dan kaki berayun, kamera mengikuti dari belakang. |
+| 2b | Lompat (⬆ / Spasi), lari (🏃 / Shift), emote 👋🕺🪑🙌 | Tokoh melompat lalu mendarat dengan debu kecil; lari lebih cepat dan condong; emote dimainkan, duduk bertahan sampai bergerak. |
+| 2c | 💬 → kirim pesan | Gelembung pesan muncul di atas kepala tokoh. |
 | 3 | Jalan menabrak rumah | Tokoh berhenti, tidak menembus. Taman dan pasar bisa dilewati. |
 | 4 | Dekati bangunan → "Lihat …" | Panel info bangunan terbuka. |
 | 5 | "Selesai jalan-jalan" (atau Escape) | Kembali ke peta biasa. |
