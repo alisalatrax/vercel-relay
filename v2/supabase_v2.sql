@@ -1427,6 +1427,7 @@ begin
   if not found then
     select email into v_email from auth.users where id = v_uid;
     return jsonb_build_object('logged_in', true, 'registered', false, 'is_admin', nz.is_admin(),
+      'optout_pending', (select coalesce(jsonb_agg(npc_id), '[]') from nz.optout_requests where user_id = v_uid and status = 'pending'),
       'username', case when v_email like '%@warga.netizenia.local' then split_part(v_email, '@', 1) end,
       'professions', to_jsonb(nz.player_professions()), 'colors', to_jsonb(nz.palette()));
   end if;
@@ -1462,6 +1463,9 @@ begin
                  join nz.district_proposals pr on pr.id = v.proposal_id where v.user_id = v_uid and pr.status = 'voting'),
     'reports_on_me', (select count(distinct reporter_id) from nz.reports where target_id = v_uid and resolved_at is null),
     'claim_pending', exists (select 1 from public.claim_requests where user_id = v_uid and status = 'pending'),
+    'claim_pending_npc', (select jsonb_build_object('id', npc_id, 'name', display_name) from public.claim_requests
+                          where user_id = v_uid and status = 'pending' order by created_at desc limit 1),
+    'optout_pending', (select coalesce(jsonb_agg(npc_id), '[]') from nz.optout_requests where user_id = v_uid and status = 'pending'),
     'professions', to_jsonb(nz.player_professions()), 'colors', to_jsonb(nz.palette())
   );
 end $$;

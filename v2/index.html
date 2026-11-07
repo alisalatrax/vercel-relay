@@ -216,7 +216,10 @@ button{cursor:pointer}
 .msg .bub b{font-size:12.5px;display:block}.msg .bub span{font-size:14px;font-weight:700;overflow-wrap:anywhere;-webkit-user-select:text;user-select:text}
 .msg .bub small{font-size:10.5px;color:var(--muted);margin-left:6px;font-weight:700}
 .msg.me{align-self:flex-end;flex-direction:row-reverse}.msg.me .bub{background:#DDF2E4;border-radius:16px 16px 4px 16px}
-.chatbar{display:flex;gap:8px;position:sticky;bottom:0;background:var(--panel-solid);padding-top:8px}
+.chatdock{position:sticky;bottom:0;background:var(--panel-solid);padding-top:8px;display:flex;flex-direction:column;gap:6px;z-index:1}
+.chatdock .hint{min-height:18px;font-weight:800}
+.chatdock .hint.bad{background:#FDE7E4;border-radius:10px;padding:6px 10px}
+.chatbar{display:flex;gap:8px}
 .chatbar input{flex:1;min-width:0;border:1.5px solid var(--line);border-radius:14px;padding:11px 13px;min-height:46px;font-weight:700}
 .photobar{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(14px + var(--safe-b));z-index:15;display:flex;gap:8px;align-items:center;flex-wrap:wrap;justify-content:center;background:rgba(29,43,51,.82);color:#fff;border-radius:18px;padding:10px 12px;box-shadow:var(--shadow);width:min(560px,calc(100% - 24px))}
 .photobar label{display:flex;align-items:center;gap:8px;font-size:12.5px;flex:1;min-width:200px}
@@ -989,6 +992,7 @@ async function poll(){
   await loadSnapshot();
   if (!S.session ? pollN % 2 === 0 : !S.live || pollN % 3 === 0) await loadDistricts([...S.loaded.keys()]);
   if (S.session) loadMe(true);
+  if (pollN % 10 === 0) loadNpcs();
 }
 
 /* ---------- realtime: hanya pemain login, hanya tabel yang perlu ---------- */
@@ -1428,7 +1432,7 @@ const SHEETS = {
     const list = (S.session && S.chat) ? S.chat : (S.snap?.chat || []), myName = S.me?.name;
     let h = `<div class="chatlist">${list.length ? list.map(m => `<div class="msg${m.name === myName ? ' me' : ''}"><span class="av" style="width:30px;height:30px;font-size:11px;background:${profColor(m.prof)}">${esc(initials(m.name))}</span><div class="bub"><b>${esc(m.name)}${m.prof ? ` <small>${esc(m.prof)}</small>` : ''}<small>${m.at ? fmtAgo(m.at) : ''}</small></b><span>${esc(m.text)}</span>${isAdmin() ? ` <button class="btn sm red" style="min-height:26px;padding:2px 8px;margin-top:4px" data-act="chat-del" data-id="${m.id}">Hapus</button>` : ''}</div></div>`).join('') : '<div class="empty">Belum ada pesan. Sapa warga duluan!</div>'}</div>`;
     const wait = Math.max(0, 5000 - (Date.now() - chatSentAt));
-    h += registered() ? `<form class="chatbar" id="chatForm" autocomplete="off"><input id="cmsg" maxlength="200" placeholder="Tulis pesan untuk semua warga" aria-label="Pesan"><button class="btn gold" type="submit">Kirim</button></form><span class="hint${chatHint ? ' bad' : ''}" id="chatHint" role="status">${chatHint ? esc(chatHint) : wait ? 'Bisa kirim lagi dalam ' + Math.ceil(wait / 1000) + ' detik.' : ''}</span><p class="note">Nama otomatis dari tokohmu. Satu pesan tiap 5 detik. Pesan lebih dari 7 hari terhapus otomatis.</p>`
+    h += registered() ? `<p class="note">Nama otomatis dari tokohmu. Satu pesan tiap 5 detik. Pesan lebih dari 7 hari terhapus otomatis.</p><div class="chatdock"><span class="hint${chatHint ? ' bad' : ''}" id="chatHint" role="status" aria-live="assertive">${chatHint ? esc(chatHint) : wait ? 'Bisa kirim lagi dalam ' + Math.ceil(wait / 1000) + ' detik.' : ''}</span><form class="chatbar" id="chatForm" autocomplete="off"><input id="cmsg" maxlength="200" placeholder="Tulis pesan untuk semua warga" aria-label="Pesan"><button class="btn gold" type="submit">Kirim</button></form></div>`
       : `<button class="btn gold wide" data-act="${S.session ? 'register' : 'login'}">${S.session ? 'Buat tokoh untuk ikut ngobrol' : 'Masuk untuk ikut ngobrol'}</button>`;
     return ['Pesan rakyat', h, S.session ? 'Langsung, untuk warga yang masuk' : 'Pesan terbaru', 'chat'];
   },
@@ -1473,8 +1477,8 @@ const SHEETS = {
   npc(p){
     if (!p) return null; const [id, name, prof, color, home, sick, ig] = p; const hb = home && S.buildings.get(home);
     return [esc(name), `<dl class="kv"><dt>Profesi</dt><dd>${esc(prof)}</dd>${ig ? `<dt>Instagram</dt><dd>@${esc(ig)}</dd>` : ''}<dt>Tinggal di</dt><dd>${hb ? esc(hb.label || catOf(hb.type).n) : home ? 'Rumah warga' : 'Apartemen Netizenia'}</dd><dt>Kesehatan</dt><dd>${sick ? 'Sedang sakit' : 'Sehat'}</dd></dl><p class="note">Warga ini berasal dari komen Instagram dan hidup sebagai NPC. Kalau ini kamu, ajukan klaim: setelah disetujui presiden, tokoh ini tertaut ke akunmu.</p>${home ? `<button class="btn" data-act="goto" data-id="${home}">Lihat rumahnya</button>` : ''}
-      ${registered() && !S.me.npc ? (S.me.claim_pending ? '<p class="note"><b>Klaimmu sedang menunggu persetujuan presiden.</b></p>' : `<button class="btn gold" data-act="claim-open" data-n="${id}">Ini aku: klaim tokoh ini</button>`) : !S.session ? '<button class="btn gold" data-act="login">Masuk untuk mengklaim</button>' : ''}
-      ${S.session ? `<button class="btn red sm" data-act="optout-open" data-n="${id}">Minta hapus nama ini</button>` : ''}`, 'Warga dari komen', 'people'];
+      ${registered() && !S.me.npc ? (S.me.claim_pending ? (S.me.claim_pending_npc && S.me.claim_pending_npc.id === id ? '<p class="note"><b>Klaimmu untuk tokoh ini sedang menunggu persetujuan presiden.</b></p>' : `<p class="note">Kamu sudah punya klaim yang menunggu${S.me.claim_pending_npc ? ' (untuk ' + esc(S.me.claim_pending_npc.name) + ')' : ''}. Satu klaim per akun.</p>`) : `<button class="btn gold" data-act="claim-open" data-n="${id}">Ini aku: klaim tokoh ini</button>`) : registered() && S.me.npc ? `<p class="note">Akunmu sudah tertaut ke tokoh ${esc(S.me.npc.name)}.</p>` : !S.session ? '<button class="btn gold" data-act="login">Masuk untuk mengklaim</button>' : ''}
+      ${S.session ? ((S.me?.optout_pending || []).includes(id) ? '<p class="note"><b>Permintaan hapus nama ini sedang menunggu presiden.</b></p>' : `<button class="btn red sm" data-act="optout-open" data-n="${id}">Minta hapus nama ini</button>`) : ''}`, 'Warga dari komen', 'people'];
   },
   distrik(key){
     const d = (S.snap?.districts || []).find(x => x.key === key) || { key, name: DIST_NAME[key], cost: 0 }; const dp = (S.snap?.district_proposals || []).find(x => x.district === key);
@@ -1494,7 +1498,7 @@ function manageHTML(b){
 }
 
 let chatSentAt = 0, chatSending = false, chatHint = '', chatHintT = null;
-function setChatHint(m){ chatHint = m; const h = $('#chatHint'); if (h){ h.textContent = m; h.className = 'hint' + (m ? ' bad' : ''); } clearTimeout(chatHintT); if (m) chatHintT = setTimeout(() => setChatHint(''), 6000); }
+function setChatHint(m, ms){ chatHint = m; const h = $('#chatHint'); if (h){ h.textContent = m; h.className = 'hint' + (m ? ' bad' : ''); } clearTimeout(chatHintT); if (m) chatHintT = setTimeout(() => { setChatHint(''); tickChatHint(); }, ms || 6000); }
 function tickChatHint(){ const h = $('#chatHint'); if (!h || chatHint) return; const w = 5000 - (Date.now() - chatSentAt); h.className = 'hint'; h.textContent = w > 0 ? 'Bisa kirim lagi dalam ' + Math.ceil(w / 1000) + ' detik.' : ''; if (w > 0) setTimeout(tickChatHint, 500); }
 async function loadQueue(){ if (!isAdmin()) return; try { const q = await rpc('admin_list_queue'); if (sheetKind === 'admin'){ sheetArg = { ...(sheetArg || {}), queue: q }; renderSheet(); } } catch (e) { toast(e.message, 'bad'); } }
 function photoOn(){ closeSheet(); if (place) cancelPlace(); photoHour = wibHours(); document.body.classList.add('photo'); $('#photobar').hidden = false; $('#phour').value = photoHour; $('#phourv').textContent = wibClock(); }
@@ -1639,11 +1643,11 @@ document.addEventListener('click', async e => {
     case 'open-kerja': openSheet('kerja'); break;
     case 'open-donatur': openSheet('donatur'); break;
     case 'open-admin': openSheet('admin', {}); break;
-    case 'npc-open': { const n = (S.npcs || []).find(x => x[0] === Number(el.dataset.n)); const row = (sheetArg?.list || []).find(x => x.kind === 'npc' && x.id === Number(el.dataset.n)); openSheet('npc', n || [Number(el.dataset.n), row?.name || 'Warga', row?.prof || 'Warga', row?.color, null, row?.sick, null]); break; }
+    case 'npc-open': { const n = (S.npcs || []).find(x => x[0] === Number(el.dataset.n)); const row = (sheetArg?.list || []).find(x => x.kind === 'npc' && x.id === Number(el.dataset.n)); const cur = n ? [...n] : [Number(el.dataset.n), row?.name || 'Warga', row?.prof || 'Warga', row?.color, null, false, null]; if (row) cur[5] = !!row.sick; openSheet('npc', cur); break; }
     case 'claim-open': if (!registered()) { openModal(S.session ? 'register' : 'login'); break; } modalArg = Number(el.dataset.n); openModal('claim'); break;
     case 'optout-open': if (!S.session) { openModal('login'); break; } modalArg = Number(el.dataset.n); openModal('optout'); break;
-    case 'claim-send': await busy(async () => { try { const r = await rpc('request_claim_v2', { p_npc_id: modalArg, p_ig: $('#cig').value.trim() || null, p_note: $('#cnote').value.trim() || null }); closeModal(); toast(r.msg, 'good'); loadMe(true); } catch (err) { $('#chint').textContent = err.message; $('#chint').className = 'hint bad'; } }); break;
-    case 'optout-send': await busy(async () => { try { const r = await rpc('request_opt_out', { p_npc_id: modalArg, p_reason: $('#cnote').value.trim() || null }); closeModal(); toast(r.msg, 'good'); } catch (err) { $('#chint').textContent = err.message; $('#chint').className = 'hint bad'; } }); break;
+    case 'claim-send': await busy(async () => { try { const r = await rpc('request_claim_v2', { p_npc_id: modalArg, p_ig: $('#cig').value.trim() || null, p_note: $('#cnote').value.trim() || null }); closeModal(); toast(r.msg, 'good'); await loadMe(true); renderSheet(); } catch (err) { $('#chint').textContent = err.message; $('#chint').className = 'hint bad'; } }); break;
+    case 'optout-send': await busy(async () => { try { const r = await rpc('request_opt_out', { p_npc_id: modalArg, p_reason: $('#cnote').value.trim() || null }); closeModal(); toast(r.msg, 'good'); await loadMe(true); renderSheet(); } catch (err) { $('#chint').textContent = err.message; $('#chint').className = 'hint bad'; } }); break;
     case 'chat-del': await busy(() => act('admin_delete_chat', { p_id: id }, { refresh: false })); if (S.chat) S.chat = S.chat.filter(m => m.id !== id); loadSnapshot(); break;
     case 'adm-claim': await busy(() => act('admin_review_claim', { p_request_id: id, p_approve: el.dataset.v === '1' }, { refresh: false })); loadQueue(); loadNpcs(); break;
     case 'adm-optout': await busy(() => act('admin_review_optout', { p_id: id, p_approve: el.dataset.v === '1' }, { refresh: false })); loadQueue(); loadNpcs(); break;
@@ -1677,15 +1681,16 @@ document.addEventListener('click', async e => {
   }
 });
 document.addEventListener('submit', async e => {
-  if (e.target.id === 'chatForm'){ e.preventDefault(); const t = ($('#cmsg')?.value || '').trim(); if (!t || chatSending) return;
+  if (e.target.id === 'chatForm'){ e.preventDefault(); const t = ($('#cmsg')?.value || '').trim(); if (!t) return;
     const wait = 5000 - (Date.now() - chatSentAt);
-    if (wait > 0){ setChatHint('Tunggu ' + Math.ceil(wait / 1000) + ' detik sebelum mengirim lagi. Pesanmu masih tersimpan di kolom.'); return; }
-    chatSending = true; setChatHint('');
-    try { await rpc('send_chat_message', { p_text: t }); chatSentAt = Date.now();
-      const now2 = $('#cmsg'); if (now2 && now2.value.trim() === t){ now2.value = ''; now2.defaultValue = ''; }   // hanya hapus bila belum diganti pesan baru
-      setTimeout(loadChat, 700); tickChatHint(); }
-    catch (err) { setChatHint(err.message); toast(err.message, 'bad'); }
-    finally { chatSending = false; } return; }
+    if (chatSending || wait > 0){ setChatHint('Tunggu ' + Math.max(1, Math.ceil(wait / 1000)) + ' detik sebelum mengirim lagi. Pesanmu masih tersimpan di kolom.', Math.max(1500, wait)); return; }
+    const prevAt = chatSentAt; chatSending = true; chatSentAt = Date.now(); setChatHint('');
+    const inp0 = $('#cmsg'); if (inp0){ inp0.value = ''; inp0.defaultValue = ''; }            // kosongkan langsung; ketikan berikutnya mulai dari kolom kosong
+    try { await rpc('send_chat_message', { p_text: t }); setTimeout(loadChat, 700); }
+    catch (err) { if (!/Tunggu/.test(err.message)) chatSentAt = prevAt;
+      const inp1 = $('#cmsg'); if (inp1 && !inp1.value.trim()){ inp1.value = t; inp1.defaultValue = ''; }   // kembalikan pesan yang gagal bila kolom masih kosong
+      setChatHint(err.message); toast(err.message, 'bad'); }
+    finally { chatSending = false; tickChatHint(); } return; }
   if (e.target.id !== 'loginForm') return; e.preventDefault(); const btn = e.target.querySelector('button[type=submit]'), hint = $('#lhint');
   btn.classList.add('busy'); hint.className = 'hint'; hint.textContent = loginMode === 'daftar' ? 'Membuat akun…' : 'Masuk…';
   try { await loginUser(loginMode, $('#lu').value, $('#lp').value); hint.textContent = 'Berhasil!'; hint.className = 'hint ok'; }

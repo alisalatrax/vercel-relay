@@ -65,3 +65,15 @@ Akun username tidak punya email sungguhan, jadi kata sandinya **tidak bisa dires
 
 - Buat akun baru lewat **Masuk → Daftar baru** di pratinjau, misalnya `tesa6` dan `tesb6`. Kata sandi diketik langsung, minimal 8 karakter. Tidak perlu email.
 - Akun tes lama bisa dihapus di Supabase: Authentication → Users → pilih → Delete user. Tokoh, bangunan, dan suaranya ikut terhapus.
+
+## Perbaikan setelah tes ulang 7 November
+
+| Temuan | Penyebab | Perbaikan |
+|---|---|---|
+| Tulisan merah "Tunggu … detik" tidak terlihat | Pesan kedua yang dikirim saat pesan pertama **masih dalam perjalanan** ke server diabaikan tanpa peringatan (jalur "baris baru dalam satu ketikan"). Peringatan juga berada di bawah kolom sehingga bisa terdorong keluar layar. | Jeda 5 detik dihitung sejak Enter ditekan. Kirim ulang di jalur mana pun memunculkan peringatan merah. Peringatan dipindah ke atas kolom, di bilah yang selalu terlihat, dan hilang tepat saat boleh kirim lagi. |
+| Ketikan berikutnya menyambung ke pesan pertama | Kolom baru dikosongkan setelah server menjawab. | Kolom langsung dikosongkan saat Enter ditekan. Bila gagal, pesan dikembalikan ke kolom. |
+| Status "minta hapus nama" tidak terlihat di sisi warga | Server belum mengirim daftar permintaan yang menunggu. | `get_my_state` kini mengirim `optout_pending` dan `claim_pending_npc`. Kartu warga menampilkan "Permintaan hapus nama ini sedang menunggu presiden" dan menyembunyikan tombolnya. |
+| Kartu klaim baru berubah setelah dibuka ulang | Kartu tidak digambar ulang setelah kirim. | Kartu langsung diperbarui setelah klaim atau permintaan hapus terkirim. Kartu tokoh lain menulis untuk tokoh mana klaimmu menunggu. |
+| Daftar warga "sakit", kartu "Sehat" | Kartu memakai data NPC yang dimuat sekali saat halaman dibuka. | Kartu yang dibuka dari daftar memakai status sakit terbaru. Data NPC disegarkan tiap 10 menit. |
+
+Perbaikan status permintaan butuh SQL dijalankan ulang (kode pemuat baru di chat).
