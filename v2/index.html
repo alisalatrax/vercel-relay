@@ -232,6 +232,14 @@ body.photo #hud,body.photo .fabs,body.photo #labels,body.photo #sheet{display:no
 .stepper{display:flex;gap:8px;align-items:center}.stepper input{width:84px;text-align:center;font:600 20px var(--f-display);border:1.5px solid var(--line);border-radius:12px;min-height:44px}
 .stepper .btn{min-width:52px;flex:none}
 .field textarea{border:1.5px solid var(--line);background:#fff;border-radius:13px;padding:11px 13px;min-height:70px;font-weight:700;resize:vertical}
+.walkui{position:fixed;inset:0;pointer-events:none;z-index:9}
+.walkui > *{pointer-events:auto}
+.joy{position:absolute;left:max(22px,var(--safe-l));bottom:calc(26px + var(--safe-b));width:132px;height:132px;border-radius:50%;background:rgba(255,255,255,.5);border:2px solid rgba(255,255,255,.85);box-shadow:var(--shadow);touch-action:none}
+.joy i{position:absolute;left:50%;top:50%;width:56px;height:56px;margin:-28px 0 0 -28px;border-radius:50%;background:linear-gradient(135deg,#FFE18A,#F2B531);box-shadow:var(--shadow)}
+.walkbtns{position:absolute;right:max(16px,var(--safe-r));bottom:calc(26px + var(--safe-b));display:flex;flex-direction:column;gap:8px;align-items:flex-end}
+.walkhint{position:absolute;left:50%;transform:translateX(-50%);top:calc(64px + var(--safe-t));background:rgba(29,43,51,.82);color:#fff;padding:7px 14px;border-radius:999px;font-weight:800;font-size:12.5px;max-width:calc(100% - 32px);text-align:center;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+body.walking #hud .bottom,body.walking .fabs,body.walking #hud .stats,body.walking #hud .ticker,body.walking #hud .banner,body.walking #donor{display:none!important}
+@media (hover:hover) and (pointer:fine){.joy{display:none}}
 #toast{position:fixed;left:50%;top:calc(118px + var(--safe-t));transform:translateX(-50%);z-index:30;background:var(--ink);color:#fff;padding:10px 16px;border-radius:14px;font-weight:800;font-size:13.5px;max-width:calc(100% - 32px);box-shadow:var(--shadow);text-align:center;pointer-events:none}
 #toast.bad{background:var(--red)}
 #toast.good{background:var(--green)}
@@ -279,10 +287,12 @@ body.photo #hud,body.photo .fabs,body.photo #labels,body.photo #sheet{display:no
 <div class="fabs" id="fabs">
   <button class="fab" type="button" data-act="home" aria-label="Ke rumahku" title="Ke rumahku"><svg viewBox="0 0 24 24"><path d="M3 11l9-7 9 7"/><path d="M5 10v10h14V10"/></svg></button>
   <button class="fab" type="button" data-act="center" aria-label="Ke pusat kota" title="Ke pusat kota"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="8"/><circle cx="12" cy="12" r="2.5"/><path d="M12 1v4M12 19v4M1 12h4M19 12h4"/></svg></button>
+  <button class="fab" type="button" data-act="walk" aria-label="Jalan-jalan dengan tokohmu" title="Jalan-jalan dengan tokohmu"><svg viewBox="0 0 24 24"><circle cx="13" cy="4.5" r="2"/><path d="M10 21l2.5-6 2.5 2.5V21"/><path d="M8.5 11.5l3-3.5 3 2.5 2.5 1"/><path d="M11.5 8l-1 5.5"/></svg></button>
   <button class="fab" type="button" data-act="photo" aria-label="Mode foto" title="Mode foto"><svg viewBox="0 0 24 24"><path d="M4 8h3l2-3h6l2 3h3v11H4z"/><circle cx="12" cy="13" r="3.5"/></svg></button>
   <button class="fab" type="button" data-act="rotate" aria-label="Putar kamera" title="Putar kamera"><svg viewBox="0 0 24 24"><path d="M20 12a8 8 0 11-2.3-5.7"/><path d="M20 4v5h-5"/></svg></button>
 </div>
 <section class="sheet" id="sheet" hidden aria-modal="false" role="dialog"></section>
+<div class="walkui" id="walkui" hidden><div class="walkhint" id="walkhint">Geser joystick untuk berjalan</div><div class="joy" id="joy" aria-label="Joystick"><i></i></div><div class="walkbtns"><button class="btn gold" type="button" id="walkAct" data-act="walk-look" hidden>Lihat</button><button class="btn" type="button" data-act="walk-exit">Selesai jalan-jalan</button></div></div>
 <div class="photobar" id="photobar" hidden><label for="phour">Jam <b id="phourv">12:00</b><input type="range" id="phour" min="0" max="24" step="0.25"></label><button class="btn sm gold" type="button" data-act="photo-save">Simpan foto</button><button class="btn sm" type="button" data-act="photo-exit">Selesai</button></div>
 <div class="modal" id="modal" hidden></div>
 <div id="toast" hidden role="status"></div>
@@ -495,7 +505,7 @@ const catOf = t => CAT[t] || CAT.rumah;
    MESIN 3D
    ===================================================================== */
 const MOBILE = Math.min(screen.width, screen.height) < 600;
-const LOW = QS.has('hemat') || (navigator.deviceMemory && navigator.deviceMemory <= 3) || (navigator.hardwareConcurrency || 8) <= 4;
+const LOW = QS.has('hemat') || store.get('nz_hemat', false) === true || (navigator.deviceMemory && navigator.deviceMemory <= 3) || (navigator.hardwareConcurrency || 8) <= 4;
 const canvas = $('#gl');
 const renderer = new THREE.WebGLRenderer({ canvas, antialias: !LOW, powerPreference: 'high-performance', preserveDrawingBuffer: false });
 renderer.setPixelRatio(Math.min(devicePixelRatio || 1, LOW ? 1.25 : MOBILE ? 1.75 : 2));
@@ -846,12 +856,13 @@ addEventListener('resize', resize);
 function panBy(dx, dy){ const k = cam.dist / (innerHeight * .75); const rx = Math.sin(cam.theta), rz = -Math.cos(cam.theta), fx = -Math.cos(cam.theta), fz = -Math.sin(cam.theta); cam.tx -= rx * dx * k - fx * dy * k * 1.3; cam.tz -= rz * dx * k - fz * dy * k * 1.3; fly = null; clampCam(); }
 const ptrs = new Map(); let gesture = null, downAt = null;
 canvas.addEventListener('contextmenu', e => e.preventDefault());
-canvas.addEventListener('pointerdown', e => { canvas.setPointerCapture(e.pointerId); ptrs.set(e.pointerId, { x: e.clientX, y: e.clientY, btn: e.button }); downAt = ptrs.size === 1 ? { x: e.clientX, y: e.clientY, t: performance.now(), moved: false } : null; gesture = null; });
+canvas.addEventListener('pointerdown', e => { try { canvas.setPointerCapture(e.pointerId); } catch (_) {} ptrs.set(e.pointerId, { x: e.clientX, y: e.clientY, btn: e.button }); downAt = ptrs.size === 1 ? { x: e.clientX, y: e.clientY, t: performance.now(), moved: false } : null; gesture = null; });
 canvas.addEventListener('pointermove', e => {
   if (!ptrs.has(e.pointerId)) return; const prev = ptrs.get(e.pointerId), cur = { x: e.clientX, y: e.clientY, btn: prev.btn };
   if (downAt && Math.hypot(cur.x - downAt.x, cur.y - downAt.y) > 8) downAt.moved = true;
   if (ptrs.size === 1){ const dx = cur.x - prev.x, dy = cur.y - prev.y;
-    if (prev.btn === 2 || e.shiftKey){ cam.theta += dx * .006; cam.phi = clamp(cam.phi - dy * .004, .3, 1.28); fly = null; } else panBy(dx, dy); }
+    if (walk.on){ cam.theta += dx * .008; cam.phi = clamp(cam.phi - dy * .004, .45, 1.25); }
+    else if (prev.btn === 2 || e.shiftKey){ cam.theta += dx * .006; cam.phi = clamp(cam.phi - dy * .004, .3, 1.28); fly = null; } else panBy(dx, dy); }
   else if (ptrs.size === 2){ const other = [...ptrs.entries()].find(([id]) => id !== e.pointerId)[1];
     const d0 = Math.hypot(prev.x - other.x, prev.y - other.y), d1 = Math.hypot(cur.x - other.x, cur.y - other.y);
     const a0 = Math.atan2(prev.y - other.y, prev.x - other.x), a1 = Math.atan2(cur.y - other.y, cur.x - other.x);
@@ -859,12 +870,12 @@ canvas.addEventListener('pointermove', e => {
     cam.phi = clamp(cam.phi - (cur.y - prev.y) * .002, .3, 1.28); fly = null; }
   ptrs.set(e.pointerId, cur);
 });
-const endPtr = e => { const was = ptrs.has(e.pointerId); ptrs.delete(e.pointerId); if (was && downAt && !downAt.moved && performance.now() - downAt.t < 500 && e.type === 'pointerup') onTap(e.clientX, e.clientY); downAt = null; };
+const endPtr = e => { const was = ptrs.has(e.pointerId); ptrs.delete(e.pointerId); if (was && downAt && !downAt.moved && performance.now() - downAt.t < 500 && e.type === 'pointerup' && !walk.on) onTap(e.clientX, e.clientY); downAt = null; };
 canvas.addEventListener('pointerup', endPtr); canvas.addEventListener('pointercancel', endPtr);
 canvas.addEventListener('wheel', e => { e.preventDefault(); cam.dist = clamp(cam.dist * Math.exp(e.deltaY * .0012), 22, 240); fly = null; }, { passive: false });
-const keys = {}; addEventListener('keydown', e => { if (e.target.closest('input,textarea')) return; keys[e.key.toLowerCase()] = true; if (e.key === 'Escape'){ if (document.body.classList.contains('photo')) photoOff(); else if (place) cancelPlace(); else closeSheet(); } });
+const keys = {}; addEventListener('keydown', e => { if (e.target.closest('input,textarea')) return; keys[e.key.toLowerCase()] = true; if (e.key === 'Escape'){ if (walk.on && !sheetKind) exitWalk(); else if (document.body.classList.contains('photo')) photoOff(); else if (place) cancelPlace(); else closeSheet(); } });
 addEventListener('keyup', e => { keys[e.key.toLowerCase()] = false; });
-function stepKeys(dt){ const s = 260 * dt; if (keys['w'] || keys['arrowup']) panBy(0, s); if (keys['s'] || keys['arrowdown']) panBy(0, -s); if (keys['a'] || keys['arrowleft']) panBy(s, 0); if (keys['d'] || keys['arrowright']) panBy(-s, 0);
+function stepKeys(dt){ if (walk.on){ if (keys['q']) cam.theta -= dt * 1.6; if (keys['e']) cam.theta += dt * 1.6; return; } const s = 260 * dt; if (keys['w'] || keys['arrowup']) panBy(0, s); if (keys['s'] || keys['arrowdown']) panBy(0, -s); if (keys['a'] || keys['arrowleft']) panBy(s, 0); if (keys['d'] || keys['arrowright']) panBy(-s, 0);
   if (keys['q']) cam.theta -= dt * 1.4; if (keys['e']) cam.theta += dt * 1.4; if (keys['=']||keys['+']) cam.dist = clamp(cam.dist * (1 - dt), 22, 240); if (keys['-']) cam.dist = clamp(cam.dist * (1 + dt), 22, 240); }
 const ray = new THREE.Raycaster(), ndc = new THREE.Vector2(), ground = new THREE.Plane(new THREE.Vector3(0, 1, 0), -.37), hit = new THREE.Vector3();
 function tileAt(x, y){ ndc.set(x / innerWidth * 2 - 1, -(y / innerHeight) * 2 + 1); ray.setFromCamera(ndc, camera); if (!ray.ray.intersectPlane(ground, hit)) return null; return [Math.round(hit.x / T + HALF), Math.round(hit.z / T + HALF)]; }
@@ -895,6 +906,60 @@ function placeLabels(){
     v.label.style.display = on ? '' : 'none'; if (on) v.label.style.transform = `translate(${(projV.x * .5 + .5) * w}px,${(-projV.y * .5 + .5) * h}px) translate(-50%,-100%)`; });
 }
 
+/* ---------- jalan-jalan dengan tokohmu ---------- */
+const WALKABLE = ['taman', 'lapangan', 'tugu', 'pasar', 'pkl', 'sawah'];
+const walk = { on: false, x: 0, z: 0, dir: 0, joy: { x: 0, y: 0 }, near: null, mesh: null, label: null, t: 0, saved: null };
+function avatarGeo(prof, color){ P = []; const pc = profColor(prof);
+  box(.42, 1.2, .42, -.26, 0, 0, '#2E3A40'); box(.42, 1.2, .42, .26, 0, 0, '#2E3A40'); box(1.25, 1.6, .78, 0, 1.15, 0, pc); box(.3, 1.25, .3, -.8, 1.4, 0, pc); box(.3, 1.25, .3, .8, 1.4, 0, pc);
+  sph(.56, 0, 3.25, 0, '#E3B28A'); sph(.6, 0, 3.42, -.06, '#2E2A28', .32); cyl(.64, .3, 0, 3.66, 0, color); box(.95, .1, .62, 0, 3.66, .42, color); box(.12, .12, .05, -.2, 3.3, .53, '#1D2B33'); box(.12, .12, .05, .2, 3.3, .53, '#1D2B33');
+  return merge(P, true); }
+function walkBlocked(x, z){
+  const i = Math.round(x / T + HALF), j = Math.round(z / T + HALF);
+  if (i < 0 || j < 0 || i >= N || j >= N) return true; if (!isLot(i, j)) return false; if (!openSet.has(districtOf(i, j))) return true;
+  const id = S.occ.get(j * N + i); if (!id) return false; const b = S.buildings.get(id); if (!b || b.stage !== 'jadi') return false;
+  return !WALKABLE.includes(b.type);
+}
+function startWalk(){
+  const me = S.me; const home = me.home_building_id && S.buildings.get(me.home_building_id);
+  if (home){ const [x, z] = centerOf(home); walk.x = x; walk.z = z + home.h * T / 2 + 1.8; if (walkBlocked(walk.x, walk.z)){ walk.x = wx(20); walk.z = wx(20); } } else { walk.x = wx(20); walk.z = wx(20); }
+  walk.mesh = new THREE.Mesh(avatarGeo(me.profession, me.color), VMAT); walk.mesh.castShadow = !LOW; scene.add(walk.mesh);
+  walk.label = document.createElement('div'); walk.label.className = 'lbl mine'; walk.label.innerHTML = `<span>${esc(me.name)}</span>`; $('#labels').appendChild(walk.label);
+  walk.saved = { ...cam }; walk.on = true; walk.near = null; cam.dist = 32; cam.phi = .78; fly = null;
+}
+function stopWalk(){ walk.on = false; if (walk.mesh){ scene.remove(walk.mesh); walk.mesh.geometry.dispose(); walk.mesh = null; } if (walk.label){ walk.label.remove(); walk.label = null; } cam.tx = walk.x; cam.tz = walk.z; cam.dist = 70; cam.phi = walk.saved?.phi ?? 1; }
+function stepWalk(dt){
+  let ix = walk.joy.x, iy = walk.joy.y;
+  if (keys['w'] || keys['arrowup']) iy -= 1; if (keys['s'] || keys['arrowdown']) iy += 1; if (keys['a'] || keys['arrowleft']) ix -= 1; if (keys['d'] || keys['arrowright']) ix += 1;
+  const m = Math.hypot(ix, iy); if (m > 1){ ix /= m; iy /= m; }
+  const fx = -Math.cos(cam.theta), fz = -Math.sin(cam.theta), rx = Math.sin(cam.theta), rz = -Math.cos(cam.theta);
+  const vx = (fx * -iy + rx * ix) * 11, vz = (fz * -iy + rz * ix) * 11, moving = Math.hypot(vx, vz) > .3;
+  if (moving){ const nx = walk.x + vx * dt, nz = walk.z + vz * dt; if (!walkBlocked(nx, walk.z)) walk.x = nx; if (!walkBlocked(walk.x, nz)) walk.z = nz; walk.dir = Math.atan2(vx, vz); walk.t += dt * 9; }
+  const L = LHALF - 1; walk.x = clamp(walk.x, -L, L); walk.z = clamp(walk.z, -L, L);
+  const bob = moving ? Math.abs(Math.sin(walk.t)) * .25 : 0;
+  walk.mesh.position.set(walk.x, .3 + bob, walk.z); walk.mesh.rotation.set(0, walk.dir, moving ? Math.sin(walk.t) * .06 : 0);
+  cam.tx += (walk.x - cam.tx) * Math.min(1, dt * 6); cam.tz += (walk.z - cam.tz) * Math.min(1, dt * 6);
+  // bangunan terdekat untuk tombol "Lihat"
+  let best = null, bd = 11; for (const b of S.buildings.values()){ const [x, z] = centerOf(b); const d = Math.hypot(x - walk.x, z - walk.z) - Math.max(b.w, b.h) * T * .35; if (d < bd){ bd = d; best = b; } }
+  if ((best?.id || null) !== walk.near){ walk.near = best?.id || null; const btn = $('#walkAct'); btn.hidden = !best; if (best){ btn.textContent = 'Lihat ' + (best.label || catOf(best.type).n); } $('#walkhint').textContent = best ? (best.label || catOf(best.type).n) + ' · ' + (best.owner_kind === 'negara' ? 'milik negara' : best.owner || 'warga') : 'Jalan-jalan di ' + DIST_NAME[districtOf(clamp(Math.round(walk.x / T + HALF), 1, N - 2), clamp(Math.round(walk.z / T + HALF), 1, N - 2))]; }
+  projV.set(walk.x, 5.4, walk.z).project(camera); walk.label.style.transform = `translate(${(projV.x * .5 + .5) * innerWidth}px,${(-projV.y * .5 + .5) * innerHeight}px) translate(-50%,-100%)`;
+}
+{ const joy = $('#joy'), knob = joy.querySelector('i'); let jid = null;
+  const set = e => { const r = joy.getBoundingClientRect(); let x = (e.clientX - r.left - r.width / 2) / (r.width / 2), y = (e.clientY - r.top - r.height / 2) / (r.height / 2); const m = Math.hypot(x, y); if (m > 1){ x /= m; y /= m; } walk.joy = { x, y }; knob.style.transform = `translate(${x * 38}px,${y * 38}px)`; };
+  joy.addEventListener('pointerdown', e => { jid = e.pointerId; try { joy.setPointerCapture(jid); } catch (_) {} set(e); });
+  joy.addEventListener('pointermove', e => { if (e.pointerId === jid) set(e); });
+  const end = () => { jid = null; walk.joy = { x: 0, y: 0 }; knob.style.transform = ''; }; joy.addEventListener('pointerup', end); joy.addEventListener('pointercancel', end); }
+
+/* ---------- mode hemat otomatis bila HP kewalahan ---------- */
+let perf = { n: 0, sum: 0, done: LOW, start: performance.now() + 4000 }, hematOn = LOW;
+function applyHemat(auto){
+  if (hematOn) return; hematOn = true;
+  renderer.setPixelRatio(1); renderer.shadowMap.enabled = false; sun.castShadow = false;
+  scene.traverse(o => { if (o.material){ (Array.isArray(o.material) ? o.material : [o.material]).forEach(m => m.needsUpdate = true); } });
+  walkerBody.count = walkerHead.count = Math.floor(WALKERS / 2); carMesh.count = Math.floor(CARS / 2);
+  resize(); if (auto){ store.set('nz_hemat', true); toast('Mode hemat dinyalakan otomatis supaya kota tetap lancar. Bisa diubah di menu Kota.'); }
+}
+function measurePerf(dt, t){ if (perf.done || document.hidden || t < perf.start) return; perf.n++; perf.sum += dt; if (perf.n >= 150){ perf.done = true; const fps = perf.n / perf.sum; if (fps < 26) applyHemat(true); } }
+
 /* ---------- loop ---------- */
 let last = performance.now(), acc1 = 0, acc5 = 0, frameSkip = 0;
 function frame(nowT){
@@ -903,6 +968,7 @@ function frame(nowT){
   if (LOW && (frameSkip ^= 1)) return;
   const dt = Math.min(.05, (nowT - last) / 1000); last = nowT;
   stepKeys(dt);
+  measurePerf(dt, nowT); if (walk.on) stepWalk(dt);
   if (fly){ cam.tx += (fly.x - cam.tx) * .1; cam.tz += (fly.z - cam.tz) * .1; cam.dist += (fly.dist - cam.dist) * .1; if (Math.abs(fly.x - cam.tx) + Math.abs(fly.z - cam.tz) + Math.abs(fly.dist - cam.dist) < .6) fly = null; }
   stepMovers(dt); stepSparks(dt); stepDonorClouds(dt);
   for (const j of cranes) j.rotation.y += dt * .25;
@@ -953,7 +1019,11 @@ async function loadSnapshot(){
     renderHud(); if (sheetKind) renderSheet(); return true;
   } catch (e) { if (!S.snap) enterPreview(e.message); return false; }
 }
-async function loadNpcs(){ try { S.npcs = await rpc('get_npcs') || []; initMovers(); } catch (_) {} }
+async function loadNpcs(){
+  const c = store.get('nz_npcs_v1', null);
+  if (c && c.url === CFG.url && Date.now() - c.at < 10 * 60000 && Array.isArray(c.list)){ S.npcs = c.list; initMovers(); return; }   // cache 10 menit di perangkat ini
+  try { S.npcs = await rpc('get_npcs') || []; initMovers(); store.set('nz_npcs_v1', { url: CFG.url, at: Date.now(), list: S.npcs }); } catch (_) {}
+}
 async function loadDistricts(keys){
   keys = [...new Set(keys)].filter(k => openSet.has(k)); if (!keys.length || S.preview) return;
   let list; try { list = await rpc('get_buildings', { p_districts: keys }); } catch (e) { return; }
@@ -1371,6 +1441,7 @@ const SHEETS = {
     h += `<div class="lab">Kabar kota</div><div class="list">${(s.news || []).slice(0, 12).map(n => `<div class="item"><div class="grow"><b style="white-space:normal;font-weight:800">${n.kind === 'kutipan' && n.actor ? esc(n.actor) + ': “' + esc(n.text) + '”' : esc(n.text)}</b>${n.at ? `<small>${fmtAgo(n.at)}</small>` : ''}</div></div>`).join('') || '<div class="empty">Belum ada kabar.</div>'}</div>`;
     const dtot = s.donation_total || 0;
     h += `<div class="lab">Donatur</div><div class="goal"><div class="spread" style="display:flex;justify-content:space-between"><b>${rupiah(dtot)} terkumpul</b><span class="note">${(s.donations || []).length} donatur terbaru</span></div>${s.donation_goal ? `<div class="meter gold"><i style="width:${Math.min(100, dtot / s.donation_goal * 100)}%"></i></div><span class="note">Target ${rupiah(s.donation_goal)}</span>` : ''}<button class="btn gold" data-act="open-donatur">Papan donatur</button></div>`;
+    h += `<div class="lab">Grafik</div><div class="row"><span class="note" style="flex:1">${hematOn ? 'Mode hemat: tanpa bayangan, resolusi rendah, pejalan kaki lebih sedikit. Cocok untuk HP lama.' : 'Grafik penuh: bayangan, sungai beriak, kota ramai.'}</span><button class="btn sm" data-act="hemat" data-v="${hematOn ? 0 : 1}">${hematOn ? 'Pakai grafik penuh' : 'Pakai mode hemat'}</button></div>`;
     h += `<div class="row"><button class="btn" data-act="open-warga" data-f="semua">Daftar warga</button><button class="btn" data-act="profil">${registered() ? 'Profil & ganti profesi' : 'Masuk / Daftar'}</button>${isAdmin() ? '<button class="btn dark" data-act="open-admin">Panel presiden</button>' : ''}</div>`;
     return ['Kota', h, 'Republik Netizenia', 'kota'];
   },
@@ -1501,6 +1572,7 @@ let chatSentAt = 0, chatSending = false, chatHint = '', chatHintT = null;
 function setChatHint(m, ms){ chatHint = m; const h = $('#chatHint'); if (h){ h.textContent = m; h.className = 'hint' + (m ? ' bad' : ''); } clearTimeout(chatHintT); if (m) chatHintT = setTimeout(() => { setChatHint(''); tickChatHint(); }, ms || 6000); }
 function tickChatHint(){ const h = $('#chatHint'); if (!h || chatHint) return; const w = 5000 - (Date.now() - chatSentAt); h.className = 'hint'; h.textContent = w > 0 ? 'Bisa kirim lagi dalam ' + Math.ceil(w / 1000) + ' detik.' : ''; if (w > 0) setTimeout(tickChatHint, 500); }
 async function loadQueue(){ if (!isAdmin()) return; try { const q = await rpc('admin_list_queue'); if (sheetKind === 'admin'){ sheetArg = { ...(sheetArg || {}), queue: q }; renderSheet(); } } catch (e) { toast(e.message, 'bad'); } }
+function exitWalk(){ if (!walk.on) return; stopWalk(); document.body.classList.remove('walking'); $('#walkui').hidden = true; renderHud(); }
 function photoOn(){ closeSheet(); if (place) cancelPlace(); photoHour = wibHours(); document.body.classList.add('photo'); $('#photobar').hidden = false; $('#phour').value = photoHour; $('#phourv').textContent = wibClock(); }
 function photoOff(){ photoHour = null; document.body.classList.remove('photo'); $('#photobar').hidden = true; applyTime(true); renderHud(); }
 function photoSave(){
@@ -1661,6 +1733,10 @@ document.addEventListener('click', async e => {
     case 'adm-saweria': await busy(() => act('pres_set_saweria', { p_url: $('#dsaw').value.trim() }, { refresh: false })); loadSnapshot(); break;
     case 'adm-tick': await busy(async () => { try { const r = await rpc('admin_run_tick'); r.at = wibClock() + ' WIB'; if (sheetKind === 'admin') sheetArg = { ...(sheetArg || {}), tick: r }; toast('Dihitung: ' + (r.usulan_ditutup || 0) + ' usulan ditutup, ' + (r.selesai_dibangun || 0) + ' bangunan selesai.', 'good'); } catch (err) { toast(err.message, 'bad'); } }); await loadSnapshot(); await loadDistricts([...S.loaded.keys()]); renderSheet(); break;
     case 'photo': photoOn(); break;
+    case 'walk': if (!S.session){ openModal('login'); break; } if (!registered()){ openModal('register'); break; } closeSheet(); if (place) cancelPlace(); startWalk(); document.body.classList.add('walking'); $('#walkui').hidden = false; break;
+    case 'walk-exit': exitWalk(); break;
+    case 'walk-look': if (walk.near){ const b = S.buildings.get(walk.near); if (b) openInfo(b.id); } break;
+    case 'hemat': store.set('nz_hemat', el.dataset.v === '1'); toast(el.dataset.v === '1' ? 'Mode hemat dinyalakan. Memuat ulang…' : 'Grafik penuh dinyalakan. Memuat ulang…'); setTimeout(() => location.reload(), 700); break;
     case 'photo-save': photoSave(); break;
     case 'photo-exit': photoOff(); break;
     case 'open-warga': openSheet('warga', { f: el.dataset.f || 'semua', q: '' }); break;
